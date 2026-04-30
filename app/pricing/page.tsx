@@ -83,7 +83,7 @@ export default function PricingPage() {
       <section className="section" style={{ textAlign: "center", paddingBottom: "3rem" }}>
         <div className="container-sm">
           <div className="badge badge-primary" style={{ marginBottom: "1rem", display: "inline-flex" }}>
-            💳 Pricing
+             Pricing
           </div>
           <h1 style={{ margin: "0 0 1rem", color: "var(--foreground)" }}>
             Simple, transparent pricing
@@ -105,7 +105,7 @@ export default function PricingPage() {
               color: "#fbbf24",
             }}
           >
-            🚧 Payments not yet implemented — this is a UI preview only
+             Payments not yet implemented — this is a UI preview only
           </div>
         </div>
       </section>
@@ -173,7 +173,7 @@ export default function PricingPage() {
                 <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                   {tier.features.map((f) => (
                     <li key={f} style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", fontSize: "0.875rem" }}>
-                      <span style={{ color: "var(--accent-light)", minWidth: "1rem" }}>✓</span>
+                      <span style={{ color: "var(--accent-light)", minWidth: "1rem" }}></span>
                       <span style={{ color: "var(--foreground)" }}>{f}</span>
                     </li>
                   ))}

@@ -193,7 +193,7 @@ export default function VocabularyPage() {
 
               {words.length === 0 ? (
                 <div className="card" style={{ textAlign: "center", padding: "3rem 1.5rem" }}>
-                  <p style={{ fontSize: "2.5rem", margin: "0 0 1rem" }}>📝</p>
+                  <p style={{ fontSize: "2.5rem", margin: "0 0 1rem" }}></p>
                   <h3 style={{ margin: "0 0 0.5rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>No words yet</h3>
                   <p style={{ margin: "0 0 1.5rem", fontSize: "0.9375rem" }}>Generate practice content and save words to build your list.</p>
                   <a href="/practice" className="btn-primary">Go to Practice →</a>
@@ -222,7 +222,7 @@ export default function VocabularyPage() {
                               <p style={{ margin: 0, fontWeight: 700, fontSize: "0.9375rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>
                                 Set {si + 1}
                               </p>
-                              {isComplete && <span className="badge badge-accent" style={{ fontSize: "0.625rem" }}>✓ Complete</span>}
+                              {isComplete && <span className="badge badge-accent" style={{ fontSize: "0.625rem" }}> Complete</span>}
                             </div>
                             <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>
                               {s.slice(0, 5).map(w => w.word).join(", ")}{s.length > 5 ? "…" : ""}
@@ -261,7 +261,7 @@ export default function VocabularyPage() {
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.125rem" }}>
                               <span style={{ fontWeight: 700, color: "var(--foreground)", fontSize: "0.9375rem" }}>{w.word}</span>
-                              {w.correctCount >= 3 && <span className="badge badge-accent" style={{ fontSize: "0.625rem" }}>✓</span>}
+                              {w.correctCount >= 3 && <span className="badge badge-accent" style={{ fontSize: "0.625rem" }}></span>}
                               {lang && getTranslation(w.word, lang) && (
                                 <span className="badge badge-coral" style={{ fontSize: "0.625rem" }}>{getTranslation(w.word, lang)}</span>
                               )}
@@ -271,7 +271,7 @@ export default function VocabularyPage() {
                           {w.totalAttempts > 0 && (
                             <span style={{ fontSize: "0.75rem", color: "var(--foreground-faint)", whiteSpace: "nowrap" }}>{w.correctCount}/{w.totalAttempts}</span>
                           )}
-                          <button onClick={() => { removeWord(w.word); refresh(); }} style={{ background: "none", border: "none", color: "var(--foreground-faint)", cursor: "pointer", fontSize: "0.875rem", padding: "0.25rem" }}>✕</button>
+                          <button onClick={() => { removeWord(w.word); refresh(); }} style={{ background: "none", border: "none", color: "var(--foreground-faint)", cursor: "pointer", fontSize: "0.875rem", padding: "0.25rem" }}></button>
                         </div>
                       ))}
                     </div>
@@ -287,7 +287,7 @@ export default function VocabularyPage() {
               <div style={{ marginBottom: "1.25rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.375rem" }}>
                   <span style={{ fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>Question {quiz.ci + 1}/{quiz.qs.length}</span>
-                  <span style={{ fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>{quiz.ans.filter((a, i) => a === quiz.qs[i].correctIndex).length} ✓</span>
+                  <span style={{ fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>{quiz.ans.filter((a, i) => a === quiz.qs[i].correctIndex).length} </span>
                 </div>
                 <div className="quiz-progress-bar">
                   <div className="quiz-progress-fill" style={{ width: `${((quiz.ci + (quiz.fb ? 1 : 0)) / quiz.qs.length) * 100}%` }} />
@@ -328,7 +328,7 @@ export default function VocabularyPage() {
                       borderRadius: "var(--radius-md)", padding: "0.875rem 1rem",
                     }}>
                       <p style={{ margin: "0 0 0.375rem", fontWeight: 700, fontSize: "0.875rem", color: quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "var(--mint-light)" : "var(--rose)" }}>
-                        {quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "✓ Correct! +10 XP" : "✗ Incorrect +2 XP"}
+                        {quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? " Correct! +10 XP" : " Incorrect +2 XP"}
                       </p>
                       <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--foreground-muted)" }}>
                         <strong style={{ color: "var(--foreground)" }}>{quiz.qs[quiz.ci].word}</strong>: {quiz.qs[quiz.ci].definition}
@@ -349,7 +349,7 @@ export default function VocabularyPage() {
             <div className="animate-scaleIn">
               <div className="card" style={{ textAlign: "center", padding: "2rem 1.5rem" }}>
                 <p style={{ fontSize: "3rem", margin: "0 0 0.75rem" }}>
-                  {getScore().correct === getScore().total ? "🏆" : getScore().correct >= getScore().total * 0.7 ? "🎉" : "💪"}
+                  {getScore().correct === getScore().total ? "" : getScore().correct >= getScore().total * 0.7 ? "" : ""}
                 </p>
                 <h2 style={{ margin: "0 0 0.25rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>
                   {getScore().correct === getScore().total ? "Perfect!" : "Quiz Complete"}
@@ -368,7 +368,7 @@ export default function VocabularyPage() {
                         background: ok ? "var(--mint-glow)" : "var(--rose-glow)",
                         border: `1px solid ${ok ? "rgba(0,201,167,0.2)" : "rgba(255,77,109,0.2)"}`,
                       }}>
-                        <span>{ok ? "✓" : "✗"}</span>
+                        <span>{ok ? "" : ""}</span>
                         <span style={{ fontWeight: 700, color: "var(--foreground)", fontSize: "0.9375rem" }}>{q.word}</span>
                         {q.nativeTranslation && <span className="badge badge-coral" style={{ fontSize: "0.625rem" }}>{q.nativeTranslation}</span>}
                       </div>

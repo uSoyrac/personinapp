@@ -67,7 +67,7 @@ export default function VocabularyCard({ vocabulary }: VocabularyCardProps) {
           className="btn-primary"
           style={{ fontSize: "0.8125rem", padding: "0.5rem 1rem", whiteSpace: "nowrap" }}
         >
-          💾 Save All to Word List
+           Save All to Word List
         </button>
       </div>
 
@@ -84,7 +84,7 @@ export default function VocabularyCard({ vocabulary }: VocabularyCardProps) {
             color: "var(--accent-light)",
           }}
         >
-          ✓ {saveMessage}
+           {saveMessage}
         </div>
       )}
 
@@ -207,7 +207,7 @@ export default function VocabularyCard({ vocabulary }: VocabularyCardProps) {
                     style={{ fontSize: "0.8125rem", padding: "0.4rem 0.875rem", alignSelf: "flex-start" }}
                     disabled={isSaved}
                   >
-                    {isSaved ? "✓ Saved" : "💾 Save to Word List"}
+                    {isSaved ? " Saved" : " Save to Word List"}
                   </button>
                 </div>
               )}
@@ -217,7 +217,7 @@ export default function VocabularyCard({ vocabulary }: VocabularyCardProps) {
       </div>
 
       <p style={{ fontSize: "0.8125rem", color: "var(--foreground-faint)", textAlign: "center" }}>
-        💡 Tip: Save words to your list, then practice them in the <a href="/vocabulary" style={{ color: "var(--primary-light)" }}>Vocabulary Quiz</a>!
+         Tip: Save words to your list, then practice them in the <a href="/vocabulary" style={{ color: "var(--primary-light)" }}>Vocabulary Quiz</a>!
       </p>
     </div>
   );

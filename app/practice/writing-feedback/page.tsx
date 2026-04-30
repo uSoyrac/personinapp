@@ -60,7 +60,7 @@ function WritingFeedbackContent() {
           {/* Header */}
           <div style={{ marginBottom: "2rem" }}>
             <div className="badge badge-primary" style={{ marginBottom: "0.75rem", display: "inline-flex" }}>
-              ✍️ Writing Feedback
+              ️ Writing Feedback
             </div>
             <h1 style={{ margin: "0 0 0.75rem", color: "var(--foreground)", fontSize: "clamp(1.75rem, 4vw, 2.25rem)" }}>
               Writing Practice & Feedback
@@ -75,7 +75,7 @@ function WritingFeedbackContent() {
             <div className="card-elevated" style={{ marginBottom: "1.75rem", borderLeft: "3px solid var(--primary)" }}>
               <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.75rem" }}>
                 <span style={{ fontSize: "0.8125rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--foreground-muted)" }}>
-                  📋 Your Writing Prompt
+                   Your Writing Prompt
                 </span>
                 <span className="badge badge-primary" style={{ fontSize: "0.7rem" }}>
                   {examType === "IELTS_ACADEMIC" ? "IELTS Task 2" : "TOEFL Independent"}
@@ -84,16 +84,16 @@ function WritingFeedbackContent() {
               <p style={{ margin: 0, fontSize: "1rem", lineHeight: 1.7, color: "var(--foreground)" }}>{prompt}</p>
               <div style={{ marginTop: "0.75rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                 {examType === "IELTS_ACADEMIC" ? (
-                  <><span className="badge badge-gray">📏 Min. 250 words</span><span className="badge badge-gray">⏱ 40 min recommended</span></>
+                  <><span className="badge badge-gray"> Min. 250 words</span><span className="badge badge-gray"> 40 min recommended</span></>
                 ) : (
-                  <><span className="badge badge-gray">📏 Min. 300 words</span><span className="badge badge-gray">⏱ 30 min recommended</span></>
+                  <><span className="badge badge-gray"> Min. 300 words</span><span className="badge badge-gray"> 30 min recommended</span></>
                 )}
               </div>
             </div>
           ) : (
             <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: "var(--radius-md)", padding: "1rem", marginBottom: "1.75rem" }}>
               <p style={{ margin: 0, fontSize: "0.9375rem", color: "#fbbf24" }}>
-                💡 No prompt passed. You can still paste your own prompt below or write freely. For a guided experience, generate practice from the{" "}
+                 No prompt passed. You can still paste your own prompt below or write freely. For a guided experience, generate practice from the{" "}
                 <a href="/practice" style={{ color: "var(--primary-light)", textDecoration: "underline" }}>Practice page</a>.
               </p>
             </div>
@@ -104,7 +104,7 @@ function WritingFeedbackContent() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.5rem" }}>
               <p className="label" style={{ margin: 0 }}>Your Response</p>
               <span style={{ fontSize: "0.8125rem", color: wordCount >= 250 ? "var(--accent-light)" : wordCount >= 50 ? "var(--foreground-muted)" : "var(--foreground-faint)" }}>
-                {wordCount} words {wordCount >= 250 && "✓"}
+                {wordCount} words {wordCount >= 250 && ""}
               </span>
             </div>
             <textarea
@@ -123,7 +123,7 @@ function WritingFeedbackContent() {
 
           {error && (
             <div style={{ background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.3)", borderRadius: "var(--radius-md)", padding: "0.875rem 1rem", marginBottom: "1rem" }}>
-              <p style={{ margin: 0, fontSize: "0.9375rem", color: "#fb7185" }}>⚠️ {error}</p>
+              <p style={{ margin: 0, fontSize: "0.9375rem", color: "#fb7185" }}>️ {error}</p>
             </div>
           )}
 
@@ -134,7 +134,7 @@ function WritingFeedbackContent() {
             disabled={loading}
             style={{ fontSize: "1.0625rem", padding: "1rem 2rem", width: "100%", justifyContent: "center", opacity: loading ? 0.7 : 1, cursor: loading ? "not-allowed" : "pointer" }}
           >
-            {loading ? "⚙️ Analysing your writing…" : "🔍 Analyse My Writing"}
+            {loading ? "️ Analysing your writing…" : " Analyse My Writing"}
           </button>
 
           <p style={{ textAlign: "center", fontSize: "0.8125rem", color: "var(--foreground-faint)", marginTop: "0.75rem" }}>
@@ -144,7 +144,7 @@ function WritingFeedbackContent() {
           {/* Loading state */}
           {loading && (
             <div style={{ marginTop: "2rem", padding: "2rem", textAlign: "center", background: "var(--surface)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border)" }}>
-              <div className="animate-spin-slow" style={{ fontSize: "2rem", display: "block", marginBottom: "1rem" }}>⚙️</div>
+              <div className="animate-spin-slow" style={{ fontSize: "2rem", display: "block", marginBottom: "1rem" }}>️</div>
               <p style={{ margin: "0 0 0.375rem", fontWeight: 700, color: "var(--foreground)" }}>Analysing your writing…</p>
               <p style={{ margin: 0, fontSize: "0.875rem" }}>Evaluating task response, coherence, vocabulary, and grammar</p>
             </div>

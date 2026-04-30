@@ -35,7 +35,7 @@ function LoadingSkeleton() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
-        <div className="animate-spin-slow" style={{ fontSize: "1.5rem" }}>⚙️</div>
+        <div className="animate-spin-slow" style={{ fontSize: "1.5rem" }}>️</div>
         <div>
           <p style={{ margin: 0, fontWeight: 700, color: "var(--foreground)" }}>Generating your practice content…</p>
           <p style={{ margin: 0, fontSize: "0.875rem" }}>This may take a few seconds</p>
@@ -218,7 +218,7 @@ export default function PracticePage() {
                   color: isOverLimit ? "#fb7185" : wordCount > 10 ? "var(--accent-light)" : "var(--foreground-faint)",
                   fontWeight: isOverLimit ? 700 : 400,
                 }}>
-                  {wordCount} / {limits.maxWords} words {wordCount >= 10 && !isOverLimit && "✓"} {isOverLimit && "⚠️"}
+                  {wordCount} / {limits.maxWords} words {wordCount >= 10 && !isOverLimit && ""} {isOverLimit && "️"}
                 </span>
               </div>
               <textarea
@@ -234,7 +234,7 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
               />
               <p style={{ marginTop: "0.375rem", fontSize: "0.8125rem", color: isOverLimit ? "#fb7185" : "var(--foreground-faint)" }}>
                 {isOverLimit
-                  ? `⚠️ Text exceeds ${limits.maxWords} word limit. ${tier === "free" ? "Upgrade to Premium for 2000 words." : "Please shorten your text."}`
+                  ? `️ Text exceeds ${limits.maxWords} word limit. ${tier === "free" ? "Upgrade to Premium for 2000 words." : "Please shorten your text."}`
                   : `Minimum 50 characters. Maximum ${limits.maxWords} words (${tier} plan).`}
               </p>
             </div>
@@ -318,7 +318,7 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
                   padding: "0.875rem 1rem",
                 }}
               >
-                <p style={{ margin: 0, fontSize: "0.9375rem", color: "#fb7185" }}>⚠️ {error}</p>
+                <p style={{ margin: 0, fontSize: "0.9375rem", color: "#fb7185" }}>️ {error}</p>
               </div>
             )}
 
@@ -341,7 +341,7 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
             </button>
 
             <p style={{ textAlign: "center", fontSize: "0.8125rem", color: "var(--foreground-faint)" }}>
-              🔒 No API key needed — all content is generated locally on our server.
+               No API key needed — all content is generated locally on our server.
             </p>
           </div>
 

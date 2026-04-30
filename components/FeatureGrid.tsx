@@ -1,14 +1,14 @@
 "use client";
 
 const WHAT_IT_CREATES = [
-  { icon: "📝", label: "Text Summary" },
-  { icon: "📖", label: "Reading Questions" },
-  { icon: "🔤", label: "Vocabulary List" },
-  { icon: "✍️", label: "Writing Prompt" },
-  { icon: "🎙️", label: "Speaking Prompt" },
-  { icon: "📅", label: "7-Day Study Plan" },
-  { icon: "🔍", label: "Answer Explanations" },
-  { icon: "📊", label: "Writing Feedback" },
+  { icon: "", label: "Text Summary" },
+  { icon: "", label: "Reading Questions" },
+  { icon: "", label: "Vocabulary List" },
+  { icon: "️", label: "Writing Prompt" },
+  { icon: "️", label: "Speaking Prompt" },
+  { icon: "", label: "7-Day Study Plan" },
+  { icon: "", label: "Answer Explanations" },
+  { icon: "", label: "Writing Feedback" },
 ];
 
 export default function FeatureGrid() {

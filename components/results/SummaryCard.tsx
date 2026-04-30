@@ -22,7 +22,7 @@ export default function SummaryCard({ result }: SummaryCardProps) {
               fontSize: "1.25rem",
             }}
           >
-            📝
+            
           </div>
           <div>
             <h3 style={{ margin: 0, fontSize: "1rem", fontFamily: "var(--font-sans)", fontWeight: 700, color: "var(--foreground)" }}>
@@ -71,11 +71,11 @@ export default function SummaryCard({ result }: SummaryCardProps) {
         }}
       >
         {[
-          { icon: "🎯", label: "Exam", value: result.examType === "IELTS_ACADEMIC" ? "IELTS Academic" : "TOEFL iBT" },
-          { icon: "🔍", label: "Skill Focus", value: result.skillFocus },
-          { icon: "📊", label: "Level", value: result.level },
+          { icon: "", label: "Exam", value: result.examType === "IELTS_ACADEMIC" ? "IELTS Academic" : "TOEFL iBT" },
+          { icon: "", label: "Skill Focus", value: result.skillFocus },
+          { icon: "", label: "Level", value: result.level },
           {
-            icon: "🤖",
+            icon: "",
             label: "Content",
             value: result.isUsingMockData ? "Demo mode" : "AI-generated",
           },
@@ -104,7 +104,7 @@ export default function SummaryCard({ result }: SummaryCardProps) {
             alignItems: "flex-start",
           }}
         >
-          <span>💡</span>
+          <span></span>
           <p style={{ margin: 0, fontSize: "0.875rem", color: "#fbbf24" }}>
             <strong>Demo mode:</strong> This is example content shown because no API key is configured. Add{" "}
             <code

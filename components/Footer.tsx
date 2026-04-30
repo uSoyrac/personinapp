@@ -34,7 +34,7 @@ export default function Footer() {
                   fontSize: "0.875rem",
                 }}
               >
-                ⚡
+                
               </div>
               <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.125rem" }}>
                 PracticeForge
@@ -87,7 +87,7 @@ export default function Footer() {
             © {new Date().getFullYear()} PracticeForge. For study purposes only.
           </p>
           <span className="badge badge-gray" style={{ fontSize: "0.7rem" }}>
-            🚧 MVP — Not for official exam use
+             MVP — Not for official exam use
           </span>
         </div>
       </div>

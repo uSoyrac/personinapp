@@ -76,7 +76,7 @@ export default function Nav() {
           aria-label="Toggle menu"
           id="mobile-menu-toggle"
         >
-          {mobileOpen ? "✕" : "☰"}
+          {mobileOpen ? "" : ""}
         </button>
       </div>
 

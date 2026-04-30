@@ -12,10 +12,10 @@ const ACTIVITY_COLORS: Record<string, string> = {
 };
 
 const ACTIVITY_ICONS: Record<string, string> = {
-  practice: "📚",
-  review: "🔍",
-  test: "⏱️",
-  rest: "😴",
+  practice: "",
+  review: "",
+  test: "️",
+  rest: "",
 };
 
 export default function StudyPlanCard({ studyPlan }: StudyPlanCardProps) {
@@ -29,7 +29,7 @@ export default function StudyPlanCard({ studyPlan }: StudyPlanCardProps) {
           <p style={{ margin: 0, fontSize: "0.875rem" }}>Personalised micro-plan for exam preparation</p>
         </div>
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <span className="badge badge-primary">⏱ {Math.round(totalMinutes / 60)}h total</span>
+          <span className="badge badge-primary"> {Math.round(totalMinutes / 60)}h total</span>
           <span className="badge badge-accent">7 days</span>
         </div>
       </div>
@@ -89,7 +89,7 @@ export default function StudyPlanCard({ studyPlan }: StudyPlanCardProps) {
       </div>
 
       <p style={{ fontSize: "0.8125rem", color: "var(--foreground-faint)", textAlign: "center", fontStyle: "italic" }}>
-        📅 Adjust daily timing to fit your schedule. Consistency matters more than duration.
+         Adjust daily timing to fit your schedule. Consistency matters more than duration.
       </p>
     </div>
   );

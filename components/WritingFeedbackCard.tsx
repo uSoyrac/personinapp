@@ -6,13 +6,13 @@ interface WritingFeedbackCardProps {
 }
 
 const DIMENSION_ICONS: Record<string, string> = {
-  "Task Response": "🎯",
-  "Coherence & Cohesion": "🔗",
-  "Lexical Resource": "📚",
-  "Grammatical Range & Accuracy": "⚙️",
-  "Task Development": "🎯",
-  Organization: "🔗",
-  "Language Use": "📚",
+  "Task Response": "",
+  "Coherence & Cohesion": "",
+  "Lexical Resource": "",
+  "Grammatical Range & Accuracy": "️",
+  "Task Development": "",
+  Organization: "",
+  "Language Use": "",
 };
 
 function DimensionBlock({
@@ -32,13 +32,13 @@ function DimensionBlock({
       style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}
     >
       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-        <span style={{ fontSize: "1.25rem" }}>{DIMENSION_ICONS[label] ?? "📌"}</span>
+        <span style={{ fontSize: "1.25rem" }}>{DIMENSION_ICONS[label] ?? ""}</span>
         <h4 style={{ margin: 0, fontSize: "0.9375rem", fontWeight: 700, color: "var(--foreground)", fontFamily: "var(--font-sans)" }}>{label}</h4>
       </div>
       <p style={{ margin: 0, fontSize: "0.9375rem", lineHeight: 1.6 }}>{feedback}</p>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
         <div>
-          <p style={{ margin: "0 0 0.375rem", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--accent-light)" }}>✓ Strengths</p>
+          <p style={{ margin: "0 0 0.375rem", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--accent-light)" }}> Strengths</p>
           <ul style={{ margin: 0, paddingLeft: "1rem", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
             {strengths.map((s, i) => <li key={i} style={{ fontSize: "0.875rem", color: "var(--foreground-muted)" }}>{s}</li>)}
           </ul>
@@ -79,7 +79,7 @@ export default function WritingFeedbackCard({ feedback, examType }: WritingFeedb
           </h3>
           <p style={{ margin: "0 0 0.5rem", fontSize: "0.9375rem", lineHeight: 1.6 }}>{feedback.overallFeedback}</p>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-            <span className="badge badge-gray">📝 {feedback.wordCount} words</span>
+            <span className="badge badge-gray"> {feedback.wordCount} words</span>
             {feedback.isUsingMockData && <span className="badge badge-amber">Demo mode</span>}
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function WritingFeedbackCard({ feedback, examType }: WritingFeedb
       {/* Improved version */}
       <div className="card-elevated">
         <h3 style={{ margin: "0 0 1rem", fontSize: "0.9375rem", fontFamily: "var(--font-sans)", fontWeight: 700, color: "var(--foreground)" }}>
-          ✨ AI-Improved Version
+           AI-Improved Version
         </h3>
         <p style={{ margin: "0 0 0.75rem", fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>
           Study this rewritten version to see how your ideas can be expressed at a higher level.
@@ -127,7 +127,7 @@ export default function WritingFeedbackCard({ feedback, examType }: WritingFeedb
       {/* Next exercises */}
       <div>
         <h3 style={{ margin: "0 0 1rem", fontSize: "0.9375rem", fontFamily: "var(--font-sans)", fontWeight: 700, color: "var(--foreground)" }}>
-          🎯 3 Concrete Next Steps
+           3 Concrete Next Steps
         </h3>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
           {feedback.nextExercises.map((ex, i) => (

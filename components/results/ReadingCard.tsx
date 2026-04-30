@@ -66,7 +66,7 @@ export default function ReadingCard({ questions, examType }: ReadingCardProps) {
         </div>
         {answered > 0 && (
           <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <span className="badge badge-accent">{correctCount} ✓</span>
+            <span className="badge badge-accent">{correctCount} </span>
             <span className="badge badge-gray">{answered}/{questions.length}</span>
           </div>
         )}
@@ -90,7 +90,7 @@ export default function ReadingCard({ questions, examType }: ReadingCardProps) {
                 fontSize: "0.875rem", fontWeight: 800,
                 color: "#000",
               }}>
-                {isAnswered ? (isCorrect ? "✓" : "✗") : i + 1}
+                {isAnswered ? (isCorrect ? "" : "") : i + 1}
               </span>
               <p style={{ margin: 0, color: "var(--foreground)", fontSize: "0.9375rem", lineHeight: 1.5 }}>
                 {q.question}
@@ -129,7 +129,7 @@ export default function ReadingCard({ questions, examType }: ReadingCardProps) {
                   <p style={{ margin: "0 0 0.25rem", fontSize: "0.875rem", fontWeight: 800,
                     color: "#000",
                     textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                    {isCorrect ? "✓ Correct! +10 XP" : "✗ Incorrect +2 XP"}
+                    {isCorrect ? " Correct! +10 XP" : " Incorrect +2 XP"}
                   </p>
                   <p style={{ margin: 0, fontSize: "0.9375rem", lineHeight: 1.6, color: "#000", fontWeight: 600 }}>
                     {q.explanation}
@@ -150,7 +150,7 @@ export default function ReadingCard({ questions, examType }: ReadingCardProps) {
           textAlign: "center",
         }}>
           <p style={{ margin: 0, fontSize: "2rem" }}>
-            {correctCount === questions.length ? "🏆" : correctCount >= questions.length * 0.7 ? "🎉" : "💪"}
+            {correctCount === questions.length ? "" : correctCount >= questions.length * 0.7 ? "" : ""}
           </p>
           <p style={{ margin: "0.5rem 0 0", fontSize: "1.25rem", fontWeight: 700, color: "var(--foreground)" }}>
             {correctCount} / {questions.length} correct

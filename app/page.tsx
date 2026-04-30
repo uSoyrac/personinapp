@@ -9,18 +9,18 @@ export const metadata: Metadata = {
 };
 
 const HOW_IT_WORKS = [
-  { step: "01", icon: "📋", title: "Paste your text", desc: "Paste any academic article, lesson notes, podcast transcript, or study material." },
-  { step: "02", icon: "⚙️", title: "Choose your profile", desc: "Select IELTS or TOEFL, your skill focus, current level, and target score." },
-  { step: "03", icon: "✨", title: "Get practice content", desc: "Receive reading questions, vocabulary, writing & speaking prompts, and a study plan — instantly." },
+  { step: "01", icon: "", title: "Paste your text", desc: "Paste any academic article, lesson notes, podcast transcript, or study material." },
+  { step: "02", icon: "️", title: "Choose your profile", desc: "Select IELTS or TOEFL, your skill focus, current level, and target score." },
+  { step: "03", icon: "", title: "Get practice content", desc: "Receive reading questions, vocabulary, writing & speaking prompts, and a study plan — instantly." },
 ];
 
 
 
 const WHO_ITS_FOR = [
-  { icon: "🎓", title: "University applicants", desc: "Preparing IELTS Academic for postgraduate admissions in the UK, Australia, or Canada." },
-  { icon: "💼", title: "Working professionals", desc: "Targeting TOEFL iBT for US university programs or visa requirements while managing a busy schedule." },
-  { icon: "🌍", title: "Self-study learners", desc: "B1–C1 students who want structured, personalised practice without expensive tutoring." },
-  { icon: "📚", title: "Content-first studiers", desc: "Students who already read academic content and want to turn it into productive exam practice." },
+  { icon: "", title: "University applicants", desc: "Preparing IELTS Academic for postgraduate admissions in the UK, Australia, or Canada." },
+  { icon: "", title: "Working professionals", desc: "Targeting TOEFL iBT for US university programs or visa requirements while managing a busy schedule." },
+  { icon: "", title: "Self-study learners", desc: "B1–C1 students who want structured, personalised practice without expensive tutoring." },
+  { icon: "", title: "Content-first studiers", desc: "Students who already read academic content and want to turn it into productive exam practice." },
 ];
 
 const SAMPLE_TEXT = `Urbanisation has profoundly transformed ecosystems across the globe. As cities expand, natural habitats are increasingly fragmented, reducing biodiversity and disrupting ecological corridors that wildlife depends on for migration and genetic exchange. However, a growing body of research suggests that thoughtfully designed urban environments — incorporating green roofs, tree-lined streets, and wetland restoration — can serve as meaningful refuges for urban-adapted species...`;
@@ -54,7 +54,7 @@ export default function LandingPage() {
 
         <div className="container-sm" style={{ position: "relative" }}>
           <div className="badge badge-primary" style={{ marginBottom: "1.5rem", display: "inline-flex" }}>
-            ⚡ AI-Powered Exam Practice
+             AI-Powered Exam Practice
           </div>
 
           <h1 style={{ marginBottom: "1.25rem", color: "var(--foreground)" }}>
@@ -195,7 +195,7 @@ export default function LandingPage() {
                   alignItems: "center",
                 }}
               >
-                <span style={{ fontSize: "1.5rem" }}>✨</span>
+                <span style={{ fontSize: "1.5rem" }}></span>
                 <div>
                   <p style={{ margin: "0 0 0.125rem", fontWeight: 700, color: "var(--foreground)", fontSize: "0.9375rem" }}>
                     Practice content generated!
@@ -357,7 +357,7 @@ export default function LandingPage() {
             }}
           >
             <h3 style={{ margin: "0 0 0.75rem", fontSize: "0.875rem", fontFamily: "var(--font-sans)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--foreground-muted)" }}>
-              ℹ️ Important Disclaimer
+              ️ Important Disclaimer
             </h3>
             <p style={{ margin: 0, fontSize: "0.875rem", lineHeight: 1.7 }}>
               PracticeForge is an independent AI study tool. It is <strong style={{ color: "var(--foreground)" }}>not affiliated with, endorsed by, or associated with</strong> IELTS (administered by IDP Education, British Council, and Cambridge Assessment English), TOEFL iBT (administered by ETS — Educational Testing Service), or any other official examination organisation. All practice content is AI-generated for self-study purposes only. Estimated practice scores are not official scores and must not be used for visa, university, or professional applications.

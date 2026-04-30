@@ -127,10 +127,10 @@ export default function WritingCard({ result }: WritingCardProps) {
 
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           <span className={`badge ${wordCount >= minWords ? "badge-accent" : "badge-gray"}`}>
-            {wordCount} / {minWords} words {wordCount >= minWords ? "✓" : ""}
+            {wordCount} / {minWords} words {wordCount >= minWords ? "" : ""}
           </span>
           <span className="badge badge-gray">
-            ⏱ {result.examType === "IELTS_ACADEMIC" ? "40 min" : "30 min"} recommended
+             {result.examType === "IELTS_ACADEMIC" ? "40 min" : "30 min"} recommended
           </span>
         </div>
 
@@ -206,7 +206,7 @@ export default function WritingCard({ result }: WritingCardProps) {
               {d.strengths.length > 0 && (
                 <div style={{ marginBottom: "0.5rem" }}>
                   {d.strengths.map((s, i) => (
-                    <p key={i} style={{ margin: "0.125rem 0", fontSize: "0.8125rem", color: "var(--mint-light)" }}>✓ {s}</p>
+                    <p key={i} style={{ margin: "0.125rem 0", fontSize: "0.8125rem", color: "var(--mint-light)" }}> {s}</p>
                   ))}
                 </div>
               )}

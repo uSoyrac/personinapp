@@ -77,7 +77,7 @@ export default function XPBar() {
           fontWeight: 900,
           boxShadow: "2px 2px 0px #1a1a1a",
         }}>
-          {state.streak}🔥
+          {state.streak}
         </div>
       )}
     </div>
