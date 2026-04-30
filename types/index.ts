@@ -148,6 +148,23 @@ export interface WritingFeedbackSession {
 }
 
 // ==============================
+// User Tier
+// ==============================
+
+export type UserTier = "free" | "premium";
+
+// ==============================
+// Vocabulary Quiz
+// ==============================
+
+export interface VocabQuizQuestion {
+  word: string;
+  correctDefinition: string;
+  options: string[];
+  correctIndex: number;
+}
+
+// ==============================
 // UI State
 // ==============================
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { VocabularyItem } from "@/types";
+import { saveWords } from "@/lib/wordList";
 
 interface VocabularyCardProps {
   vocabulary: VocabularyItem[];
@@ -15,17 +16,77 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 
 export default function VocabularyCard({ vocabulary }: VocabularyCardProps) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [savedWords, setSavedWords] = useState<Set<string>>(new Set());
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+
+  function handleSaveWord(item: VocabularyItem) {
+    const count = saveWords([{
+      word: item.word,
+      definition: item.definition,
+      contextSentence: item.exampleSentence,
+      partOfSpeech: item.partOfSpeech,
+      difficulty: item.difficulty,
+    }]);
+    setSavedWords(prev => new Set([...prev, item.word]));
+    if (count > 0) {
+      setSaveMessage(`"${item.word}" saved to your word list!`);
+    } else {
+      setSaveMessage(`"${item.word}" is already in your word list.`);
+    }
+    setTimeout(() => setSaveMessage(null), 2000);
+  }
+
+  function handleSaveAll() {
+    const words = vocabulary.map(v => ({
+      word: v.word,
+      definition: v.definition,
+      contextSentence: v.exampleSentence,
+      partOfSpeech: v.partOfSpeech,
+      difficulty: v.difficulty,
+    }));
+    const count = saveWords(words);
+    setSavedWords(new Set(vocabulary.map(v => v.word)));
+    setSaveMessage(`${count} new word(s) saved to your word list!`);
+    setTimeout(() => setSaveMessage(null), 3000);
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-      <div>
-        <h3 style={{ margin: "0 0 0.25rem", fontSize: "1rem", fontFamily: "var(--font-sans)", fontWeight: 700, color: "var(--foreground)" }}>
-          Academic Vocabulary
-        </h3>
-        <p style={{ margin: 0, fontSize: "0.875rem" }}>
-          {vocabulary.length} high-value words for exam success. Click any word to see full details.
-        </p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "0.75rem" }}>
+        <div>
+          <h3 style={{ margin: "0 0 0.25rem", fontSize: "1rem", fontFamily: "var(--font-sans)", fontWeight: 700, color: "var(--foreground)" }}>
+            Academic Vocabulary
+          </h3>
+          <p style={{ margin: 0, fontSize: "0.875rem" }}>
+            {vocabulary.length} high-value words for exam success. Click any word to see full details.
+          </p>
+        </div>
+        <button
+          onClick={handleSaveAll}
+          id="save-all-vocab"
+          className="btn-primary"
+          style={{ fontSize: "0.8125rem", padding: "0.5rem 1rem", whiteSpace: "nowrap" }}
+        >
+          💾 Save All to Word List
+        </button>
       </div>
+
+      {/* Save message */}
+      {saveMessage && (
+        <div
+          className="animate-fadeInFast"
+          style={{
+            background: "rgba(16,185,129,0.1)",
+            border: "1px solid rgba(16,185,129,0.3)",
+            borderRadius: "var(--radius-md)",
+            padding: "0.625rem 1rem",
+            fontSize: "0.875rem",
+            color: "var(--accent-light)",
+          }}
+        >
+          ✓ {saveMessage}
+        </div>
+      )}
 
       <div
         style={{
@@ -36,17 +97,20 @@ export default function VocabularyCard({ vocabulary }: VocabularyCardProps) {
       >
         {vocabulary.map((item) => {
           const isOpen = expanded === item.word;
+          const isSaved = savedWords.has(item.word);
 
           return (
             <div
               key={item.word}
               className="vocab-card"
-              onClick={() => setExpanded(isOpen ? null : item.word)}
               id={`vocab-${item.word.replace(/\s+/g, "-")}`}
               style={{ cursor: "pointer" }}
             >
               {/* Word header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
+              <div
+                onClick={() => setExpanded(isOpen ? null : item.word)}
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}
+              >
                 <div>
                   <p style={{ margin: "0 0 0.125rem", fontSize: "1rem", fontWeight: 700, color: "var(--foreground)" }}>
                     {item.word}
@@ -67,6 +131,7 @@ export default function VocabularyCard({ vocabulary }: VocabularyCardProps) {
 
               {/* Short definition */}
               <p
+                onClick={() => setExpanded(isOpen ? null : item.word)}
                 style={{
                   margin: 0,
                   fontSize: "0.875rem",
@@ -134,6 +199,16 @@ export default function VocabularyCard({ vocabulary }: VocabularyCardProps) {
                       </div>
                     </div>
                   )}
+
+                  {/* Save button */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleSaveWord(item); }}
+                    className={isSaved ? "btn-secondary" : "btn-primary"}
+                    style={{ fontSize: "0.8125rem", padding: "0.4rem 0.875rem", alignSelf: "flex-start" }}
+                    disabled={isSaved}
+                  >
+                    {isSaved ? "✓ Saved" : "💾 Save to Word List"}
+                  </button>
                 </div>
               )}
             </div>
@@ -142,7 +217,7 @@ export default function VocabularyCard({ vocabulary }: VocabularyCardProps) {
       </div>
 
       <p style={{ fontSize: "0.8125rem", color: "var(--foreground-faint)", textAlign: "center" }}>
-        💡 Tip: Create flashcards from these words, focusing on collocations for higher band scores.
+        💡 Tip: Save words to your list, then practice them in the <a href="/vocabulary" style={{ color: "var(--primary-light)" }}>Vocabulary Quiz</a>!
       </p>
     </div>
   );

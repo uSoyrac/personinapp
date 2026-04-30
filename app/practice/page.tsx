@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type {
   ExamType,
   SkillFocus,
   EnglishLevel,
   PracticeGenerationResult,
   GenerationStatus,
+  UserTier,
 } from "@/types";
 import ResultTabs from "@/components/ResultTabs";
+import { TIER_LIMITS } from "@/lib/quiz-engine";
 
 const EXAM_OPTIONS: { id: ExamType; label: string; desc: string; icon: string }[] = [
   { id: "IELTS_ACADEMIC", label: "IELTS Academic", desc: "For university admission in UK, Australia & more", icon: "🇬🇧" },
@@ -61,12 +63,32 @@ export default function PracticePage() {
   const [status, setStatus] = useState<GenerationStatus>("idle");
   const [result, setResult] = useState<PracticeGenerationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [tier, setTier] = useState<UserTier>("free");
+
+  // Load tier from localStorage
+  useEffect(() => {
+    const savedTier = localStorage.getItem("practiceforge_tier");
+    if (savedTier === "premium") setTier("premium");
+  }, []);
+
+  function toggleTier() {
+    const newTier = tier === "free" ? "premium" : "free";
+    setTier(newTier);
+    localStorage.setItem("practiceforge_tier", newTier);
+  }
 
   const wordCount = inputText.trim().split(/\s+/).filter(Boolean).length;
+  const limits = TIER_LIMITS[tier];
+  const isOverLimit = wordCount > limits.maxWords;
 
   async function handleGenerate() {
     if (inputText.trim().length < 50) {
       setError("Please paste at least 50 characters of text to generate practice content.");
+      return;
+    }
+
+    if (isOverLimit) {
+      setError(`Word limit exceeded. ${tier === "free" ? "Free" : "Premium"} plan allows up to ${limits.maxWords} words. You have ${wordCount} words.`);
       return;
     }
 
@@ -78,7 +100,7 @@ export default function PracticePage() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ examType, skillFocus, inputText, level, targetScore, examDate, weakArea }),
+        body: JSON.stringify({ examType, skillFocus, inputText, level, targetScore, examDate, weakArea, tier }),
       });
 
       if (!res.ok) {
@@ -90,7 +112,6 @@ export default function PracticePage() {
       setResult(data);
       setStatus("success");
 
-      // Scroll to results
       setTimeout(() => {
         document.getElementById("results-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
@@ -113,8 +134,30 @@ export default function PracticePage() {
               Generate Your Practice
             </h1>
             <p style={{ margin: 0, fontSize: "1.0625rem" }}>
-              Paste any academic text below and configure your session. Content is generated in seconds.
+              Paste any academic text below and configure your session. Content is generated instantly — no API needed.
             </p>
+          </div>
+
+          {/* Tier toggle */}
+          <div className="card" style={{ marginBottom: "1.75rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+            <div>
+              <p style={{ margin: "0 0 0.25rem", fontWeight: 700, color: "var(--foreground)", fontSize: "0.9375rem" }}>
+                {tier === "premium" ? "⭐ Premium Plan" : "🆓 Free Plan"}
+              </p>
+              <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>
+                {tier === "free"
+                  ? `Up to ${limits.maxWords} words · ${limits.questionCount} questions · ${limits.vocabCount} vocabulary items`
+                  : `Up to ${limits.maxWords} words · ${limits.questionCount}+ questions · ${limits.vocabCount}+ vocabulary · Study plan · Writing prompts`}
+              </p>
+            </div>
+            <button
+              onClick={toggleTier}
+              id="tier-toggle"
+              className={tier === "premium" ? "btn-secondary" : "btn-primary"}
+              style={{ fontSize: "0.875rem", padding: "0.5rem 1.25rem", whiteSpace: "nowrap" }}
+            >
+              {tier === "premium" ? "Switch to Free" : "✨ Upgrade to Premium"}
+            </button>
           </div>
 
           {/* ===== FORM ===== */}
@@ -171,23 +214,29 @@ export default function PracticePage() {
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <p className="label">3. Paste Your Text</p>
-                <span style={{ fontSize: "0.8125rem", color: wordCount > 50 ? "var(--accent-light)" : "var(--foreground-faint)" }}>
-                  {wordCount} words {wordCount >= 50 && "✓"}
+                <span style={{
+                  fontSize: "0.8125rem",
+                  color: isOverLimit ? "#fb7185" : wordCount > 10 ? "var(--accent-light)" : "var(--foreground-faint)",
+                  fontWeight: isOverLimit ? 700 : 400,
+                }}>
+                  {wordCount} / {limits.maxWords} words {wordCount >= 10 && !isOverLimit && "✓"} {isOverLimit && "⚠️"}
                 </span>
               </div>
               <textarea
                 id="input-text"
                 className="input-base"
                 rows={10}
-                placeholder="Paste any academic article, lesson notes, textbook excerpt, podcast transcript, or study material here…
+                placeholder="Paste any academic article, lesson notes, podcast transcript, or study material here…
 
 Example: 'Urbanisation has profoundly transformed ecosystems across the globe. As cities expand, natural habitats are increasingly fragmented, reducing biodiversity...'"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 style={{ resize: "vertical", lineHeight: 1.7 }}
               />
-              <p style={{ marginTop: "0.375rem", fontSize: "0.8125rem", color: "var(--foreground-faint)" }}>
-                Minimum 50 characters. Recommended: 200–800 words for best results.
+              <p style={{ marginTop: "0.375rem", fontSize: "0.8125rem", color: isOverLimit ? "#fb7185" : "var(--foreground-faint)" }}>
+                {isOverLimit
+                  ? `⚠️ Text exceeds ${limits.maxWords} word limit. ${tier === "free" ? "Upgrade to Premium for 2000 words." : "Please shorten your text."}`
+                  : `Minimum 50 characters. Maximum ${limits.maxWords} words (${tier} plan).`}
               </p>
             </div>
 
@@ -279,21 +328,21 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
               id="generate-btn"
               className="btn-primary"
               onClick={handleGenerate}
-              disabled={status === "loading"}
+              disabled={status === "loading" || isOverLimit}
               style={{
                 fontSize: "1.0625rem",
                 padding: "1rem 2rem",
                 width: "100%",
                 justifyContent: "center",
-                opacity: status === "loading" ? 0.7 : 1,
-                cursor: status === "loading" ? "not-allowed" : "pointer",
+                opacity: status === "loading" || isOverLimit ? 0.7 : 1,
+                cursor: status === "loading" || isOverLimit ? "not-allowed" : "pointer",
               }}
             >
               {status === "loading" ? "⚙️ Generating…" : "✨ Generate Practice Content"}
             </button>
 
             <p style={{ textAlign: "center", fontSize: "0.8125rem", color: "var(--foreground-faint)" }}>
-              No API key? No problem — demo content will be shown automatically.
+              🔒 No API key needed — all content is generated locally on our server.
             </p>
           </div>
 
@@ -311,9 +360,9 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
                 <h2 style={{ margin: "0 0 0.25rem", color: "var(--foreground)", fontSize: "1.5rem" }}>
                   Your Practice Session
                 </h2>
-                {result?.isUsingMockData && (
-                  <span className="badge badge-amber">Demo mode — connect OpenAI for real generation</span>
-                )}
+                <span className={`badge ${tier === "premium" ? "badge-primary" : "badge-accent"}`}>
+                  {tier === "premium" ? "⭐ Premium" : "🆓 Free"} · {result?.readingQuestions?.length ?? "..."} questions
+                </span>
               </div>
 
               {status === "loading" && <LoadingSkeleton />}

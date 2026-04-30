@@ -2,93 +2,73 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import XPBar from "@/components/XPBar";
 
 const NAV_LINKS = [
-  { href: "/practice", label: "Practice" },
-  { href: "/pricing", label: "Pricing" },
+  { href: "/practice", label: "Practice", icon: "⚡" },
+  { href: "/vocabulary", label: "My Words", icon: "📚" },
+  { href: "/pricing", label: "Pricing", icon: "💎" },
 ];
 
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        background: "rgba(15, 23, 42, 0.85)",
-        backdropFilter: "blur(12px)",
-        borderBottom: "1px solid var(--border)",
-      }}
-    >
-      <div
-        className="container"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0.875rem 1rem",
-        }}
-      >
+    <nav style={{
+      position: "sticky", top: 0, zIndex: 100,
+      background: "rgba(10, 14, 26, 0.88)",
+      backdropFilter: "blur(16px)",
+      borderBottom: "1px solid var(--border)",
+    }}>
+      <div className="container" style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0.75rem 1rem",
+      }}>
         {/* Logo */}
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <div
-            style={{
-              width: "2rem",
-              height: "2rem",
-              borderRadius: "0.5rem",
-              background: "linear-gradient(135deg, var(--primary), var(--accent))",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1rem",
-            }}
-          >
+          <div style={{
+            width: "2rem", height: "2rem", borderRadius: "0.5rem",
+            background: "linear-gradient(135deg, var(--coral), var(--lavender))",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem",
+          }}>
             ⚡
           </div>
-          <span
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "1.25rem",
-              fontWeight: 700,
-              color: "var(--foreground)",
-            }}
-          >
+          <span style={{
+            fontFamily: "var(--font-display)", fontSize: "1.25rem", fontWeight: 700,
+            color: "var(--foreground)",
+          }}>
             PracticeForge
           </span>
         </Link>
 
-        {/* Desktop links */}
-        <div className="hide-mobile" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          {NAV_LINKS.map((link) => (
+        {/* Desktop */}
+        <div className="hide-mobile" style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+          {NAV_LINKS.map(link => (
             <Link
               key={link.href}
               href={link.href}
               style={{
-                padding: "0.5rem 1rem",
-                borderRadius: "var(--radius-md)",
-                fontSize: "0.9375rem",
-                fontWeight: 500,
-                color: "var(--foreground-muted)",
-                transition: "color 0.2s",
+                padding: "0.5rem 0.875rem", borderRadius: "var(--radius-md)",
+                fontSize: "0.875rem", fontWeight: 500, color: "var(--foreground-muted)",
+                transition: "color 0.2s, background 0.2s", display: "flex", alignItems: "center", gap: "0.375rem",
               }}
-              onMouseEnter={(e) =>
-                ((e.target as HTMLElement).style.color = "var(--foreground)")
-              }
-              onMouseLeave={(e) =>
-                ((e.target as HTMLElement).style.color = "var(--foreground-muted)")
-              }
+              onMouseEnter={e => { (e.target as HTMLElement).style.color = "var(--foreground)"; (e.target as HTMLElement).style.background = "var(--surface)"; }}
+              onMouseLeave={e => { (e.target as HTMLElement).style.color = "var(--foreground-muted)"; (e.target as HTMLElement).style.background = "transparent"; }}
             >
-              {link.label}
+              {link.icon} {link.label}
             </Link>
           ))}
-          <Link href="/practice" className="btn-primary" style={{ marginLeft: "0.5rem" }}>
-            Generate Practice →
+
+          <div style={{ width: "1px", height: "1.25rem", background: "var(--border)", margin: "0 0.25rem" }} />
+
+          <XPBar />
+
+          <Link href="/practice" className="btn-primary" style={{ marginLeft: "0.5rem", fontSize: "0.8125rem", padding: "0.5rem 1rem" }}>
+            Generate →
           </Link>
         </div>
 
-        {/* Mobile menu button */}
+        {/* Mobile toggle */}
         <button
           className="btn-secondary"
           style={{ padding: "0.5rem 0.75rem", display: "none" }}
@@ -102,35 +82,22 @@ export default function Nav() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div
-          style={{
-            borderTop: "1px solid var(--border)",
-            padding: "1rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.5rem",
-          }}
-        >
-          {NAV_LINKS.map((link) => (
+        <div style={{
+          borderTop: "1px solid var(--border)", padding: "1rem",
+          display: "flex", flexDirection: "column", gap: "0.5rem",
+        }}>
+          {NAV_LINKS.map(link => (
             <Link
               key={link.href}
               href={link.href}
-              style={{
-                padding: "0.75rem 1rem",
-                borderRadius: "var(--radius-md)",
-                color: "var(--foreground-muted)",
-                fontWeight: 500,
-              }}
+              style={{ padding: "0.75rem 1rem", borderRadius: "var(--radius-md)", color: "var(--foreground-muted)", fontWeight: 500 }}
               onClick={() => setMobileOpen(false)}
             >
-              {link.label}
+              {link.icon} {link.label}
             </Link>
           ))}
-          <Link
-            href="/practice"
-            className="btn-primary"
-            onClick={() => setMobileOpen(false)}
-          >
+          <div style={{ padding: "0.5rem 1rem" }}><XPBar /></div>
+          <Link href="/practice" className="btn-primary" onClick={() => setMobileOpen(false)}>
             Generate Practice →
           </Link>
         </div>
