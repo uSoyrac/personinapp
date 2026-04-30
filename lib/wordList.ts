@@ -80,7 +80,12 @@ export function updateWordProgress(word: string, correct: boolean) {
   if (idx === -1) return;
 
   words[idx].totalAttempts++;
-  if (correct) words[idx].correctCount++;
+  if (correct) {
+    words[idx].correctCount++;
+    if (words[idx].difficulty === "hard") words[idx].difficulty = "medium";
+  } else {
+    words[idx].difficulty = "hard";
+  }
   words[idx].lastReviewed = new Date().toISOString();
 
   // Simple spaced repetition: correct answers push next review further

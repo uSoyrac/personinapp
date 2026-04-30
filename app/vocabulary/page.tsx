@@ -10,22 +10,45 @@ import ProgressBar from "@/components/ProgressBar";
 import Confetti from "@/components/Confetti";
 
 type ViewMode = "sets" | "quiz" | "results";
+type QuizDirection = "en-native" | "native-en" | "mixed";
 const SET_SIZE = 20;
 
-interface QuizQ { word: string; definition: string; nativeTranslation?: string; options: string[]; correctIndex: number; }
+interface QuizQ { word: string; definition: string; nativeTranslation?: string; options: string[]; correctIndex: number; direction: "en-native" | "native-en"; }
 
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a;
 }
 
-function buildQuiz(words: SavedWord[], lang: NativeLanguage | null): QuizQ[] {
+function buildQuiz(words: SavedWord[], lang: NativeLanguage | null, mode: QuizDirection): QuizQ[] {
+  const allEnWords = words.map(w => w.word);
   const allDefs = words.map(w => lang ? (getTranslation(w.word, lang) ?? w.definition) : w.definition);
+  
   return words.map(w => {
-    const correctDef = lang ? (getTranslation(w.word, lang) ?? w.definition) : w.definition;
-    const wrongs = shuffleArray(allDefs.filter(d => d !== correctDef)).slice(0, 3);
-    while (wrongs.length < 3) wrongs.push(["İlgisiz kavram", "Concepte sin relación", "Unrelatiertes Konzept", "Concept sans rapport"][wrongs.length] ?? "—");
-    const opts = shuffleArray([correctDef, ...wrongs]);
-    return { word: w.word, definition: w.definition, nativeTranslation: lang ? getTranslation(w.word, lang) ?? undefined : undefined, options: opts, correctIndex: opts.indexOf(correctDef) };
+    let isReverse = false;
+    if (lang) {
+      if (mode === "native-en") isReverse = true;
+      else if (mode === "mixed") isReverse = Math.random() > 0.5;
+    }
+    
+    if (isReverse) {
+      const correctWord = w.word;
+      const wrongs = shuffleArray(allEnWords.filter(e => e !== correctWord)).slice(0, 3);
+      while (wrongs.length < 3) wrongs.push(["random", "example", "test", "dummy"][wrongs.length] ?? "—");
+      const opts = shuffleArray([correctWord, ...wrongs]);
+      return { 
+        word: w.word, definition: w.definition, nativeTranslation: getTranslation(w.word, lang) ?? undefined, 
+        options: opts, correctIndex: opts.indexOf(correctWord), direction: "native-en" 
+      };
+    } else {
+      const correctDef = lang ? (getTranslation(w.word, lang) ?? w.definition) : w.definition;
+      const wrongs = shuffleArray(allDefs.filter(d => d !== correctDef)).slice(0, 3);
+      while (wrongs.length < 3) wrongs.push(["İlgisiz kavram", "Concepte sin relación", "Unrelatiertes Konzept", "Concept sans rapport"][wrongs.length] ?? "—");
+      const opts = shuffleArray([correctDef, ...wrongs]);
+      return { 
+        word: w.word, definition: w.definition, nativeTranslation: lang ? getTranslation(w.word, lang) ?? undefined : undefined, 
+        options: opts, correctIndex: opts.indexOf(correctDef), direction: "en-native" 
+      };
+    }
   });
 }
 
@@ -35,6 +58,7 @@ export default function VocabularyPage() {
   const [stats, setStats] = useState({ total: 0, learned: 0, needsReview: 0, accuracy: 0 });
   const [lang, setLang] = useState<NativeLanguage | null>(null);
   const [activeSet, setActiveSet] = useState(0);
+  const [quizMode, setQuizMode] = useState<QuizDirection>("en-native");
   const [quiz, setQuiz] = useState<{ qs: QuizQ[]; ci: number; ans: (number | null)[]; fb: boolean } | null>(null);
   const [confetti, setConfetti] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -51,15 +75,18 @@ export default function VocabularyPage() {
   for (let i = 0; i < words.length; i += SET_SIZE) sets.push(words.slice(i, i + SET_SIZE));
   if (sets.length === 0) sets.push([]);
 
-  const currentSet = sets[activeSet] ?? [];
-  const setLearned = currentSet.filter(w => w.correctCount >= 3).length;
+  const currentSet = activeSet === -1 ? words.filter(w => w.difficulty === "hard") : (sets[activeSet] ?? []);
+  const hardWords = words.filter(w => w.difficulty === "hard");
 
   function changeLang(l: NativeLanguage) { setLang(l); setNativeLanguage(l); }
 
   function startQuiz(setIdx: number) {
-    const s = sets[setIdx] ?? [];
+    let s: SavedWord[] = [];
+    if (setIdx === -1) s = hardWords;
+    else s = sets[setIdx] ?? [];
+    
     if (s.length < 2) return;
-    const qs = buildQuiz(shuffleArray(s).slice(0, Math.min(20, s.length)), lang);
+    const qs = buildQuiz(shuffleArray(s).slice(0, Math.min(20, s.length)), lang, quizMode);
     setQuiz({ qs, ci: 0, ans: new Array(qs.length).fill(null), fb: false });
     setActiveSet(setIdx);
     setView("quiz");
@@ -160,25 +187,53 @@ export default function VocabularyPage() {
             ))}
           </div>
 
-          {/* Language selector */}
-          <div className="card" style={{ marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap", padding: "0.875rem 1rem" }}>
-            <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "var(--foreground)" }}>NATIVE LANGUAGE:</span>
-            {(["tr", "es", "de", "fr"] as NativeLanguage[]).map(l => (
-              <button
-                key={l}
-                onClick={() => changeLang(l)}
-                style={{
-                  padding: "0.375rem 0.75rem", borderRadius: "0", fontSize: "0.8125rem", fontWeight: 800,
-                  background: lang === l ? "var(--peach)" : "var(--surface)",
-                  border: `2px solid #000`,
-                  color: "#000",
-                  boxShadow: lang === l ? "2px 2px 0px #000" : "none",
-                  cursor: "pointer", transition: "all 0.1s",
-                }}
-              >
-                {LANGUAGE_FLAGS[l]} {LANGUAGE_LABELS[l]}
-              </button>
-            ))}
+          {/* Language selector & Quiz Mode */}
+          <div className="card" style={{ marginBottom: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem", padding: "1rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "var(--foreground)" }}>NATIVE LANGUAGE:</span>
+              {(["tr", "es", "de", "fr"] as NativeLanguage[]).map(l => (
+                <button
+                  key={l}
+                  onClick={() => changeLang(l)}
+                  style={{
+                    padding: "0.375rem 0.75rem", borderRadius: "0", fontSize: "0.8125rem", fontWeight: 800,
+                    background: lang === l ? "var(--peach)" : "var(--surface)",
+                    border: `2px solid #000`,
+                    color: "#000",
+                    boxShadow: lang === l ? "2px 2px 0px #000" : "none",
+                    cursor: "pointer", transition: "all 0.1s",
+                  }}
+                >
+                  {LANGUAGE_FLAGS[l]} {LANGUAGE_LABELS[l]}
+                </button>
+              ))}
+            </div>
+
+            {lang && (
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "var(--foreground)", textTransform: "uppercase" }}>Test Mode:</span>
+                {[
+                  { id: "en-native", label: `EN ➔ ${LANGUAGE_LABELS[lang].substring(0,3).toUpperCase()}` },
+                  { id: "native-en", label: `${LANGUAGE_LABELS[lang].substring(0,3).toUpperCase()} ➔ EN` },
+                  { id: "mixed", label: "Mixed 🔀" },
+                ].map(m => (
+                  <button
+                    key={m.id}
+                    onClick={() => setQuizMode(m.id as QuizDirection)}
+                    style={{
+                      padding: "0.375rem 0.75rem", borderRadius: "0", fontSize: "0.8125rem", fontWeight: 800,
+                      background: quizMode === m.id ? "var(--brutal-purple)" : "var(--surface)",
+                      border: `2px solid #000`,
+                      color: quizMode === m.id ? "#fff" : "#000",
+                      boxShadow: quizMode === m.id ? "2px 2px 0px #000" : "none",
+                      cursor: "pointer", transition: "all 0.1s",
+                    }}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* ===== SETS VIEW ===== */}
@@ -224,6 +279,19 @@ export default function VocabularyPage() {
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                  
+                  {/* Hard Words Set */}
+                  {hardWords.length > 0 && (
+                    <div className="card" style={{ padding: "1.5rem", background: "var(--brutal-red)", color: "#000", border: "4px solid #000", marginBottom: "1rem", boxShadow: "6px 6px 0px #000" }}>
+                      <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.25rem", fontWeight: 900, textTransform: "uppercase" }}>Zor Kelimeler (Hard Words)</h3>
+                      <p style={{ margin: "0 0 1rem", fontSize: "0.875rem", fontWeight: 600 }}>{hardWords.length} words need review. Practice them to remove the 'hard' tag.</p>
+                      <button onClick={() => startQuiz(-1)} className="btn-primary" style={{ background: "#fff", color: "#000" }} disabled={hardWords.length < 2}>
+                        Practice Hard Words
+                      </button>
+                      {hardWords.length < 2 && <p style={{ margin: "0.5rem 0 0", fontSize: "0.75rem", fontWeight: 800 }}>Need at least 2 hard words to start quiz.</p>}
+                    </div>
+                  )}
+
                   {sets.map((s, si) => {
                     const learned = s.filter(w => w.correctCount >= 3).length;
                     const pct = s.length > 0 ? (learned / s.length) * 100 : 0;
@@ -270,7 +338,7 @@ export default function VocabularyPage() {
                   <div style={{ marginTop: "0.75rem" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
                       <p style={{ margin: 0, fontSize: "0.875rem", fontWeight: 600, color: "var(--foreground)" }}>
-                        Set {activeSet + 1} · {currentSet.length} word{currentSet.length !== 1 ? "s" : ""}
+                        {activeSet === -1 ? "Hard Words" : `Set ${activeSet + 1}`} · {currentSet.length} word{currentSet.length !== 1 ? "s" : ""}
                       </p>
                       {words.length > 0 && (
                         <button onClick={() => { if (confirm("Clear all?")) { clearWordList(); refresh(); } }} className="btn-secondary" style={{ fontSize: "0.75rem", padding: "0.25rem 0.625rem", color: "var(--rose)" }}>
@@ -320,10 +388,14 @@ export default function VocabularyPage() {
 
               <div className="card" style={{ padding: "2rem 1.5rem" }}>
                 <p style={{ margin: "0 0 0.25rem", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--foreground-faint)" }}>
-                  {lang ? `What is the ${LANGUAGE_LABELS[lang]} meaning of:` : "What is the meaning of:"}
+                  {quiz.qs[quiz.ci].direction === "native-en" 
+                    ? "What is the English word for:" 
+                    : (lang ? `What is the ${LANGUAGE_LABELS[lang]} meaning of:` : "What is the meaning of:")}
                 </p>
                 <h2 style={{ margin: "0 0 1.5rem", color: "var(--foreground)", fontSize: "1.5rem", fontFamily: "var(--font-display)" }}>
-                  {quiz.qs[quiz.ci].word}
+                  {quiz.qs[quiz.ci].direction === "native-en" 
+                    ? (quiz.qs[quiz.ci].nativeTranslation ?? quiz.qs[quiz.ci].definition)
+                    : quiz.qs[quiz.ci].word}
                 </h2>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
