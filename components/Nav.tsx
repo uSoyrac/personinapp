@@ -16,9 +16,9 @@ export default function Nav() {
   return (
     <nav style={{
       position: "sticky", top: 0, zIndex: 100,
-      background: "rgba(10, 14, 26, 0.88)",
-      backdropFilter: "blur(16px)",
-      borderBottom: "1px solid var(--border)",
+      background: "var(--bg)",
+      borderBottom: "var(--border-width) solid #000",
+      boxShadow: "0px 2px 0px #000"
     }}>
       <div className="container" style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -27,9 +27,9 @@ export default function Nav() {
         {/* Logo */}
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <div style={{
-            width: "2rem", height: "2rem", borderRadius: "0.5rem",
-            background: "linear-gradient(135deg, var(--coral), var(--lavender))",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem",
+            width: "2.5rem", height: "2.5rem", borderRadius: "0",
+            background: "var(--peach)", border: "2px solid #000", boxShadow: "2px 2px 0px #000",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem",
           }}>
             ⚡
           </div>

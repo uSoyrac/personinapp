@@ -117,8 +117,8 @@ export default function WritingCard({ result }: WritingCardProps) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
         <div style={{
-          background: "var(--coral-glow)", border: "1px solid var(--coral)",
-          borderRadius: "var(--radius-md)", padding: "1rem", borderLeft: "3px solid var(--coral)",
+          background: "var(--surface)", border: "var(--border-width) solid #000",
+          borderRadius: "var(--radius-md)", padding: "1rem", boxShadow: "var(--shadow-md)",
         }}>
           <p style={{ margin: 0, fontSize: "0.9375rem", lineHeight: 1.6, color: "var(--foreground)" }}>
             {prompts[selectedIdx!]}
@@ -189,11 +189,12 @@ export default function WritingCard({ result }: WritingCardProps) {
                 <span style={{ fontSize: "1.25rem" }}>{d.icon}</span>
                 <div style={{ flex: 1 }}>
                   <p style={{ margin: 0, fontWeight: 700, fontSize: "0.875rem", color: "var(--foreground)" }}>{d.label}</p>
-                  <div style={{ width: "100%", height: "4px", background: "var(--border)", borderRadius: "2px", marginTop: "0.375rem" }}>
+                  <div style={{ width: "100%", height: "8px", background: "var(--surface-2)", border: "2px solid #000", marginTop: "0.375rem" }}>
                     <div style={{
-                      width: `${d.score}%`, height: "100%", borderRadius: "2px",
+                      width: `${d.score}%`, height: "100%",
                       background: d.score >= 70 ? "var(--mint)" : d.score >= 45 ? "var(--lavender)" : "var(--coral)",
                       transition: "width 0.6s ease",
+                      borderRight: "2px solid #000"
                     }} />
                   </div>
                 </div>
@@ -222,7 +223,7 @@ export default function WritingCard({ result }: WritingCardProps) {
 
         {/* Suggestions */}
         {analysis.suggestions.length > 0 && (
-          <div className="card" style={{ borderLeft: "3px solid var(--lavender)" }}>
+          <div className="card" style={{ background: "var(--surface)", border: "3px solid #000" }}>
             <p style={{ margin: "0 0 0.75rem", fontWeight: 700, fontSize: "0.875rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>
               💡 Improvement Tips
             </p>

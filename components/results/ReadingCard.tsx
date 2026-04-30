@@ -83,11 +83,12 @@ export default function ReadingCard({ questions, examType }: ReadingCardProps) {
             <div style={{ padding: "1rem", borderBottom: "1px solid var(--border)", display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
               <span style={{
                 minWidth: "1.75rem", height: "1.75rem",
-                background: isAnswered ? (isCorrect ? "var(--mint-glow)" : "var(--rose-glow)") : "var(--lavender-glow)",
-                border: `1px solid ${isAnswered ? (isCorrect ? "var(--mint)" : "var(--rose)") : "var(--lavender)"}`,
-                borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "0.75rem", fontWeight: 700,
-                color: isAnswered ? (isCorrect ? "var(--mint-light)" : "var(--rose)") : "var(--lavender-light)",
+                background: isAnswered ? (isCorrect ? "var(--mint)" : "var(--rose)") : "var(--lavender)",
+                border: `2px solid #000`,
+                boxShadow: "2px 2px 0px #000",
+                borderRadius: "0", display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "0.875rem", fontWeight: 800,
+                color: "#000",
               }}>
                 {isAnswered ? (isCorrect ? "✓" : "✗") : i + 1}
               </span>
@@ -120,16 +121,17 @@ export default function ReadingCard({ questions, examType }: ReadingCardProps) {
               {/* Instant feedback */}
               {isAnswered && (
                 <div className="animate-fadeInFast" style={{
-                  background: isCorrect ? "var(--mint-glow)" : "var(--rose-glow)",
-                  border: `1px solid ${isCorrect ? "var(--mint)" : "var(--rose)"}`,
-                  borderRadius: "var(--radius-md)", padding: "0.875rem 1rem", marginTop: "0.25rem",
+                  background: isCorrect ? "var(--mint)" : "var(--rose)",
+                  border: `3px solid #000`,
+                  boxShadow: "4px 4px 0px #000",
+                  borderRadius: "var(--radius-md)", padding: "0.875rem 1rem", marginTop: "0.5rem",
                 }}>
-                  <p style={{ margin: "0 0 0.25rem", fontSize: "0.8125rem", fontWeight: 700,
-                    color: isCorrect ? "var(--mint-light)" : "var(--rose)",
+                  <p style={{ margin: "0 0 0.25rem", fontSize: "0.875rem", fontWeight: 800,
+                    color: "#000",
                     textTransform: "uppercase", letterSpacing: "0.05em" }}>
                     {isCorrect ? "✓ Correct! +10 XP" : "✗ Incorrect +2 XP"}
                   </p>
-                  <p style={{ margin: 0, fontSize: "0.875rem", lineHeight: 1.6, color: "var(--foreground-muted)" }}>
+                  <p style={{ margin: 0, fontSize: "0.9375rem", lineHeight: 1.6, color: "#000", fontWeight: 600 }}>
                     {q.explanation}
                   </p>
                 </div>
@@ -142,8 +144,9 @@ export default function ReadingCard({ questions, examType }: ReadingCardProps) {
       {/* Final score */}
       {allDone && (
         <div className="card-elevated animate-scaleIn" style={{
-          background: correctCount === questions.length ? "var(--mint-glow)" : "var(--lavender-glow)",
-          border: `1px solid ${correctCount === questions.length ? "var(--mint)" : "var(--lavender)"}`,
+          background: correctCount === questions.length ? "var(--mint)" : "var(--lavender)",
+          border: `3px solid #000`,
+          boxShadow: "6px 6px 0px #000",
           textAlign: "center",
         }}>
           <p style={{ margin: 0, fontSize: "2rem" }}>

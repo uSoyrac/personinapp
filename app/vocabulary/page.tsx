@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { SavedWord } from "@/lib/wordList";
-import { getWordList, removeWord, clearWordList, getWordStats, updateWordProgress } from "@/lib/wordList";
+import { getWordList, saveWords, removeWord, clearWordList, getWordStats, updateWordProgress } from "@/lib/wordList";
 import { getTranslation, getNativeLanguage, setNativeLanguage, LANGUAGE_LABELS, LANGUAGE_FLAGS } from "@/lib/translations";
 import type { NativeLanguage } from "@/lib/translations";
 import { addXP, awardBadge, getGameState } from "@/lib/gamification";
@@ -38,6 +38,10 @@ export default function VocabularyPage() {
   const [quiz, setQuiz] = useState<{ qs: QuizQ[]; ci: number; ans: (number | null)[]; fb: boolean } | null>(null);
   const [confetti, setConfetti] = useState(false);
   const [mounted, setMounted] = useState(false);
+  
+  // Manual word entry state
+  const [manualWord, setManualWord] = useState("");
+  const [manualDef, setManualDef] = useState("");
 
   const refresh = useCallback(() => { setWords(getWordList()); setStats(getWordStats()); }, []);
 
@@ -89,6 +93,23 @@ export default function VocabularyPage() {
     return { correct: quiz.qs.filter((q, i) => quiz.ans[i] === q.correctIndex).length, total: quiz.qs.length };
   }
 
+  function handleAddManualWord(e: React.FormEvent) {
+    e.preventDefault();
+    if (!manualWord.trim() || !manualDef.trim()) return;
+    
+    saveWords([{
+      word: manualWord.trim(),
+      definition: manualDef.trim(),
+      contextSentence: "Manually added.",
+      partOfSpeech: "unknown",
+      difficulty: "manual"
+    }]);
+    
+    setManualWord("");
+    setManualDef("");
+    refresh();
+  }
+
   if (!mounted) return null;
 
   return (
@@ -123,17 +144,18 @@ export default function VocabularyPage() {
 
           {/* Language selector */}
           <div className="card" style={{ marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap", padding: "0.875rem 1rem" }}>
-            <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground-muted)" }}>Native language:</span>
+            <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "var(--foreground)" }}>NATIVE LANGUAGE:</span>
             {(["tr", "es", "de", "fr"] as NativeLanguage[]).map(l => (
               <button
                 key={l}
                 onClick={() => changeLang(l)}
                 style={{
-                  padding: "0.375rem 0.75rem", borderRadius: "9999px", fontSize: "0.8125rem", fontWeight: 600,
-                  background: lang === l ? "var(--coral-glow)" : "transparent",
-                  border: `1px solid ${lang === l ? "var(--coral)" : "var(--border)"}`,
-                  color: lang === l ? "var(--coral-light)" : "var(--foreground-muted)",
-                  cursor: "pointer", transition: "all 0.2s",
+                  padding: "0.375rem 0.75rem", borderRadius: "0", fontSize: "0.8125rem", fontWeight: 800,
+                  background: lang === l ? "var(--peach)" : "var(--surface)",
+                  border: `2px solid #000`,
+                  color: "#000",
+                  boxShadow: lang === l ? "2px 2px 0px #000" : "none",
+                  cursor: "pointer", transition: "all 0.1s",
                 }}
               >
                 {LANGUAGE_FLAGS[l]} {LANGUAGE_LABELS[l]}
@@ -144,6 +166,32 @@ export default function VocabularyPage() {
           {/* ===== SETS VIEW ===== */}
           {view === "sets" && (
             <div className="animate-fadeIn">
+              {/* Add Manual Word Form */}
+              <div className="card" style={{ marginBottom: "1.5rem", padding: "1.25rem" }}>
+                <h3 style={{ margin: "0 0 1rem", fontSize: "1.125rem" }}>Add Word Manually</h3>
+                <form onSubmit={handleAddManualWord} style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+                  <input 
+                    type="text" 
+                    className="input-base" 
+                    placeholder="Word (e.g., Ubiquitous)" 
+                    value={manualWord}
+                    onChange={(e) => setManualWord(e.target.value)}
+                    style={{ flex: "1 1 200px" }}
+                  />
+                  <input 
+                    type="text" 
+                    className="input-base" 
+                    placeholder="Definition" 
+                    value={manualDef}
+                    onChange={(e) => setManualDef(e.target.value)}
+                    style={{ flex: "2 1 300px" }}
+                  />
+                  <button type="submit" className="btn-primary" style={{ flexShrink: 0 }}>
+                    + Add Word
+                  </button>
+                </form>
+              </div>
+
               {words.length === 0 ? (
                 <div className="card" style={{ textAlign: "center", padding: "3rem 1.5rem" }}>
                   <p style={{ fontSize: "2.5rem", margin: "0 0 1rem" }}>📝</p>
