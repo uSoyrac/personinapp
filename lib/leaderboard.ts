@@ -62,7 +62,7 @@ export function getLeaderboard(timeframe: Timeframe, region: Region): Leaderboar
   const currentUser: LeaderboardUser = {
     id: "current_user",
     name: "You",
-    country: nativeLang === "en" ? "us" : nativeLang,
+    country: nativeLang,
     avatarColor: "#000",
     xpWeekly: gameState.xp, // In a real app, we'd track timeframe specific XP. Using total XP for MVP.
     xpMonthly: gameState.xp,
