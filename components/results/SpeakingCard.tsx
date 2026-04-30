@@ -9,10 +9,14 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   
+  // Exam Mode State
+  const [examStarted, setExamStarted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
+  const [examComplete, setExamComplete] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    // Initialize Web Speech API for zero-cost transcription
     if (typeof window !== "undefined" && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
@@ -31,28 +35,49 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
         }
       };
     }
+    return () => clearInterval(timerRef.current!);
   }, []);
 
-  const toggleRecording = () => {
-    if (isRecording) {
-      recognitionRef.current?.stop();
-      setIsRecording(false);
-    } else {
-      setTranscript("");
-      setFeedback(null);
-      recognitionRef.current?.start();
-      setIsRecording(true);
-    }
+  const startExam = () => {
+    setExamStarted(true);
+    setTranscript("");
+    setFeedback(null);
+    setExamComplete(false);
+    setTimeLeft(120);
+    recognitionRef.current?.start();
+    setIsRecording(true);
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!);
+          finishExam();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const finishExam = () => {
+    clearInterval(timerRef.current!);
+    recognitionRef.current?.stop();
+    setIsRecording(false);
+    setExamComplete(true);
   };
 
   const analyzeSpeech = async () => {
     if (!transcript.trim()) return;
     setIsAnalyzing(true);
     
-    // Simulate AI analysis since we don't have the real endpoint yet.
-    // In a real implementation, this would hit `/api/speaking-feedback`
+    // Simulate AI Exam Analysis
     setTimeout(() => {
-      setFeedback("Great effort! You spoke clearly and answered the prompt well. \n\n**Strengths:** Good fluency and confidence.\n\n**Improvements:** Try to use more advanced vocabulary. For example, instead of saying 'very good', you could use 'excellent' or 'outstanding'.");
+      const words = transcript.split(" ").length;
+      let band = "5.0";
+      if (words > 100) band = "6.5";
+      if (words > 200) band = "7.5";
+      
+      setFeedback(`**Estimated Band Score: ${band}**\n\nGreat effort! You spoke clearly and addressed the prompts.\n\n**Strengths:** Good fluency and confidence.\n\n**Improvements:** Try to use more advanced vocabulary. For example, instead of saying 'very good', you could use 'excellent' or 'outstanding'. Maintain better cohesion between ideas.`);
       setIsAnalyzing(false);
     }, 2000);
   };
@@ -83,14 +108,32 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
           </div>
         )}
 
-        <button 
-          onClick={toggleRecording} 
-          className={isRecording ? "btn-secondary" : "btn-primary"}
-          style={{ width: "100%", justifyContent: "center", background: isRecording ? "var(--rose)" : "var(--brutal-green)", color: "#000" }}
-          disabled={!recognitionRef.current || isAnalyzing}
-        >
-          {isRecording ? "🛑 Stop Recording" : "🎤 Start Recording"}
-        </button>
+        {examStarted && !examComplete && (
+          <div style={{ fontSize: "2rem", fontWeight: 900, textAlign: "center", color: timeLeft <= 30 ? "var(--rose)" : "var(--foreground)" }}>
+            ⏳ {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
+          </div>
+        )}
+
+        {!examStarted ? (
+          <button 
+            onClick={startExam} 
+            className="btn-primary"
+            style={{ width: "100%", justifyContent: "center", background: "var(--brutal-green)", color: "#000", padding: "1.5rem", fontSize: "1.25rem" }}
+            disabled={!recognitionRef.current}
+          >
+            🎤 Start 2-Minute Speaking Exam
+          </button>
+        ) : (
+          !examComplete && (
+            <button 
+              onClick={finishExam} 
+              className="btn-secondary"
+              style={{ width: "100%", justifyContent: "center", background: "var(--rose)", color: "#fff" }}
+            >
+              🛑 Finish Early
+            </button>
+          )
+        )}
 
         {transcript && (
           <div style={{ padding: "1rem", border: "2px solid #000", background: "#fff", minHeight: "100px" }}>
@@ -99,21 +142,21 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
           </div>
         )}
 
-        {transcript && !isRecording && !feedback && (
+        {examComplete && !feedback && (
           <button 
             onClick={analyzeSpeech} 
             className="btn-primary"
-            style={{ background: "var(--brutal-yellow)", color: "#000" }}
+            style={{ background: "var(--brutal-yellow)", color: "#000", padding: "1rem" }}
             disabled={isAnalyzing}
           >
-            {isAnalyzing ? "Analyzing with AI..." : "✨ Get AI Feedback (Gold Plan)"}
+            {isAnalyzing ? "Analyzing with AI..." : "✨ Calculate Score (Gold Plan)"}
           </button>
         )}
 
         {feedback && (
-          <div className="animate-scaleIn" style={{ padding: "1.5rem", background: "var(--mint-glow)", border: "2px solid var(--mint)", marginTop: "1rem" }}>
-            <h4 style={{ margin: "0 0 0.5rem", color: "var(--mint-light)" }}>AI Feedback</h4>
-            <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{feedback}</p>
+          <div className="animate-scaleIn" style={{ padding: "1.5rem", background: "var(--surface)", border: "4px solid #000", boxShadow: "6px 6px 0px #000", marginTop: "1rem" }}>
+            <h4 style={{ margin: "0 0 1rem", fontSize: "1.5rem", borderBottom: "2px solid #000", paddingBottom: "0.5rem" }}>AI Examiner Report</h4>
+            <div style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.6, fontSize: "1.0625rem" }}>{feedback}</div>
           </div>
         )}
       </div>

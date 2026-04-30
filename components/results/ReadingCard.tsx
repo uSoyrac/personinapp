@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { ReadingQuestion, ExamType } from "@/types";
 import { addXP } from "@/lib/gamification";
 import Confetti from "@/components/Confetti";
+import { saveQuestion } from "@/lib/questionBank";
 
 interface ReadingCardProps {
   questions: ReadingQuestion[];
@@ -14,6 +15,13 @@ export default function ReadingCard({ questions, examType }: ReadingCardProps) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [xpPopups, setXpPopups] = useState<{ id: string; amount: number; x: number }[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  function handleSave(q: ReadingQuestion) {
+    const res = saveQuestion(q);
+    setToast(res.message);
+    setTimeout(() => setToast(null), 3000);
+  }
 
   function selectAnswer(qId: string, idx: number, correctIdx: number) {
     if (answers[qId] !== undefined) return; // Already answered
@@ -41,6 +49,11 @@ export default function ReadingCard({ questions, examType }: ReadingCardProps) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", position: "relative" }}>
+      {toast && (
+        <div style={{ position: "fixed", top: "1rem", right: "1rem", background: "var(--brutal-yellow)", border: "2px solid #000", boxShadow: "4px 4px 0px #000", color: "#000", padding: "1rem", zIndex: 9999, fontWeight: 700 }}>
+          {toast}
+        </div>
+      )}
       {showConfetti && <Confetti />}
 
       {/* XP popups */}
@@ -79,8 +92,14 @@ export default function ReadingCard({ questions, examType }: ReadingCardProps) {
         const isCorrect = selected === q.correctIndex;
 
         return (
-          <div key={q.id} className={`question-card ${isAnswered ? (isCorrect ? "animate-correctPulse" : "animate-wrongShake") : ""}`}>
-            <div style={{ padding: "1rem", borderBottom: "1px solid var(--border)", display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
+          <div key={q.id} className={`question-card ${isAnswered ? (isCorrect ? "animate-correctPulse" : "animate-wrongShake") : ""}`} style={{ position: "relative" }}>
+            <button 
+              onClick={() => handleSave(q)}
+              style={{ position: "absolute", top: "0.5rem", right: "0.5rem", background: "var(--brutal-yellow)", border: "2px solid #000", padding: "0.25rem 0.5rem", fontSize: "0.75rem", fontWeight: 800, cursor: "pointer", zIndex: 10 }}
+            >
+              ➕ Bankama Ekle
+            </button>
+            <div style={{ padding: "1rem", borderBottom: "1px solid var(--border)", display: "flex", gap: "0.75rem", alignItems: "flex-start", paddingRight: "7rem" }}>
               <span style={{
                 minWidth: "1.75rem", height: "1.75rem",
                 background: isAnswered ? (isCorrect ? "var(--mint)" : "var(--rose)") : "var(--lavender)",

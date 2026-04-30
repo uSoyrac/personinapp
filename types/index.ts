@@ -30,6 +30,10 @@ export interface ReadingQuestion {
     | "short_answer";
 }
 
+export interface SavedQuestion extends ReadingQuestion {
+  savedAt: string;
+}
+
 // ==============================
 // Vocabulary
 // ==============================

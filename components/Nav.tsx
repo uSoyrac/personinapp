@@ -7,6 +7,9 @@ import XPBar from "@/components/XPBar";
 const NAV_LINKS = [
   { href: "/practice", label: "Practice" },
   { href: "/vocabulary", label: "My Words" },
+  { href: "/question-bank", label: "Question Bank" },
+  { href: "/blog", label: "Blog" },
+  { href: "/community", label: "Community" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/pricing", label: "Pricing" },
 ];
