@@ -12,17 +12,17 @@ import type {
 import ResultTabs from "@/components/ResultTabs";
 import { TIER_LIMITS } from "@/lib/quiz-engine";
 
-const EXAM_OPTIONS: { id: ExamType; label: string; desc: string; icon: string }[] = [
-  { id: "IELTS_ACADEMIC", label: "IELTS Academic", desc: "For university admission in UK, Australia & more", icon: "🇬🇧" },
-  { id: "TOEFL_IBT", label: "TOEFL iBT", desc: "For US university admission & visa requirements", icon: "🇺🇸" },
+const EXAM_OPTIONS: { id: ExamType; label: string; desc: string }[] = [
+  { id: "IELTS_ACADEMIC", label: "IELTS Academic", desc: "For university admission in UK, Australia & more" },
+  { id: "TOEFL_IBT", label: "TOEFL iBT", desc: "For US university admission & visa requirements" },
 ];
 
-const SKILL_OPTIONS: { id: SkillFocus; label: string; icon: string }[] = [
-  { id: "Full", label: "Full Practice", icon: "⚡" },
-  { id: "Reading", label: "Reading", icon: "📖" },
-  { id: "Writing", label: "Writing", icon: "✍️" },
-  { id: "Speaking", label: "Speaking", icon: "🎙️" },
-  { id: "Vocabulary", label: "Vocabulary", icon: "🔤" },
+const SKILL_OPTIONS: { id: SkillFocus; label: string }[] = [
+  { id: "Full", label: "Full Practice" },
+  { id: "Reading", label: "Reading" },
+  { id: "Writing", label: "Writing" },
+  { id: "Speaking", label: "Speaking" },
+  { id: "Vocabulary", label: "Vocabulary" },
 ];
 
 const LEVEL_OPTIONS: { id: EnglishLevel; label: string; desc: string }[] = [
@@ -128,7 +128,7 @@ export default function PracticePage() {
           {/* Page header */}
           <div style={{ marginBottom: "2.5rem" }}>
             <div className="badge badge-primary" style={{ marginBottom: "0.75rem", display: "inline-flex" }}>
-              ⚡ Practice Generator
+              Practice Generator
             </div>
             <h1 style={{ margin: "0 0 0.75rem", color: "var(--foreground)", fontSize: "clamp(1.75rem, 4vw, 2.5rem)" }}>
               Generate Your Practice
@@ -141,8 +141,8 @@ export default function PracticePage() {
           {/* Tier toggle */}
           <div className="card" style={{ marginBottom: "1.75rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
             <div>
-              <p style={{ margin: "0 0 0.25rem", fontWeight: 700, color: "var(--foreground)", fontSize: "0.9375rem" }}>
-                {tier === "premium" ? "⭐ Premium Plan" : "🆓 Free Plan"}
+              <p style={{ margin: "0 0 0.25rem", fontWeight: 800, color: "var(--foreground)", fontSize: "0.9375rem" }}>
+                {tier === "premium" ? "Premium Plan" : "Free Plan"}
               </p>
               <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>
                 {tier === "free"
@@ -156,7 +156,7 @@ export default function PracticePage() {
               className={tier === "premium" ? "btn-secondary" : "btn-primary"}
               style={{ fontSize: "0.875rem", padding: "0.5rem 1.25rem", whiteSpace: "nowrap" }}
             >
-              {tier === "premium" ? "Switch to Free" : "✨ Upgrade to Premium"}
+              {tier === "premium" ? "Switch to Free" : "Upgrade to Premium"}
             </button>
           </div>
 
@@ -183,8 +183,7 @@ export default function PracticePage() {
                     }}
                   >
                     <div style={{ display: "flex", gap: "0.625rem", alignItems: "center", marginBottom: "0.25rem" }}>
-                      <span style={{ fontSize: "1.25rem" }}>{opt.icon}</span>
-                      <span style={{ fontWeight: 700, color: "var(--foreground)", fontSize: "0.9375rem" }}>{opt.label}</span>
+                      <span style={{ fontWeight: 800, color: "var(--foreground)", fontSize: "0.9375rem" }}>{opt.label}</span>
                       {examType === opt.id && <span className="badge badge-primary" style={{ marginLeft: "auto", fontSize: "0.7rem" }}>Selected</span>}
                     </div>
                     <p style={{ margin: 0, fontSize: "0.8125rem" }}>{opt.desc}</p>
@@ -204,7 +203,7 @@ export default function PracticePage() {
                     className={`tab-item ${skillFocus === opt.id ? "active" : ""}`}
                     onClick={() => setSkillFocus(opt.id)}
                   >
-                    {opt.icon} {opt.label}
+                    {opt.label}
                   </button>
                 ))}
               </div>
@@ -338,7 +337,7 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
                 cursor: status === "loading" || isOverLimit ? "not-allowed" : "pointer",
               }}
             >
-              {status === "loading" ? "⚙️ Generating…" : "✨ Generate Practice Content"}
+              {status === "loading" ? "Generating…" : "Generate Practice Content"}
             </button>
 
             <p style={{ textAlign: "center", fontSize: "0.8125rem", color: "var(--foreground-faint)" }}>
@@ -361,7 +360,7 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
                   Your Practice Session
                 </h2>
                 <span className={`badge ${tier === "premium" ? "badge-primary" : "badge-accent"}`}>
-                  {tier === "premium" ? "⭐ Premium" : "🆓 Free"} · {result?.readingQuestions?.length ?? "..."} questions
+                  {tier === "premium" ? "Premium" : "Free"} · {result?.readingQuestions?.length ?? "..."} questions
                 </span>
               </div>
 

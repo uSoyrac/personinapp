@@ -5,9 +5,9 @@ import { useState } from "react";
 import XPBar from "@/components/XPBar";
 
 const NAV_LINKS = [
-  { href: "/practice", label: "Practice", icon: "⚡" },
-  { href: "/vocabulary", label: "My Words", icon: "📚" },
-  { href: "/pricing", label: "Pricing", icon: "💎" },
+  { href: "/practice", label: "Practice" },
+  { href: "/vocabulary", label: "My Words" },
+  { href: "/pricing", label: "Pricing" },
 ];
 
 export default function Nav() {
@@ -29,9 +29,9 @@ export default function Nav() {
           <div style={{
             width: "2.5rem", height: "2.5rem", borderRadius: "0",
             background: "var(--peach)", border: "2px solid #000", boxShadow: "2px 2px 0px #000",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem", fontWeight: "900",
           }}>
-            ⚡
+            P
           </div>
           <span style={{
             fontFamily: "var(--font-display)", fontSize: "1.25rem", fontWeight: 700,
@@ -55,7 +55,7 @@ export default function Nav() {
               onMouseEnter={e => { (e.target as HTMLElement).style.color = "var(--foreground)"; (e.target as HTMLElement).style.background = "var(--surface)"; }}
               onMouseLeave={e => { (e.target as HTMLElement).style.color = "var(--foreground-muted)"; (e.target as HTMLElement).style.background = "transparent"; }}
             >
-              {link.icon} {link.label}
+              {link.label}
             </Link>
           ))}
 
@@ -93,7 +93,7 @@ export default function Nav() {
               style={{ padding: "0.75rem 1rem", borderRadius: "var(--radius-md)", color: "var(--foreground-muted)", fontWeight: 500 }}
               onClick={() => setMobileOpen(false)}
             >
-              {link.icon} {link.label}
+              {link.label}
             </Link>
           ))}
           <div style={{ padding: "0.5rem 1rem" }}><XPBar /></div>

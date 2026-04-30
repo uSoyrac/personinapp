@@ -68,7 +68,7 @@ export default function WritingCard({ result }: WritingCardProps) {
       <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
         <div>
           <h3 style={{ margin: "0 0 0.25rem", fontFamily: "var(--font-display)", fontWeight: 700, color: "var(--foreground)", fontSize: "1.125rem" }}>
-            ✍️ Choose Your Writing Topic
+            Choose Your Writing Topic
           </h3>
           <p style={{ margin: 0, fontSize: "0.875rem" }}>Select one of the three exam-style prompts below.</p>
         </div>
@@ -106,7 +106,7 @@ export default function WritingCard({ result }: WritingCardProps) {
           style={{ width: "100%", justifyContent: "center", opacity: selectedIdx === null ? 0.5 : 1 }}
           id="start-writing-btn"
         >
-          ✍️ Start Writing
+          Start Writing
         </button>
       </div>
     );
@@ -155,7 +155,7 @@ export default function WritingCard({ result }: WritingCardProps) {
             style={{ flex: 1, justifyContent: "center", opacity: wordCount < 30 ? 0.5 : 1 }}
             id="submit-essay-btn"
           >
-            📊 Analyze My Writing (+25 XP)
+            Analyze My Writing (+25 XP)
           </button>
         </div>
       </div>
@@ -225,7 +225,7 @@ export default function WritingCard({ result }: WritingCardProps) {
         {analysis.suggestions.length > 0 && (
           <div className="card" style={{ background: "var(--surface)", border: "3px solid #000" }}>
             <p style={{ margin: "0 0 0.75rem", fontWeight: 700, fontSize: "0.875rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>
-              💡 Improvement Tips
+              Improvement Tips
             </p>
             {analysis.suggestions.map((s, i) => (
               <p key={i} style={{ margin: "0.25rem 0", fontSize: "0.875rem", color: "var(--foreground-muted)" }}>• {s}</p>
@@ -236,10 +236,10 @@ export default function WritingCard({ result }: WritingCardProps) {
         {/* Try again */}
         <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
           <button onClick={() => { setStep("write"); setAnalysis(null); }} className="btn-secondary">
-            ✏️ Revise Essay
+            Revise Essay
           </button>
           <button onClick={() => { setStep("choose"); setEssay(""); setAnalysis(null); setSelectedIdx(null); }} className="btn-primary">
-            🔄 Try Different Topic
+            Try Different Topic
           </button>
         </div>
       </div>

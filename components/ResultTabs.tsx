@@ -14,12 +14,12 @@ interface ResultTabsProps {
 
 type TabId = "summary" | "reading" | "vocabulary" | "writing" | "studyplan";
 
-const TABS: { id: TabId; label: string; icon: string }[] = [
-  { id: "summary", label: "Summary", icon: "📝" },
-  { id: "reading", label: "Reading", icon: "📖" },
-  { id: "vocabulary", label: "Vocabulary", icon: "🔤" },
-  { id: "writing", label: "Writing", icon: "✍️" },
-  { id: "studyplan", label: "Study Plan", icon: "📅" },
+const TABS: { id: TabId; label: string }[] = [
+  { id: "summary", label: "Summary" },
+  { id: "reading", label: "Reading" },
+  { id: "vocabulary", label: "Vocabulary" },
+  { id: "writing", label: "Writing" },
+  { id: "studyplan", label: "Study Plan" },
 ];
 
 export default function ResultTabs({ result }: ResultTabsProps) {
@@ -38,7 +38,6 @@ export default function ResultTabs({ result }: ResultTabsProps) {
             className={`tab-item ${active === tab.id ? "active" : ""}`}
             onClick={() => setActive(tab.id)}
           >
-            <div className="tab-item-icon">{tab.icon}</div>
             {tab.label}
           </button>
         ))}

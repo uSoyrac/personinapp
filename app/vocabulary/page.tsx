@@ -129,15 +129,14 @@ export default function VocabularyPage() {
           {/* Stats row */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.625rem", marginBottom: "1.5rem" }}>
             {[
-              { l: "Total", v: stats.total, icon: "📖", c: "var(--lavender-light)" },
-              { l: "Learned", v: stats.learned, icon: "✅", c: "var(--mint-light)" },
-              { l: "Review", v: stats.needsReview, icon: "🔄", c: "var(--coral-light)" },
-              { l: "Accuracy", v: `${stats.accuracy}%`, icon: "🎯", c: "var(--gold)" },
+              { l: "Total", v: stats.total, c: "var(--lavender)" },
+              { l: "Learned", v: stats.learned, c: "var(--mint)" },
+              { l: "Review", v: stats.needsReview, c: "var(--coral)" },
+              { l: "Accuracy", v: `${stats.accuracy}%`, c: "var(--gold)" },
             ].map(s => (
               <div key={s.l} className="card" style={{ textAlign: "center", padding: "1rem" }}>
-                <p style={{ margin: 0, fontSize: "1.25rem" }}>{s.icon}</p>
                 <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, color: s.c, fontFamily: "var(--font-display)" }}>{s.v}</p>
-                <p style={{ margin: "0.125rem 0 0", fontSize: "0.75rem", color: "var(--foreground-muted)" }}>{s.l}</p>
+                <p style={{ margin: "0.125rem 0 0", fontSize: "0.75rem", color: "var(--foreground-muted)", textTransform: "uppercase", fontWeight: 800 }}>{s.l}</p>
               </div>
             ))}
           </div>
@@ -234,7 +233,7 @@ export default function VocabularyPage() {
                           style={{ fontSize: "0.8125rem", padding: "0.5rem 1rem", flexShrink: 0 }}
                           disabled={s.length < 2}
                         >
-                          🧠 Quiz
+                          Start Quiz
                         </button>
                       </div>
                     );
@@ -248,7 +247,7 @@ export default function VocabularyPage() {
                       </p>
                       {words.length > 0 && (
                         <button onClick={() => { if (confirm("Clear all?")) { clearWordList(); refresh(); } }} className="btn-secondary" style={{ fontSize: "0.75rem", padding: "0.25rem 0.625rem", color: "var(--rose)" }}>
-                          🗑️ Clear All
+                          Clear All
                         </button>
                       )}
                     </div>
@@ -375,8 +374,8 @@ export default function VocabularyPage() {
                 </div>
 
                 <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap" }}>
-                  <button className="btn-primary" onClick={() => startQuiz(activeSet)}>🔄 Retry Set</button>
-                  <button className="btn-secondary" onClick={() => { setView("sets"); refresh(); }}>📋 Back to Sets</button>
+                  <button className="btn-primary" onClick={() => startQuiz(activeSet)}>Retry Set</button>
+                  <button className="btn-secondary" onClick={() => { setView("sets"); refresh(); }}>Back to Sets</button>
                 </div>
               </div>
             </div>
