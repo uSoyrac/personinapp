@@ -17,13 +17,19 @@
   --foreground-faint: #666666;
 
   /* Brutalist Accent Colors */
-  --coral: #FF5A5F;
-  --lavender: #C1B0FF;
-  --mint: #8CE0FF; /* Using bright blue instead of mint for clarity */
-  --peach: #FFE26A; /* Bright yellow */
-  --sky: #8CE0FF;
-  --rose: #FF9CEE; /* Neon pink */
-  --gold: #FFE26A;
+  --brutal-yellow: #FFE200;
+  --brutal-purple: #A45EE5;
+  --brutal-blue: #007AFF;
+  --brutal-green: #34C759;
+  --brutal-red: #FF3B30;
+  
+  --coral: var(--brutal-red);
+  --lavender: var(--brutal-purple);
+  --mint: var(--brutal-green); 
+  --peach: var(--brutal-yellow); 
+  --sky: var(--brutal-blue);
+  --rose: #FF9CEE;
+  --gold: var(--brutal-yellow);
   
   /* System mappings */
   --background: var(--bg);

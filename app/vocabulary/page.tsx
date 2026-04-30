@@ -6,7 +6,7 @@ import { getWordList, saveWords, removeWord, clearWordList, getWordStats, update
 import { getTranslation, getNativeLanguage, setNativeLanguage, LANGUAGE_LABELS, LANGUAGE_FLAGS } from "@/lib/translations";
 import type { NativeLanguage } from "@/lib/translations";
 import { addXP, awardBadge, getGameState } from "@/lib/gamification";
-import ProgressRing from "@/components/ProgressRing";
+import ProgressBar from "@/components/ProgressBar";
 import Confetti from "@/components/Confetti";
 
 type ViewMode = "sets" | "quiz" | "results";
@@ -210,31 +210,34 @@ export default function VocabularyPage() {
                         key={si}
                         className={`set-card ${activeSet === si ? "active" : ""}`}
                         onClick={() => setActiveSet(si)}
+                        style={{ flexDirection: "column", alignItems: "stretch", gap: "0.5rem" }}
                       >
-                        <ProgressRing progress={pct} size={52} stroke={4} color={isComplete ? "var(--mint)" : "var(--coral)"}>
-                          <span style={{ fontSize: "0.6875rem" }}>{learned}/{s.length}</span>
-                        </ProgressRing>
-
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-                            <p style={{ margin: 0, fontWeight: 700, fontSize: "0.9375rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>
-                              Set {si + 1}
-                            </p>
-                            {isComplete && <span className="badge badge-accent" style={{ fontSize: "0.625rem" }}>✓ Complete</span>}
-                          </div>
-                          <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>
-                            {s.slice(0, 5).map(w => w.word).join(", ")}{s.length > 5 ? "…" : ""}
-                          </p>
+                        <div style={{ width: "100%", marginBottom: "1rem" }}>
+                          <ProgressBar progress={pct} color={isComplete ? "var(--brutal-green)" : "var(--brutal-yellow)"} label={`${learned}/${s.length} Learned`} />
                         </div>
 
-                        <button
-                          onClick={(e) => { e.stopPropagation(); startQuiz(si); }}
-                          className="btn-primary"
-                          style={{ fontSize: "0.8125rem", padding: "0.5rem 1rem", flexShrink: 0 }}
-                          disabled={s.length < 2}
-                        >
-                          Start Quiz
-                        </button>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                          <div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+                              <p style={{ margin: 0, fontWeight: 700, fontSize: "0.9375rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>
+                                Set {si + 1}
+                              </p>
+                              {isComplete && <span className="badge badge-accent" style={{ fontSize: "0.625rem" }}>✓ Complete</span>}
+                            </div>
+                            <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>
+                              {s.slice(0, 5).map(w => w.word).join(", ")}{s.length > 5 ? "…" : ""}
+                            </p>
+                          </div>
+
+                          <button
+                            onClick={(e) => { e.stopPropagation(); startQuiz(si); }}
+                            className="btn-primary"
+                            style={{ fontSize: "0.8125rem", padding: "0.5rem 1rem", flexShrink: 0 }}
+                            disabled={s.length < 2}
+                          >
+                            Start Quiz
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
