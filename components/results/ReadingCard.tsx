@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import type { ReadingQuestion } from "@/types";
+import type { ReadingQuestion, ExamType } from "@/types";
 import { addXP } from "@/lib/gamification";
 import Confetti from "@/components/Confetti";
 
 interface ReadingCardProps {
   questions: ReadingQuestion[];
-  examType: "IELTS_ACADEMIC" | "TOEFL_IBT";
+  examType: ExamType;
 }
 
 export default function ReadingCard({ questions, examType }: ReadingCardProps) {
