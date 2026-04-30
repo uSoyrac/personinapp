@@ -361,8 +361,8 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
                 <h2 style={{ margin: "0 0 0.25rem", color: "var(--foreground)", fontSize: "1.5rem" }}>
                   Your Practice Session
                 </h2>
-                <span className={`badge ${tier === "premium" ? "badge-primary" : "badge-accent"}`}>
-                  {tier === "premium" ? "Premium" : "Free"} · {result?.readingQuestions?.length ?? "..."} questions
+                <span className={`badge ${tier !== "free" ? "badge-primary" : "badge-accent"}`}>
+                  {tier === "gold" ? "Gold" : tier === "pro" ? "Pro" : "Free"} · {result?.readingQuestions?.length ?? "..."} questions
                 </span>
               </div>
 
