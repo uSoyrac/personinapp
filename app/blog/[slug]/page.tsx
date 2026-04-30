@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: "Post Not Found" };
 
   return {
-    title: \`\${post.title} — PracticeForge Blog\`,
+    title: `${post.title} — PracticeForge Blog`,
     description: post.excerpt,
     openGraph: {
       images: [post.coverImage],
@@ -47,7 +47,7 @@ export default async function BlogPostPage({ params }: Props) {
           ← Back to Blog
         </a>
 
-        <div style={{ height: "400px", background: \`url(\${post.coverImage}) center/cover\`, border: "4px solid #000", boxShadow: "8px 8px 0px #000", marginBottom: "2rem" }} />
+        <div style={{ height: "400px", background: `url(${post.coverImage}) center/cover`, border: "4px solid #000", boxShadow: "8px 8px 0px #000", marginBottom: "2rem" }} />
 
         <div className="card" style={{ padding: "3rem" }}>
           <p style={{ margin: "0 0 1rem", fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 700 }}>
