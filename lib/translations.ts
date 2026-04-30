@@ -112,18 +112,60 @@ const DICT: Record<string, Record<NativeLanguage, string>> = {
 
 /** Get translation for a word in a given language. Returns null if not found. */
 export function getTranslation(word: string, lang: NativeLanguage): string | null {
-  const entry = DICT[word.toLowerCase()];
-  return entry?.[lang] ?? null;
+  const lower = word.toLowerCase();
+  
+  // 1. Check hardcoded dictionary
+  const entry = DICT[lower];
+  if (entry?.[lang]) return entry[lang];
+
+  // 2. Check local cache
+  if (typeof window !== "undefined") {
+    try {
+      const cache = JSON.parse(localStorage.getItem("pf_trans_cache") || "{}");
+      if (cache[lower]?.[lang]) return cache[lower][lang];
+    } catch {
+      // ignore
+    }
+  }
+
+  return null;
 }
 
-/** Get all available translations for a word. */
+/** Async fetch missing translations via zero-cost Google Translate endpoint */
+export async function fetchTranslation(text: string, lang: NativeLanguage): Promise<string | null> {
+  // Check cache first
+  const cached = getTranslation(text, lang);
+  if (cached) return cached;
+
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const translated = data[0][0][0];
+
+    // Save to cache
+    if (typeof window !== "undefined" && translated) {
+      const cache = JSON.parse(localStorage.getItem("pf_trans_cache") || "{}");
+      const lower = text.toLowerCase();
+      if (!cache[lower]) cache[lower] = {};
+      cache[lower][lang] = translated;
+      localStorage.setItem("pf_trans_cache", JSON.stringify(cache));
+      return translated;
+    }
+  } catch (error) {
+    console.error("Translation failed:", error);
+  }
+  return null;
+}
+
+/** Get all available translations for a word from DICT only. */
 export function getAllTranslations(word: string): Record<NativeLanguage, string> | null {
   return DICT[word.toLowerCase()] ?? null;
 }
 
-/** Check if translation exists for a word. */
-export function hasTranslation(word: string): boolean {
-  return word.toLowerCase() in DICT;
+/** Check if translation exists for a word in DICT or Cache. */
+export function hasTranslation(word: string, lang: NativeLanguage): boolean {
+  return getTranslation(word, lang) !== null;
 }
 
 /** Get saved native language preference. */

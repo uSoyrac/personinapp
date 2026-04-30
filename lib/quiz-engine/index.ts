@@ -8,11 +8,12 @@ import { analyzeText, countWords } from "./textAnalyzer";
 import { generateQuestions } from "./questionGenerator";
 import { extractVocabulary } from "./vocabularyExtractor";
 
-export type UserTier = "free" | "premium";
+export type UserTier = "free" | "pro" | "gold";
 
 export const TIER_LIMITS = {
   free: { maxWords: 300, questionCount: 5, vocabCount: 5 },
-  premium: { maxWords: 2000, questionCount: 15, vocabCount: 15 },
+  pro: { maxWords: 2000, questionCount: 15, vocabCount: 15 },
+  gold: { maxWords: 3000, questionCount: 15, vocabCount: 20 },
 } as const;
 
 /**
@@ -42,17 +43,17 @@ export function generateOfflinePractice(
       ? analysis.sentences.slice(0, 3).join(" ")
       : "Text analysis complete. See the generated questions and vocabulary below.";
 
-  // Build study plan (premium only)
-  const studyPlan = tier === "premium" ? buildBasicStudyPlan() : [];
+  // Build study plan (pro/gold only)
+  const studyPlan = tier !== "free" ? buildBasicStudyPlan() : [];
 
-  // Build writing/speaking prompts (premium only)
+  // Build writing/speaking prompts
   const writingPrompt =
-    tier === "premium" && analysis.keywords.length > 0
+    tier !== "free" && analysis.keywords.length > 0
       ? `Write an essay discussing the role of ${analysis.keywords[0]} in modern society. To what extent do you agree that ${analysis.keywords.slice(0, 2).join(" and ")} are important factors? Support your answer with examples.`
       : "";
 
   const speakingPrompt =
-    tier === "premium" && analysis.keywords.length > 0
+    tier === "gold" && analysis.keywords.length > 0
       ? `Describe a situation where ${analysis.keywords[0]} played an important role. You should say: what happened, why it was important, and what you learned from it.`
       : "";
 
@@ -65,7 +66,7 @@ export function generateOfflinePractice(
     writingPromptType: input.examType === "IELTS_ACADEMIC" ? "Task 2" : "Independent",
     speakingPrompt,
     speakingFollowUps:
-      tier === "premium" && analysis.keywords.length > 1
+      tier === "gold" && analysis.keywords.length > 1
         ? [
             `Do you think ${analysis.keywords[0]} will become more important in the future?`,
             `How does ${analysis.keywords[1]} affect daily life in your country?`,

@@ -15,6 +15,7 @@ import { TIER_LIMITS } from "@/lib/quiz-engine";
 const EXAM_OPTIONS: { id: ExamType; label: string; desc: string }[] = [
   { id: "IELTS_ACADEMIC", label: "IELTS Academic", desc: "For university admission in UK, Australia & more" },
   { id: "TOEFL_IBT", label: "TOEFL iBT", desc: "For US university admission & visa requirements" },
+  { id: "GENERAL_ENGLISH", label: "General English", desc: "Improve daily vocabulary, grammar, and reading" },
 ];
 
 const SKILL_OPTIONS: { id: SkillFocus; label: string }[] = [
@@ -67,12 +68,13 @@ export default function PracticePage() {
 
   // Load tier from localStorage
   useEffect(() => {
-    const savedTier = localStorage.getItem("practiceforge_tier");
-    if (savedTier === "premium") setTier("premium");
+    const savedTier = localStorage.getItem("practiceforge_tier") as UserTier;
+    if (savedTier === "pro" || savedTier === "gold") setTier(savedTier);
   }, []);
 
   function toggleTier() {
-    const newTier = tier === "free" ? "premium" : "free";
+    const map: Record<UserTier, UserTier> = { free: "pro", pro: "gold", gold: "free" };
+    const newTier = map[tier];
     setTier(newTier);
     localStorage.setItem("practiceforge_tier", newTier);
   }
@@ -141,22 +143,22 @@ export default function PracticePage() {
           {/* Tier toggle */}
           <div className="card" style={{ marginBottom: "1.75rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
             <div>
-              <p style={{ margin: "0 0 0.25rem", fontWeight: 800, color: "var(--foreground)", fontSize: "0.9375rem" }}>
-                {tier === "premium" ? "Premium Plan" : "Free Plan"}
+              <p style={{ margin: "0 0 0.25rem", fontWeight: 800, color: "var(--foreground)", fontSize: "0.9375rem", textTransform: "capitalize" }}>
+                {tier} Plan (Dev Test Toggle)
               </p>
               <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>
-                {tier === "free"
-                  ? `Up to ${limits.maxWords} words · ${limits.questionCount} questions · ${limits.vocabCount} vocabulary items`
-                  : `Up to ${limits.maxWords} words · ${limits.questionCount}+ questions · ${limits.vocabCount}+ vocabulary · Study plan · Writing prompts`}
+                Up to {limits.maxWords} words · {limits.questionCount} questions · {limits.vocabCount} vocabulary
+                {tier === "pro" && " · Writing · Study plan"}
+                {tier === "gold" && " · Writing · Study plan · AI Speaking Agent"}
               </p>
             </div>
             <button
               onClick={toggleTier}
               id="tier-toggle"
-              className={tier === "premium" ? "btn-secondary" : "btn-primary"}
+              className={tier === "free" ? "btn-primary" : "btn-secondary"}
               style={{ fontSize: "0.875rem", padding: "0.5rem 1.25rem", whiteSpace: "nowrap" }}
             >
-              {tier === "premium" ? "Switch to Free" : "Upgrade to Premium"}
+              Cycle Tier: {tier} ➔ {tier === "free" ? "pro" : tier === "pro" ? "gold" : "free"}
             </button>
           </div>
 
@@ -365,7 +367,16 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
               </div>
 
               {status === "loading" && <LoadingSkeleton />}
-              {status === "success" && result && <ResultTabs result={result} />}
+              {status === "success" && result && (
+                <>
+                  <ResultTabs result={result} />
+                  <div style={{ marginTop: "2rem", display: "flex", justifyContent: "center" }}>
+                    <button onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); handleGenerate(); }} className="btn-primary" style={{ background: "var(--brutal-yellow)", color: "#000" }}>
+                      Regenerate
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

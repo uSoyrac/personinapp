@@ -2,7 +2,7 @@
 // Enums / Union Types
 // ==============================
 
-export type ExamType = "IELTS_ACADEMIC" | "TOEFL_IBT";
+export type ExamType = "IELTS_ACADEMIC" | "TOEFL_IBT" | "GENERAL_ENGLISH";
 
 export type SkillFocus =
   | "Reading"
@@ -151,7 +151,7 @@ export interface WritingFeedbackSession {
 // User Tier
 // ==============================
 
-export type UserTier = "free" | "premium";
+export type UserTier = "free" | "pro" | "gold";
 
 // ==============================
 // Vocabulary Quiz

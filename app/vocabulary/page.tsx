@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { SavedWord } from "@/lib/wordList";
 import { getWordList, saveWords, removeWord, clearWordList, getWordStats, updateWordProgress } from "@/lib/wordList";
-import { getTranslation, getNativeLanguage, setNativeLanguage, LANGUAGE_LABELS, LANGUAGE_FLAGS } from "@/lib/translations";
+import { getTranslation, getNativeLanguage, setNativeLanguage, fetchTranslation, LANGUAGE_LABELS, LANGUAGE_FLAGS } from "@/lib/translations";
 import type { NativeLanguage } from "@/lib/translations";
 import { addXP, awardBadge, getGameState } from "@/lib/gamification";
 import ProgressBar from "@/components/ProgressBar";
@@ -80,16 +80,30 @@ export default function VocabularyPage() {
 
   function changeLang(l: NativeLanguage) { setLang(l); setNativeLanguage(l); }
 
-  function startQuiz(setIdx: number) {
+  const [isStartingQuiz, setIsStartingQuiz] = useState(false);
+
+  async function startQuiz(setIdx: number) {
     let s: SavedWord[] = [];
     if (setIdx === -1) s = hardWords;
     else s = sets[setIdx] ?? [];
     
     if (s.length < 2) return;
+
+    setIsStartingQuiz(true);
+    // Fetch any missing translations on the fly
+    if (lang) {
+      for (const w of s) {
+        if (!getTranslation(w.word, lang)) {
+          await fetchTranslation(w.word, lang);
+        }
+      }
+    }
+    
     const qs = buildQuiz(shuffleArray(s).slice(0, Math.min(20, s.length)), lang, quizMode);
     setQuiz({ qs, ci: 0, ans: new Array(qs.length).fill(null), fb: false });
     setActiveSet(setIdx);
     setView("quiz");
+    setIsStartingQuiz(false);
   }
 
   function handleAnswer(idx: number) {
@@ -285,8 +299,8 @@ export default function VocabularyPage() {
                     <div className="card" style={{ padding: "1.5rem", background: "var(--brutal-red)", color: "#000", border: "4px solid #000", marginBottom: "1rem", boxShadow: "6px 6px 0px #000" }}>
                       <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.25rem", fontWeight: 900, textTransform: "uppercase" }}>Zor Kelimeler (Hard Words)</h3>
                       <p style={{ margin: "0 0 1rem", fontSize: "0.875rem", fontWeight: 600 }}>{hardWords.length} words need review. Practice them to remove the 'hard' tag.</p>
-                      <button onClick={() => startQuiz(-1)} className="btn-primary" style={{ background: "#fff", color: "#000" }} disabled={hardWords.length < 2}>
-                        Practice Hard Words
+                      <button onClick={() => startQuiz(-1)} className="btn-primary" style={{ background: "#fff", color: "#000" }} disabled={hardWords.length < 2 || isStartingQuiz}>
+                        {isStartingQuiz ? "Translating..." : "Practice Hard Words"}
                       </button>
                       {hardWords.length < 2 && <p style={{ margin: "0.5rem 0 0", fontSize: "0.75rem", fontWeight: 800 }}>Need at least 2 hard words to start quiz.</p>}
                     </div>
@@ -325,9 +339,9 @@ export default function VocabularyPage() {
                             onClick={(e) => { e.stopPropagation(); startQuiz(si); }}
                             className="btn-primary"
                             style={{ fontSize: "0.8125rem", padding: "0.5rem 1rem", flexShrink: 0 }}
-                            disabled={s.length < 2}
+                            disabled={s.length < 2 || isStartingQuiz}
                           >
-                            Start Quiz
+                            {isStartingQuiz && activeSet === si ? "Translating..." : "Start Quiz"}
                           </button>
                         </div>
                       </div>
