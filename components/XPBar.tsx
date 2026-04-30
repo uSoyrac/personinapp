@@ -9,7 +9,10 @@ export default function XPBar() {
 
   useEffect(() => {
     setMounted(true);
-    const update = () => setState(getGameState());
+    const update = () => {
+      const s = getGameState();
+      setState({ ...s, nextLevelXP: Math.max(100, Math.floor(100 * Math.pow(1.5, s.level - 1))) });
+    };
     update();
     window.addEventListener("xp_updated", update);
     return () => window.removeEventListener("xp_updated", update);
