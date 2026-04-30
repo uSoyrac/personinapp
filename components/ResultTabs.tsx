@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { PracticeGenerationResult } from "@/types";
 import ReadingCard from "./results/ReadingCard";
 import VocabularyCard from "./results/VocabularyCard";
 import WritingCard from "./results/WritingCard";
