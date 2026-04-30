@@ -1,8 +1,8 @@
-import type { WritingFeedbackResult } from "@/types";
+import type { WritingFeedbackResult, ExamType } from "@/types";
 
 interface WritingFeedbackCardProps {
   feedback: WritingFeedbackResult;
-  examType: "IELTS_ACADEMIC" | "TOEFL_IBT";
+  examType: ExamType;
 }
 
 const DIMENSION_ICONS: Record<string, string> = {
