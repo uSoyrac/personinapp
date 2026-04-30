@@ -95,6 +95,10 @@ export default function VocabularyPage() {
 
   function handleAddManualWord(e: React.FormEvent) {
     e.preventDefault();
+    addWordInternal();
+  }
+
+  function addWordInternal() {
     if (!manualWord.trim() || !manualDef.trim()) return;
     
     saveWords([{
@@ -108,6 +112,21 @@ export default function VocabularyPage() {
     setManualWord("");
     setManualDef("");
     refresh();
+  }
+
+  function handleAddAndTest() {
+    if (!manualWord.trim() || !manualDef.trim()) return;
+    const w = manualWord.trim();
+    addWordInternal();
+    
+    // Find the word in the updated list
+    const updatedWords = getWordList();
+    const idx = updatedWords.findIndex(x => x.word === w);
+    if (idx !== -1) {
+      const setIdx = Math.floor(idx / SET_SIZE);
+      // Wait a tick for states to sync before starting quiz
+      setTimeout(() => startQuiz(setIdx), 50);
+    }
   }
 
   if (!mounted) return null;
@@ -185,9 +204,14 @@ export default function VocabularyPage() {
                     onChange={(e) => setManualDef(e.target.value)}
                     style={{ flex: "2 1 300px" }}
                   />
-                  <button type="submit" className="btn-primary" style={{ flexShrink: 0 }}>
-                    + Add Word
-                  </button>
+                  <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
+                    <button type="submit" className="btn-secondary">
+                      + Add
+                    </button>
+                    <button type="button" onClick={handleAddAndTest} className="btn-primary" style={{ background: "var(--brutal-yellow)" }}>
+                      + Add & Test Now
+                    </button>
+                  </div>
                 </form>
               </div>
 
