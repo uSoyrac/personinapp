@@ -36,7 +36,7 @@ function buildQuiz(words: SavedWord[], lang: NativeLanguage | null, mode: QuizDi
       while (wrongs.length < 3) wrongs.push(["random", "example", "test", "dummy"][wrongs.length] ?? "—");
       const opts = shuffleArray([correctWord, ...wrongs]);
       return { 
-        word: w.word, definition: w.definition, nativeTranslation: getTranslation(w.word, lang) ?? undefined, 
+        word: w.word, definition: w.definition, nativeTranslation: getTranslation(w.word, lang as NativeLanguage) ?? undefined, 
         options: opts, correctIndex: opts.indexOf(correctWord), direction: "native-en" 
       };
     } else {
