@@ -35,21 +35,22 @@
   --accent-light: #000000;
   --accent-glow: #F0EDE8;
 
-  --radius-sm: 0;
-  --radius-md: 4px;
-  --radius-lg: 4px;
-  --radius-xl: 4px;
+  /* Softer Neo-Brutalism adjustments */
+  --radius-sm: 4px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 
   --font-sans: "Inter", system-ui, sans-serif;
   --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
 
-  /* Hard shadows */
-  --shadow-sm: 2px 2px 0px #000000;
-  --shadow-md: 4px 4px 0px #000000;
-  --shadow-lg: 6px 6px 0px #000000;
-  --shadow-glow: 4px 4px 0px #000000;
+  /* Slightly softer shadows */
+  --shadow-sm: 2px 2px 0px #1a1a1a;
+  --shadow-md: 4px 4px 0px #1a1a1a;
+  --shadow-lg: 6px 6px 0px #1a1a1a;
+  --shadow-glow: 4px 4px 0px #1a1a1a;
   
-  --border-width: 3px;
+  --border-width: 2px;
 }
 
 /* ==============================
@@ -309,35 +310,46 @@ a { color: inherit; text-decoration: none; }
 .glow-text-primary { text-shadow: 2px 2px 0px rgba(0,0,0,0.2); }
 
 /* ==============================
-   Tabs
+   Tabs (Grid style based on UI request)
    ============================== */
 .tab-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+.tab-item {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  padding: 1.5rem 1rem;
   background: var(--surface);
   border: var(--border-width) solid #000;
   border-radius: var(--radius-md);
-  padding: 0.5rem;
-  flex-wrap: wrap;
-  box-shadow: var(--shadow-sm);
-}
-.tab-item {
-  padding: 0.5rem 1rem;
-  border-radius: 0;
   font-size: 0.875rem;
   font-weight: 800;
   color: #000;
   cursor: pointer;
-  transition: all 0.1s ease;
-  border: 2px solid transparent;
-  background: transparent;
-  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
 }
-.tab-item:hover { background: var(--bg); border: 2px solid #000; }
+.tab-item:hover { 
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-md);
+  background: var(--bg);
+}
 .tab-item.active {
-  background: #000;
-  color: #FFF;
-  border: 2px solid #000;
+  background: var(--peach);
+  color: #000;
+  border-color: #000;
+  box-shadow: inset 3px 3px 0px rgba(0,0,0,0.05);
+  transform: translate(2px, 2px);
+}
+.tab-item-icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.25rem;
 }
 
 /* ==============================

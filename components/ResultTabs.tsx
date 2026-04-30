@@ -38,7 +38,7 @@ export default function ResultTabs({ result }: ResultTabsProps) {
             className={`tab-item ${active === tab.id ? "active" : ""}`}
             onClick={() => setActive(tab.id)}
           >
-            <span style={{ marginRight: "0.25rem" }}>{tab.icon}</span>
+            <div className="tab-item-icon">{tab.icon}</div>
             {tab.label}
           </button>
         ))}
