@@ -17,6 +17,7 @@ const NAV_LINKS = [
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [tier, setTier] = useState<UserTier>("guest");
+  const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
     // Hidden Dev Tool: Clear cache if ?reset=true
@@ -102,9 +103,59 @@ export default function Nav() {
               </button>
             </div>
           ) : (
-            <Link href="/practice" className="btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.875rem", borderRadius: "var(--radius-sm)", whiteSpace: "nowrap", height: "fit-content" }}>
-              Start Practice
-            </Link>
+            <div style={{ position: "relative" }}>
+              <button 
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="btn-secondary" 
+                style={{ padding: "0.5rem 1rem", fontSize: "0.875rem", borderRadius: "var(--radius-sm)", whiteSpace: "nowrap", height: "fit-content", display: "flex", alignItems: "center", gap: "0.5rem" }}
+              >
+                <div style={{ width: "1.5rem", height: "1.5rem", borderRadius: "50%", background: "linear-gradient(135deg, var(--primary), var(--accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "0.75rem", fontWeight: "bold" }}>
+                  U
+                </div>
+                <span>{tier.toUpperCase()} User</span>
+              </button>
+              
+              {profileOpen && (
+                <div style={{
+                  position: "absolute", top: "100%", right: 0, marginTop: "0.5rem",
+                  background: "var(--surface)", border: "1px solid var(--border)",
+                  borderRadius: "var(--radius-sm)", boxShadow: "var(--shadow-lg)",
+                  width: "220px", zIndex: 1000, padding: "0.5rem"
+                }}>
+                  <div style={{ padding: "0.75rem", borderBottom: "1px solid var(--border)", marginBottom: "0.5rem" }}>
+                    <p style={{ margin: 0, fontSize: "0.75rem", color: "var(--foreground-muted)" }}>Current Plan</p>
+                    <p style={{ margin: 0, fontSize: "1rem", fontWeight: "bold", color: "var(--primary)" }}>{tier.toUpperCase()} Plan</p>
+                  </div>
+                  
+                  {tier !== "gold" && (
+                    <button 
+                      onClick={() => { localStorage.setItem("practiceforge_tier", "gold"); window.location.reload(); }}
+                      style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "var(--primary-glow)", color: "var(--primary)", border: "none", fontSize: "0.875rem", fontWeight: 600, cursor: "pointer", marginBottom: "0.5rem" }}
+                    >
+                      🚀 Upgrade to Gold
+                    </button>
+                  )}
+                  
+                  <button 
+                    onClick={() => { alert("Settings / Subscription Management\n\n- Viewing renewal date\n- Update payment method\n- Cancel Subscription (Funbridge style)"); }}
+                    style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--foreground)", border: "none", fontSize: "0.875rem", cursor: "pointer", marginBottom: "0.5rem" }}
+                    onMouseEnter={e => (e.target as HTMLElement).style.background = "var(--surface-2)"}
+                    onMouseLeave={e => (e.target as HTMLElement).style.background = "transparent"}
+                  >
+                    ⚙️ Manage Subscription
+                  </button>
+                  
+                  <button 
+                    onClick={() => { localStorage.setItem("practiceforge_tier", "guest"); window.location.reload(); }}
+                    style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--rose)", border: "none", fontSize: "0.875rem", cursor: "pointer" }}
+                    onMouseEnter={e => (e.target as HTMLElement).style.background = "var(--surface-2)"}
+                    onMouseLeave={e => (e.target as HTMLElement).style.background = "transparent"}
+                  >
+                    🚪 Log Out
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -166,9 +217,35 @@ export default function Nav() {
               </button>
             </div>
           ) : (
-            <Link href="/practice" className="btn-primary" onClick={() => setMobileOpen(false)} style={{ justifyContent: "center", padding: "0.75rem", borderRadius: "var(--radius-sm)" }}>
-              Start Practice
-            </Link>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div style={{ padding: "0.75rem", background: "var(--surface-2)", borderRadius: "var(--radius-sm)", textAlign: "center" }}>
+                <p style={{ margin: 0, fontSize: "0.75rem", color: "var(--foreground-muted)" }}>Logged in as</p>
+                <p style={{ margin: 0, fontSize: "1rem", fontWeight: "bold", color: "var(--primary)" }}>{tier.toUpperCase()} User</p>
+              </div>
+              {tier !== "gold" && (
+                <button 
+                  onClick={() => { localStorage.setItem("practiceforge_tier", "gold"); window.location.reload(); }}
+                  className="btn-primary" 
+                  style={{ justifyContent: "center", padding: "0.75rem", borderRadius: "var(--radius-sm)" }}
+                >
+                  🚀 Upgrade to Gold
+                </button>
+              )}
+              <button 
+                onClick={() => { alert("Settings / Subscription Management\n\n- Viewing renewal date\n- Update payment method\n- Cancel Subscription (Funbridge style)"); }}
+                className="btn-secondary"
+                style={{ justifyContent: "center", padding: "0.75rem", borderRadius: "var(--radius-sm)" }}
+              >
+                ⚙️ Manage Subscription
+              </button>
+              <button 
+                onClick={() => { localStorage.setItem("practiceforge_tier", "guest"); window.location.reload(); }}
+                className="btn-secondary"
+                style={{ justifyContent: "center", padding: "0.75rem", borderRadius: "var(--radius-sm)", color: "var(--rose)", borderColor: "var(--rose)" }}
+              >
+                🚪 Log Out
+              </button>
+            </div>
           )}
         </div>
       )}

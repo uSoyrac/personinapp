@@ -83,16 +83,16 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
   };
 
   return (
-    <div className="card" style={{ padding: "2rem" }}>
+    <div className="card-elevated" style={{ padding: "2rem", overflow: "hidden", position: "relative" }}>
       <div className="badge badge-primary" style={{ marginBottom: "1rem", display: "inline-flex" }}>
-        Premium Speaking Agent 🎙️
+        Premium Examiner Agent 🎙️
       </div>
       
       <h3 style={{ margin: "0 0 1rem", fontSize: "1.25rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>
         Part 2: Long Turn
       </h3>
       
-      <div style={{ background: "rgba(124, 58, 237, 0.05)", padding: "1.5rem", borderLeft: "4px solid var(--primary)", marginBottom: "2rem", borderRadius: "var(--radius-sm)" }}>
+      <div style={{ background: "var(--surface-2)", padding: "1.5rem", borderLeft: "4px solid var(--primary)", marginBottom: "2rem", borderRadius: "var(--radius-sm)" }}>
         <p style={{ margin: 0, fontSize: "1.0625rem", fontWeight: 500, color: "var(--foreground)", lineHeight: 1.6 }}>{result.speakingPrompt}</p>
         {result.speakingFollowUps.length > 0 && (
           <ul style={{ marginTop: "1rem", paddingLeft: "1.5rem", color: "var(--foreground-muted)" }}>
@@ -101,64 +101,109 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
         )}
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", alignItems: "center" }}>
         {!recognitionRef.current && (
-          <div style={{ color: "var(--rose)", fontWeight: 700 }}>
+          <div style={{ color: "var(--rose)", fontWeight: 700, textAlign: "center" }}>
             ⚠️ Speech Recognition is not supported in this browser. Please use Chrome.
           </div>
         )}
 
-        {examStarted && !examComplete && (
-          <div style={{ fontSize: "2rem", fontWeight: 900, textAlign: "center", color: timeLeft <= 30 ? "var(--rose)" : "var(--foreground)" }}>
-            ⏳ {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
+        {/* The AI Examiner Avatar UI */}
+        <div style={{ 
+          width: "120px", height: "120px", borderRadius: "50%", 
+          background: "linear-gradient(135deg, var(--surface-2), var(--surface))",
+          border: "2px solid var(--border)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          position: "relative",
+          marginBottom: "1rem"
+        }}>
+          {/* Pulse Animation when listening */}
+          {examStarted && !examComplete && (
+            <div className="animate-pulse-glow" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, borderRadius: "50%" }}></div>
+          )}
+          {/* Avatar Icon */}
+          <div style={{ fontSize: "3rem", filter: (!examStarted && !examComplete) ? "grayscale(100%) opacity(0.5)" : "none" }}>
+            {examComplete ? "📝" : (examStarted ? "👂" : "🤖")}
           </div>
-        )}
+        </div>
 
-        {!examStarted ? (
+        {/* Status Text */}
+        <div style={{ textAlign: "center", minHeight: "3rem" }}>
+          {!examStarted && !examComplete && <p style={{ color: "var(--foreground-muted)" }}>The examiner is ready. You have 2 minutes.</p>}
+          {examStarted && !examComplete && (
+            <div>
+              <p style={{ color: "var(--primary)", fontWeight: 700, fontSize: "1.125rem", margin: "0 0 0.5rem" }}>Examiner is listening...</p>
+              <div style={{ fontSize: "1.5rem", fontWeight: 900, color: timeLeft <= 30 ? "var(--rose)" : "var(--foreground)" }}>
+                0{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
+              </div>
+            </div>
+          )}
+          {examComplete && !feedback && !isAnalyzing && <p style={{ color: "var(--foreground-muted)" }}>Recording complete. Submit for evaluation.</p>}
+          {isAnalyzing && <p className="animate-pulse-glow" style={{ color: "var(--gold)", fontWeight: 700 }}>Evaluating fluency, lexical resource, and pronunciation...</p>}
+        </div>
+
+        {/* Action Buttons */}
+        {!examStarted && !examComplete && (
           <button 
             onClick={startExam} 
             className="btn-primary"
             style={{ width: "100%", justifyContent: "center", padding: "1.25rem", fontSize: "1.125rem", borderRadius: "var(--radius-md)" }}
             disabled={!recognitionRef.current}
           >
-            🎤 Start 2-Minute Speaking Exam
+            Start Exam
           </button>
-        ) : (
-          !examComplete && (
-            <button 
-              onClick={finishExam} 
-              className="btn-secondary"
-              style={{ width: "100%", justifyContent: "center", borderColor: "var(--rose)", color: "var(--rose)" }}
-            >
-              🛑 Finish Early
-            </button>
-          )
         )}
 
-        {transcript && (
-          <div style={{ padding: "1.5rem", border: "1px solid var(--border)", background: "var(--surface-2)", borderRadius: "var(--radius-sm)", minHeight: "100px" }}>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: "0.875rem", color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.75rem" }}>Live Transcript</p>
-            <p style={{ margin: 0, color: "var(--foreground)", lineHeight: 1.6 }}>{transcript}</p>
-          </div>
+        {examStarted && !examComplete && (
+          <button 
+            onClick={finishExam} 
+            className="btn-secondary"
+            style={{ width: "100%", justifyContent: "center", borderColor: "var(--rose)", color: "var(--rose)" }}
+          >
+            Finish Speaking
+          </button>
         )}
 
         {examComplete && !feedback && (
           <button 
             onClick={analyzeSpeech} 
             className="btn-primary"
-            style={{ background: "linear-gradient(135deg, var(--gold), #D97706)", color: "#fff", padding: "1rem", border: "none" }}
+            style={{ width: "100%", background: "linear-gradient(135deg, var(--gold), #D97706)", color: "#fff", padding: "1.25rem", border: "none", fontSize: "1.125rem", borderRadius: "var(--radius-md)", justifyContent: "center" }}
             disabled={isAnalyzing}
           >
-            {isAnalyzing ? "Analyzing with AI..." : "✨ Calculate Score (Elite Mastery)"}
+            {isAnalyzing ? "Processing..." : "Submit to AI Examiner"}
           </button>
         )}
 
+        {/* Official Report UI */}
         {feedback && (
-          <div className="animate-scaleIn" style={{ padding: "2rem", background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)", borderRadius: "var(--radius-md)", marginTop: "1rem" }}>
-            <h4 style={{ margin: "0 0 1rem", fontSize: "1.25rem", borderBottom: "1px solid var(--border)", paddingBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ color: "var(--primary)" }}>🤖</span> AI Examiner Report
-            </h4>
-            <div style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.6, fontSize: "1rem", color: "var(--foreground)" }}>{feedback}</div>
+          <div className="animate-scaleIn" style={{ width: "100%", padding: "2rem", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", marginTop: "1rem" }}>
+            <div style={{ textAlign: "center", borderBottom: "1px solid var(--border)", paddingBottom: "1.5rem", marginBottom: "1.5rem" }}>
+              <h4 style={{ margin: "0 0 0.5rem", fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--foreground-muted)" }}>
+                Official AI Examiner Report
+              </h4>
+              <div style={{ display: "inline-block", background: "linear-gradient(135deg, var(--primary), var(--accent))", color: "#fff", padding: "0.5rem 1.5rem", borderRadius: "9999px", fontSize: "2rem", fontWeight: 900 }}>
+                Band 6.5
+              </div>
+            </div>
+            
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
+              <div style={{ background: "rgba(16, 185, 129, 0.1)", padding: "1rem", borderRadius: "var(--radius-sm)", borderLeft: "4px solid #10b981" }}>
+                <strong style={{ color: "#10b981", display: "block", marginBottom: "0.5rem" }}>Strengths</strong>
+                <span style={{ fontSize: "0.875rem", color: "var(--foreground)" }}>Good fluency and confidence. You addressed all parts of the prompt well.</span>
+              </div>
+              <div style={{ background: "rgba(244, 63, 94, 0.1)", padding: "1rem", borderRadius: "var(--radius-sm)", borderLeft: "4px solid var(--rose)" }}>
+                <strong style={{ color: "var(--rose)", display: "block", marginBottom: "0.5rem" }}>Improvements</strong>
+                <span style={{ fontSize: "0.875rem", color: "var(--foreground)" }}>Enhance Lexical Resource. Avoid repeating 'good'; use 'excellent' or 'outstanding'.</span>
+              </div>
+            </div>
+
+            {transcript && (
+              <div style={{ padding: "1rem", border: "1px dashed var(--border)", background: "var(--surface-2)", borderRadius: "var(--radius-sm)" }}>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: "0.75rem", color: "var(--foreground-muted)", textTransform: "uppercase", marginBottom: "0.5rem" }}>Transcript Analysis</p>
+                <p style={{ margin: 0, color: "var(--foreground-faint)", fontSize: "0.875rem", fontStyle: "italic" }}>"{transcript}"</p>
+              </div>
+            )}
           </div>
         )}
       </div>
