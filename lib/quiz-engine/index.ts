@@ -3,14 +3,13 @@
  * Generates offline practice content without any API calls.
  */
 
-import type { PracticeGenerationResult, PracticeSessionInput } from "@/types";
+import type { PracticeGenerationResult, PracticeSessionInput, UserTier } from "@/types";
 import { analyzeText, countWords } from "./textAnalyzer";
 import { generateQuestions } from "./questionGenerator";
 import { extractVocabulary } from "./vocabularyExtractor";
 
-export type UserTier = "free" | "pro" | "gold";
-
 export const TIER_LIMITS = {
+  guest: { maxWords: 150, questionCount: 3, vocabCount: 3 },
   free: { maxWords: 300, questionCount: 5, vocabCount: 5 },
   pro: { maxWords: 2000, questionCount: 15, vocabCount: 15 },
   gold: { maxWords: 3000, questionCount: 15, vocabCount: 20 },

@@ -155,7 +155,7 @@ export interface WritingFeedbackSession {
 // User Tier
 // ==============================
 
-export type UserTier = "free" | "pro" | "gold";
+export type UserTier = "guest" | "free" | "pro" | "gold";
 
 // ==============================
 // Vocabulary Quiz

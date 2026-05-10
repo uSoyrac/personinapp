@@ -64,16 +64,29 @@ export default function PracticePage() {
   const [status, setStatus] = useState<GenerationStatus>("idle");
   const [result, setResult] = useState<PracticeGenerationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tier, setTier] = useState<UserTier>("free");
+  const [tier, setTier] = useState<UserTier>("guest");
+  const [usageCount, setUsageCount] = useState(0);
 
-  // Load tier from localStorage
+  // Load tier and usage from localStorage
   useEffect(() => {
     const savedTier = localStorage.getItem("practiceforge_tier") as UserTier;
-    if (savedTier === "pro" || savedTier === "gold") setTier(savedTier);
+    if (savedTier) setTier(savedTier);
+
+    const today = new Date().toISOString().split("T")[0];
+    const savedDate = localStorage.getItem("practiceforge_usage_date");
+    
+    if (savedDate !== today) {
+      localStorage.setItem("practiceforge_usage_date", today);
+      localStorage.setItem("practiceforge_usage_count", "0");
+      setUsageCount(0);
+    } else {
+      const count = parseInt(localStorage.getItem("practiceforge_usage_count") || "0", 10);
+      setUsageCount(count);
+    }
   }, []);
 
   function toggleTier() {
-    const map: Record<UserTier, UserTier> = { free: "pro", pro: "gold", gold: "free" };
+    const map: Record<UserTier, UserTier> = { guest: "free", free: "pro", pro: "gold", gold: "guest" };
     const newTier = map[tier];
     setTier(newTier);
     localStorage.setItem("practiceforge_tier", newTier);
@@ -84,6 +97,15 @@ export default function PracticePage() {
   const isOverLimit = wordCount > limits.maxWords;
 
   async function handleGenerate() {
+    if (tier === "guest" && usageCount >= 1) {
+      setError("GUEST_WALL");
+      return;
+    }
+    if (tier === "free" && usageCount >= 1) {
+      setError("FREE_WALL");
+      return;
+    }
+
     if (inputText.trim().length < 50) {
       setError("Please paste at least 50 characters of text to generate practice content.");
       return;
@@ -113,6 +135,10 @@ export default function PracticePage() {
       const data: PracticeGenerationResult = await res.json();
       setResult(data);
       setStatus("success");
+      
+      const newCount = usageCount + 1;
+      setUsageCount(newCount);
+      localStorage.setItem("practiceforge_usage_count", newCount.toString());
 
       setTimeout(() => {
         document.getElementById("results-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -144,7 +170,7 @@ export default function PracticePage() {
           <div className="card" style={{ marginBottom: "1.75rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
             <div>
               <p style={{ margin: "0 0 0.25rem", fontWeight: 800, color: "var(--foreground)", fontSize: "0.9375rem", textTransform: "capitalize" }}>
-                {tier} Plan (Dev Test Toggle)
+                {tier} Plan
               </p>
               <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>
                 Up to {limits.maxWords} words · {limits.questionCount} questions · {limits.vocabCount} vocabulary
@@ -155,15 +181,38 @@ export default function PracticePage() {
             <button
               onClick={toggleTier}
               id="tier-toggle"
-              className={tier === "free" ? "btn-primary" : "btn-secondary"}
+              className={tier === "guest" || tier === "free" ? "btn-primary" : "btn-secondary"}
               style={{ fontSize: "0.875rem", padding: "0.5rem 1.25rem", whiteSpace: "nowrap" }}
             >
-              Cycle Tier: {tier} ➔ {tier === "free" ? "pro" : tier === "pro" ? "gold" : "free"}
+              Cycle Tier: {tier} ➔ {tier === "guest" ? "free" : tier === "free" ? "pro" : tier === "pro" ? "gold" : "guest"}
             </button>
           </div>
 
+          {/* Upsell Walls */}
+          {error === "GUEST_WALL" && (
+            <div className="card-elevated animate-fadeIn" style={{ padding: "2rem", marginBottom: "1.75rem", background: "linear-gradient(to right, var(--surface), var(--surface-2))", borderLeft: "4px solid var(--primary)" }}>
+              <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>You've unlocked your potential!</h3>
+              <p style={{ color: "var(--foreground-muted)", marginBottom: "1.5rem" }}>You've used your 1 free guest trial. Create a free account to unlock daily practice, a personalized dictionary, and progress tracking.</p>
+              <button className="btn-primary" onClick={() => window.dispatchEvent(new Event("open-signup"))}>Create Free Account</button>
+            </div>
+          )}
+
+          {error === "FREE_WALL" && (
+            <div className="card-elevated animate-fadeIn" style={{ padding: "2rem", marginBottom: "1.75rem", background: "linear-gradient(to right, var(--surface), var(--surface-2))", borderLeft: "4px solid var(--primary)" }}>
+              <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>Daily Limit Reached</h3>
+              <p style={{ color: "var(--foreground-muted)", marginBottom: "1.5rem" }}>You've reached your free daily limit. Upgrade to Pro Study to unlock unlimited practice and AI writing feedback.</p>
+              <button className="btn-primary" onClick={() => { localStorage.setItem("practiceforge_tier", "pro"); window.location.reload(); }}>Upgrade to Pro Study</button>
+            </div>
+          )}
+
+          {error && error !== "GUEST_WALL" && error !== "FREE_WALL" && (
+            <div style={{ color: "var(--red)", background: "rgba(239, 68, 68, 0.1)", padding: "1rem", borderRadius: "0.5rem", marginBottom: "1.75rem" }}>
+              {error}
+            </div>
+          )}
+
           {/* ===== FORM ===== */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem", opacity: (error === "GUEST_WALL" || error === "FREE_WALL") ? 0.5 : 1, pointerEvents: (error === "GUEST_WALL" || error === "FREE_WALL") ? "none" : "auto" }}>
 
             {/* Exam Type */}
             <div>

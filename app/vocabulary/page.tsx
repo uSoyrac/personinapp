@@ -3,50 +3,58 @@
 import { useState, useEffect, useCallback } from "react";
 import type { SavedWord } from "@/lib/wordList";
 import { getWordList, saveWords, removeWord, clearWordList, getWordStats, updateWordProgress } from "@/lib/wordList";
-import { getTranslation, getNativeLanguage, setNativeLanguage, fetchTranslation, LANGUAGE_LABELS, LANGUAGE_FLAGS } from "@/lib/translations";
-import type { NativeLanguage } from "@/lib/translations";
-import { addXP, awardBadge, getGameState } from "@/lib/gamification";
+import { addXP, awardBadge } from "@/lib/gamification";
 import ProgressBar from "@/components/ProgressBar";
 import Confetti from "@/components/Confetti";
 
 type ViewMode = "sets" | "quiz" | "results";
-type QuizDirection = "en-native" | "native-en" | "mixed";
+type QuizDirection = "word-def" | "def-word";
 const SET_SIZE = 20;
 
-interface QuizQ { word: string; definition: string; nativeTranslation?: string; options: string[]; correctIndex: number; direction: "en-native" | "native-en"; }
-
-function shuffleArray<T>(arr: T[]): T[] {
-  const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a;
+interface QuizQ { 
+  word: string; 
+  definition: string; 
+  options: string[]; 
+  correctIndex: number; 
+  direction: QuizDirection; 
 }
 
-function buildQuiz(words: SavedWord[], lang: NativeLanguage | null, mode: QuizDirection): QuizQ[] {
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr]; 
+  for (let i = a.length - 1; i > 0; i--) { 
+    const j = Math.floor(Math.random() * (i + 1)); 
+    [a[i], a[j]] = [a[j], a[i]]; 
+  } 
+  return a;
+}
+
+function buildQuiz(words: SavedWord[], mode: QuizDirection): QuizQ[] {
   const allEnWords = words.map(w => w.word);
-  const allDefs = words.map(w => lang ? (getTranslation(w.word, lang) ?? w.definition) : w.definition);
+  const allDefs = words.map(w => w.definition);
   
   return words.map(w => {
-    let isReverse = false;
-    if (lang) {
-      if (mode === "native-en") isReverse = true;
-      else if (mode === "mixed") isReverse = Math.random() > 0.5;
-    }
+    // If mode is mixed (optional later), we could randomize, but let's stick to chosen direction
+    const isReverse = mode === "def-word";
     
     if (isReverse) {
+      // Show definition, guess word
       const correctWord = w.word;
       const wrongs = shuffleArray(allEnWords.filter(e => e !== correctWord)).slice(0, 3);
-      while (wrongs.length < 3) wrongs.push(["random", "example", "test", "dummy"][wrongs.length] ?? "—");
+      while (wrongs.length < 3) wrongs.push(["ubiquitous", "ephemeral", "pragmatic", "lucid"][wrongs.length] ?? "—");
       const opts = shuffleArray([correctWord, ...wrongs]);
       return { 
-        word: w.word, definition: w.definition, nativeTranslation: getTranslation(w.word, lang as NativeLanguage) ?? undefined, 
-        options: opts, correctIndex: opts.indexOf(correctWord), direction: "native-en" 
+        word: w.word, definition: w.definition, 
+        options: opts, correctIndex: opts.indexOf(correctWord), direction: "def-word" 
       };
     } else {
-      const correctDef = lang ? (getTranslation(w.word, lang) ?? w.definition) : w.definition;
+      // Show word, guess definition
+      const correctDef = w.definition;
       const wrongs = shuffleArray(allDefs.filter(d => d !== correctDef)).slice(0, 3);
-      while (wrongs.length < 3) wrongs.push(["İlgisiz kavram", "Concepte sin relación", "Unrelatiertes Konzept", "Concept sans rapport"][wrongs.length] ?? "—");
+      while (wrongs.length < 3) wrongs.push(["A common misconception", "Relating to the study of stars", "Without logical reasoning", "To increase in volume"][wrongs.length] ?? "—");
       const opts = shuffleArray([correctDef, ...wrongs]);
       return { 
-        word: w.word, definition: w.definition, nativeTranslation: lang ? getTranslation(w.word, lang) ?? undefined : undefined, 
-        options: opts, correctIndex: opts.indexOf(correctDef), direction: "en-native" 
+        word: w.word, definition: w.definition, 
+        options: opts, correctIndex: opts.indexOf(correctDef), direction: "word-def" 
       };
     }
   });
@@ -56,9 +64,8 @@ export default function VocabularyPage() {
   const [view, setView] = useState<ViewMode>("sets");
   const [words, setWords] = useState<SavedWord[]>([]);
   const [stats, setStats] = useState({ total: 0, learned: 0, needsReview: 0, accuracy: 0 });
-  const [lang, setLang] = useState<NativeLanguage | null>(null);
   const [activeSet, setActiveSet] = useState(0);
-  const [quizMode, setQuizMode] = useState<QuizDirection>("en-native");
+  const [quizMode, setQuizMode] = useState<QuizDirection>("word-def");
   const [quiz, setQuiz] = useState<{ qs: QuizQ[]; ci: number; ans: (number | null)[]; fb: boolean } | null>(null);
   const [confetti, setConfetti] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -69,7 +76,7 @@ export default function VocabularyPage() {
 
   const refresh = useCallback(() => { setWords(getWordList()); setStats(getWordStats()); }, []);
 
-  useEffect(() => { setMounted(true); refresh(); const l = getNativeLanguage(); if (l) setLang(l); }, [refresh]);
+  useEffect(() => { setMounted(true); refresh(); }, [refresh]);
 
   const sets: SavedWord[][] = [];
   for (let i = 0; i < words.length; i += SET_SIZE) sets.push(words.slice(i, i + SET_SIZE));
@@ -78,11 +85,9 @@ export default function VocabularyPage() {
   const currentSet = activeSet === -1 ? words.filter(w => w.difficulty === "hard") : (sets[activeSet] ?? []);
   const hardWords = words.filter(w => w.difficulty === "hard");
 
-  function changeLang(l: NativeLanguage) { setLang(l); setNativeLanguage(l); }
-
   const [isStartingQuiz, setIsStartingQuiz] = useState(false);
 
-  async function startQuiz(setIdx: number) {
+  function startQuiz(setIdx: number) {
     let s: SavedWord[] = [];
     if (setIdx === -1) s = hardWords;
     else s = sets[setIdx] ?? [];
@@ -90,16 +95,8 @@ export default function VocabularyPage() {
     if (s.length < 2) return;
 
     setIsStartingQuiz(true);
-    // Fetch any missing translations on the fly
-    if (lang) {
-      for (const w of s) {
-        if (!getTranslation(w.word, lang)) {
-          await fetchTranslation(w.word, lang);
-        }
-      }
-    }
     
-    const qs = buildQuiz(shuffleArray(s).slice(0, Math.min(20, s.length)), lang, quizMode);
+    const qs = buildQuiz(shuffleArray(s).slice(0, Math.min(20, s.length)), quizMode);
     setQuiz({ qs, ci: 0, ans: new Array(qs.length).fill(null), fb: false });
     setActiveSet(setIdx);
     setView("quiz");
@@ -179,205 +176,208 @@ export default function VocabularyPage() {
           {confetti && <Confetti />}
 
           {/* Header */}
-          <div style={{ marginBottom: "1.5rem" }}>
-            <h1 style={{ margin: "0 0 0.5rem", color: "var(--foreground)", fontSize: "clamp(1.75rem, 4vw, 2.25rem)" }}>
-              <span className="gradient-text">My Words</span>
+          <div style={{ marginBottom: "2rem", textAlign: "center" }}>
+            <h1 style={{ margin: "0 0 0.75rem", fontSize: "clamp(2rem, 5vw, 3rem)" }}>
+              <span className="gradient-text">My Dictionary</span>
             </h1>
-            <p style={{ margin: 0, fontSize: "1rem" }}>Master vocabulary in 20-word sets. 3 correct = learned!</p>
+            <p style={{ margin: "0 auto", fontSize: "1.125rem", maxWidth: "600px" }}>Build your ultimate English vocabulary. Master definitions contextually to boost your IELTS score.</p>
           </div>
 
           {/* Stats row */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.625rem", marginBottom: "1.5rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
             {[
-              { l: "Total", v: stats.total, c: "var(--lavender)" },
+              { l: "Total Words", v: stats.total, c: "var(--primary)" },
               { l: "Learned", v: stats.learned, c: "var(--mint)" },
-              { l: "Review", v: stats.needsReview, c: "var(--coral)" },
-              { l: "Accuracy", v: `${stats.accuracy}%`, c: "var(--gold)" },
+              { l: "To Review", v: stats.needsReview, c: "var(--gold)" },
+              { l: "Accuracy", v: `${stats.accuracy}%`, c: "var(--sky)" },
             ].map(s => (
-              <div key={s.l} className="card" style={{ textAlign: "center", padding: "1rem" }}>
-                <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, color: s.c, fontFamily: "var(--font-display)" }}>{s.v}</p>
-                <p style={{ margin: "0.125rem 0 0", fontSize: "0.75rem", color: "var(--foreground-muted)", textTransform: "uppercase", fontWeight: 800 }}>{s.l}</p>
+              <div key={s.l} className="card" style={{ textAlign: "center", padding: "1.5rem 1rem", borderTop: `4px solid ${s.c}` }}>
+                <p style={{ margin: 0, fontSize: "2rem", fontWeight: 800, color: "var(--foreground)", fontFamily: "var(--font-display)", lineHeight: 1.2 }}>{s.v}</p>
+                <p style={{ margin: "0.25rem 0 0", fontSize: "0.8125rem", color: "var(--foreground-muted)", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.05em" }}>{s.l}</p>
               </div>
             ))}
           </div>
 
-          {/* Language selector & Quiz Mode */}
-          <div className="card" style={{ marginBottom: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem", padding: "1rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
-              <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "var(--foreground)" }}>NATIVE LANGUAGE:</span>
-              {(["tr", "es", "de", "fr"] as NativeLanguage[]).map(l => (
-                <button
-                  key={l}
-                  onClick={() => changeLang(l)}
-                  style={{
-                    padding: "0.375rem 0.75rem", borderRadius: "0", fontSize: "0.8125rem", fontWeight: 800,
-                    background: lang === l ? "var(--peach)" : "var(--surface)",
-                    border: `2px solid #000`,
-                    color: "#000",
-                    boxShadow: lang === l ? "2px 2px 0px #000" : "none",
-                    cursor: "pointer", transition: "all 0.1s",
-                  }}
-                >
-                  {LANGUAGE_FLAGS[l]} {LANGUAGE_LABELS[l]}
-                </button>
-              ))}
-            </div>
-
-            {lang && (
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
-                <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "var(--foreground)", textTransform: "uppercase" }}>Test Mode:</span>
+          {/* Quiz Mode Selector */}
+          {words.length > 0 && (
+            <div className="card" style={{ marginBottom: "2rem", display: "flex", flexDirection: "column", gap: "1rem", padding: "1.25rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>QUIZ MODE:</span>
                 {[
-                  { id: "en-native", label: `EN ➔ ${LANGUAGE_LABELS[lang].substring(0,3).toUpperCase()}` },
-                  { id: "native-en", label: `${LANGUAGE_LABELS[lang].substring(0,3).toUpperCase()} ➔ EN` },
-                  { id: "mixed", label: "Mixed 🔀" },
+                  { id: "word-def", label: "Guess Definition" },
+                  { id: "def-word", label: "Guess Word" },
                 ].map(m => (
                   <button
                     key={m.id}
                     onClick={() => setQuizMode(m.id as QuizDirection)}
                     style={{
-                      padding: "0.375rem 0.75rem", borderRadius: "0", fontSize: "0.8125rem", fontWeight: 800,
-                      background: quizMode === m.id ? "var(--brutal-purple)" : "var(--surface)",
-                      border: `2px solid #000`,
-                      color: quizMode === m.id ? "#fff" : "#000",
-                      boxShadow: quizMode === m.id ? "2px 2px 0px #000" : "none",
-                      cursor: "pointer", transition: "all 0.1s",
+                      padding: "0.5rem 1rem", borderRadius: "9999px", fontSize: "0.875rem", fontWeight: 600,
+                      background: quizMode === m.id ? "var(--primary-glow)" : "transparent",
+                      border: `1px solid ${quizMode === m.id ? "var(--primary)" : "var(--border)"}`,
+                      color: quizMode === m.id ? "var(--primary-dark)" : "var(--foreground-muted)",
+                      cursor: "pointer", transition: "all 0.2s",
                     }}
                   >
                     {m.label}
                   </button>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* ===== SETS VIEW ===== */}
           {view === "sets" && (
             <div className="animate-fadeIn">
               {/* Add Manual Word Form */}
-              <div className="card" style={{ marginBottom: "1.5rem", padding: "1.25rem" }}>
-                <h3 style={{ margin: "0 0 1rem", fontSize: "1.125rem" }}>Add Word Manually</h3>
-                <form onSubmit={handleAddManualWord} style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-                  <input 
-                    type="text" 
-                    className="input-base" 
-                    placeholder="Word (e.g., Ubiquitous)" 
-                    value={manualWord}
-                    onChange={(e) => setManualWord(e.target.value)}
-                    style={{ flex: "1 1 200px" }}
-                  />
-                  <input 
-                    type="text" 
-                    className="input-base" 
-                    placeholder="Definition" 
-                    value={manualDef}
-                    onChange={(e) => setManualDef(e.target.value)}
-                    style={{ flex: "2 1 300px" }}
-                  />
+              <div className="card" style={{ marginBottom: "2rem", padding: "1.5rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
+                  <div style={{ width: "2rem", height: "2rem", borderRadius: "50%", background: "var(--primary-glow)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  </div>
+                  <h3 style={{ margin: 0, fontSize: "1.125rem" }}>Add New Word</h3>
+                </div>
+                <form onSubmit={handleAddManualWord} style={{ display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "flex-end" }}>
+                  <div style={{ flex: "1 1 200px" }}>
+                    <label className="label">Word</label>
+                    <input 
+                      type="text" 
+                      className="input-base" 
+                      placeholder="e.g., Ubiquitous" 
+                      value={manualWord}
+                      onChange={(e) => setManualWord(e.target.value)}
+                    />
+                  </div>
+                  <div style={{ flex: "2 1 300px" }}>
+                    <label className="label">English Definition</label>
+                    <input 
+                      type="text" 
+                      className="input-base" 
+                      placeholder="e.g., Present, appearing, or found everywhere." 
+                      value={manualDef}
+                      onChange={(e) => setManualDef(e.target.value)}
+                    />
+                  </div>
                   <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
-                    <button type="submit" className="btn-secondary">
-                      + Add
+                    <button type="submit" className="btn-secondary" style={{ padding: "0.875rem 1.25rem" }}>
+                      Add Only
                     </button>
-                    <button type="button" onClick={handleAddAndTest} className="btn-primary" style={{ background: "var(--brutal-yellow)" }}>
-                      + Add & Test Now
+                    <button type="button" onClick={handleAddAndTest} className="btn-primary" style={{ padding: "0.875rem 1.25rem" }}>
+                      Add & Test Now
                     </button>
                   </div>
                 </form>
               </div>
 
               {words.length === 0 ? (
-                <div className="card" style={{ textAlign: "center", padding: "3rem 1.5rem" }}>
-                  <p style={{ fontSize: "2.5rem", margin: "0 0 1rem" }}></p>
-                  <h3 style={{ margin: "0 0 0.5rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>No words yet</h3>
-                  <p style={{ margin: "0 0 1.5rem", fontSize: "0.9375rem" }}>Generate practice content and save words to build your list.</p>
-                  <a href="/practice" className="btn-primary">Go to Practice →</a>
+                <div className="card" style={{ textAlign: "center", padding: "4rem 2rem", borderStyle: "dashed" }}>
+                  <div style={{ width: "4rem", height: "4rem", margin: "0 auto 1.5rem", borderRadius: "50%", background: "var(--primary-glow)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                  </div>
+                  <h3 style={{ margin: "0 0 0.75rem", color: "var(--foreground)", fontFamily: "var(--font-display)", fontSize: "1.5rem" }}>Your Dictionary is Empty</h3>
+                  <p style={{ margin: "0 auto 2rem", fontSize: "1rem", maxWidth: "400px" }}>Start adding words manually above, or generate practice content from articles to build your vocabulary list automatically.</p>
+                  <a href="/practice" className="btn-primary">Generate from Reading →</a>
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                   
                   {/* Hard Words Set */}
                   {hardWords.length > 0 && (
-                    <div className="card" style={{ padding: "1.5rem", background: "var(--brutal-red)", color: "#000", border: "4px solid #000", marginBottom: "1rem", boxShadow: "6px 6px 0px #000" }}>
-                      <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.25rem", fontWeight: 900, textTransform: "uppercase" }}>Zor Kelimeler (Hard Words)</h3>
-                      <p style={{ margin: "0 0 1rem", fontSize: "0.875rem", fontWeight: 600 }}>{hardWords.length} words need review. Practice them to remove the 'hard' tag.</p>
-                      <button onClick={() => startQuiz(-1)} className="btn-primary" style={{ background: "#fff", color: "#000" }} disabled={hardWords.length < 2 || isStartingQuiz}>
-                        {isStartingQuiz ? "Translating..." : "Practice Hard Words"}
-                      </button>
-                      {hardWords.length < 2 && <p style={{ margin: "0.5rem 0 0", fontSize: "0.75rem", fontWeight: 800 }}>Need at least 2 hard words to start quiz.</p>}
+                    <div className="card" style={{ padding: "1.5rem", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
+                        <div>
+                          <h3 style={{ margin: "0 0 0.25rem", fontSize: "1.25rem", color: "var(--premium-red)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            Words Needing Review
+                          </h3>
+                          <p style={{ margin: 0, fontSize: "0.875rem" }}>{hardWords.length} words require attention. Practice to remove the 'hard' tag.</p>
+                        </div>
+                        <button onClick={() => startQuiz(-1)} className="btn-primary" style={{ background: "var(--premium-red)", boxShadow: "0 4px 14px 0 rgba(239, 68, 68, 0.39)" }} disabled={hardWords.length < 2 || isStartingQuiz}>
+                          {isStartingQuiz ? "Preparing..." : "Practice Hard Words"}
+                        </button>
+                      </div>
                     </div>
                   )}
 
-                  {sets.map((s, si) => {
-                    const learned = s.filter(w => w.correctCount >= 3).length;
-                    const pct = s.length > 0 ? (learned / s.length) * 100 : 0;
-                    const isComplete = pct === 100;
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "1rem" }}>
+                    {sets.map((s, si) => {
+                      const learned = s.filter(w => w.correctCount >= 3).length;
+                      const pct = s.length > 0 ? (learned / s.length) * 100 : 0;
+                      const isComplete = pct === 100;
 
-                    return (
-                      <div
-                        key={si}
-                        className={`set-card ${activeSet === si ? "active" : ""}`}
-                        onClick={() => setActiveSet(si)}
-                        style={{ flexDirection: "column", alignItems: "stretch", gap: "0.5rem" }}
-                      >
-                        <div style={{ width: "100%", marginBottom: "1rem" }}>
-                          <ProgressBar progress={pct} color={isComplete ? "var(--brutal-green)" : "var(--brutal-yellow)"} label={`${learned}/${s.length} Learned`} />
-                        </div>
-
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                          <div>
-                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-                              <p style={{ margin: 0, fontWeight: 700, fontSize: "0.9375rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>
-                                Set {si + 1}
+                      return (
+                        <div
+                          key={si}
+                          className="card"
+                          onClick={() => setActiveSet(si)}
+                          style={{ 
+                            cursor: "pointer",
+                            borderColor: activeSet === si ? "var(--primary)" : "var(--border)",
+                            boxShadow: activeSet === si ? "0 0 0 1px var(--primary)" : "var(--shadow-sm)",
+                            padding: "1.25rem",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "1rem"
+                          }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                            <div>
+                              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+                                <h4 style={{ margin: 0, fontSize: "1.125rem" }}>Set {si + 1}</h4>
+                                {isComplete && <span className="badge badge-accent" style={{ padding: "0.125rem 0.5rem" }}>Mastered</span>}
+                              </div>
+                              <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-faint)" }}>
+                                {s.length} words
                               </p>
-                              {isComplete && <span className="badge badge-accent" style={{ fontSize: "0.625rem" }}> Complete</span>}
                             </div>
-                            <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>
-                              {s.slice(0, 5).map(w => w.word).join(", ")}{s.length > 5 ? "…" : ""}
-                            </p>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); startQuiz(si); }}
+                              className="btn-secondary"
+                              style={{ padding: "0.375rem 0.75rem", fontSize: "0.8125rem" }}
+                              disabled={s.length < 2 || isStartingQuiz}
+                            >
+                              Quiz
+                            </button>
                           </div>
-
-                          <button
-                            onClick={(e) => { e.stopPropagation(); startQuiz(si); }}
-                            className="btn-primary"
-                            style={{ fontSize: "0.8125rem", padding: "0.5rem 1rem", flexShrink: 0 }}
-                            disabled={s.length < 2 || isStartingQuiz}
-                          >
-                            {isStartingQuiz && activeSet === si ? "Translating..." : "Start Quiz"}
-                          </button>
+                          
+                          <div style={{ width: "100%" }}>
+                            <ProgressBar progress={pct} color={isComplete ? "var(--mint)" : "var(--primary)"} label={`${learned}/${s.length} Learned`} />
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
 
                   {/* Word list for active set */}
-                  <div style={{ marginTop: "0.75rem" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                      <p style={{ margin: 0, fontSize: "0.875rem", fontWeight: 600, color: "var(--foreground)" }}>
-                        {activeSet === -1 ? "Hard Words" : `Set ${activeSet + 1}`} · {currentSet.length} word{currentSet.length !== 1 ? "s" : ""}
-                      </p>
+                  <div className="card" style={{ marginTop: "1rem", padding: "1.5rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", paddingBottom: "1rem", borderBottom: "1px solid var(--border)" }}>
+                      <h3 style={{ margin: 0, fontSize: "1.25rem" }}>
+                        {activeSet === -1 ? "Review Words" : `Dictionary Set ${activeSet + 1}`}
+                      </h3>
                       {words.length > 0 && (
-                        <button onClick={() => { if (confirm("Clear all?")) { clearWordList(); refresh(); } }} className="btn-secondary" style={{ fontSize: "0.75rem", padding: "0.25rem 0.625rem", color: "var(--rose)" }}>
-                          Clear All
+                        <button onClick={() => { if (confirm("Clear all words in dictionary?")) { clearWordList(); refresh(); } }} className="btn-secondary" style={{ fontSize: "0.75rem", padding: "0.375rem 0.75rem", color: "var(--premium-red)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
+                          Clear Dictionary
                         </button>
                       )}
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+                    <div style={{ display: "grid", gap: "0.75rem" }}>
                       {currentSet.map(w => (
-                        <div key={w.word} className="card" style={{ display: "flex", alignItems: "center", gap: "0.875rem", padding: "0.75rem 1rem" }}>
+                        <div key={w.word} style={{ display: "flex", alignItems: "flex-start", gap: "1rem", padding: "1rem", background: "var(--surface-2)", borderRadius: "var(--radius-sm)" }}>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.125rem" }}>
-                              <span style={{ fontWeight: 700, color: "var(--foreground)", fontSize: "0.9375rem" }}>{w.word}</span>
-                              {w.correctCount >= 3 && <span className="badge badge-accent" style={{ fontSize: "0.625rem" }}></span>}
-                              {lang && getTranslation(w.word, lang) && (
-                                <span className="badge badge-coral" style={{ fontSize: "0.625rem" }}>{getTranslation(w.word, lang)}</span>
-                              )}
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
+                              <span style={{ fontWeight: 700, color: "var(--foreground)", fontSize: "1rem" }}>{w.word}</span>
+                              {w.correctCount >= 3 && <span className="badge badge-accent" style={{ padding: "0.125rem 0.5rem" }}>Learned</span>}
                             </div>
-                            <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{w.definition}</p>
+                            <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--foreground-muted)" }}>{w.definition}</p>
                           </div>
-                          {w.totalAttempts > 0 && (
-                            <span style={{ fontSize: "0.75rem", color: "var(--foreground-faint)", whiteSpace: "nowrap" }}>{w.correctCount}/{w.totalAttempts}</span>
-                          )}
-                          <button onClick={() => { removeWord(w.word); refresh(); }} style={{ background: "none", border: "none", color: "var(--foreground-faint)", cursor: "pointer", fontSize: "0.875rem", padding: "0.25rem" }}></button>
+                          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.5rem" }}>
+                            {w.totalAttempts > 0 && (
+                              <span className="badge badge-primary" style={{ fontSize: "0.75rem" }}>{w.correctCount}/{w.totalAttempts} Score</span>
+                            )}
+                            <button onClick={() => { removeWord(w.word); refresh(); }} style={{ background: "none", border: "none", color: "var(--foreground-faint)", cursor: "pointer", fontSize: "0.875rem", padding: "0.25rem", transition: "color 0.2s" }} onMouseOver={(e) => e.currentTarget.style.color = "var(--premium-red)"} onMouseOut={(e) => e.currentTarget.style.color = "var(--foreground-faint)"}>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -390,29 +390,29 @@ export default function VocabularyPage() {
           {/* ===== QUIZ VIEW ===== */}
           {view === "quiz" && quiz && (
             <div className="animate-fadeIn">
-              <div style={{ marginBottom: "1.25rem" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.375rem" }}>
-                  <span style={{ fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>Question {quiz.ci + 1}/{quiz.qs.length}</span>
-                  <span style={{ fontSize: "0.8125rem", color: "var(--foreground-muted)" }}>{quiz.ans.filter((a, i) => a === quiz.qs[i].correctIndex).length} </span>
+              <div style={{ marginBottom: "2rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                  <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--foreground-muted)" }}>Question {quiz.ci + 1} of {quiz.qs.length}</span>
+                  <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--mint)" }}>{quiz.ans.filter((a, i) => a === quiz.qs[i].correctIndex).length} Correct</span>
                 </div>
                 <div className="quiz-progress-bar">
                   <div className="quiz-progress-fill" style={{ width: `${((quiz.ci + (quiz.fb ? 1 : 0)) / quiz.qs.length) * 100}%` }} />
                 </div>
               </div>
 
-              <div className="card" style={{ padding: "2rem 1.5rem" }}>
-                <p style={{ margin: "0 0 0.25rem", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--foreground-faint)" }}>
-                  {quiz.qs[quiz.ci].direction === "native-en" 
-                    ? "What is the English word for:" 
-                    : (lang ? `What is the ${LANGUAGE_LABELS[lang]} meaning of:` : "What is the meaning of:")}
+              <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
+                <p style={{ margin: "0 0 0.5rem", fontSize: "0.875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--primary)" }}>
+                  {quiz.qs[quiz.ci].direction === "def-word" 
+                    ? "Which word matches this definition?" 
+                    : "What is the definition of this word?"}
                 </p>
-                <h2 style={{ margin: "0 0 1.5rem", color: "var(--foreground)", fontSize: "1.5rem", fontFamily: "var(--font-display)" }}>
-                  {quiz.qs[quiz.ci].direction === "native-en" 
-                    ? (quiz.qs[quiz.ci].nativeTranslation ?? quiz.qs[quiz.ci].definition)
+                <h2 style={{ margin: "0 auto 2rem", color: "var(--foreground)", fontSize: "1.75rem", maxWidth: "600px", lineHeight: 1.4 }}>
+                  {quiz.qs[quiz.ci].direction === "def-word" 
+                    ? `"${quiz.qs[quiz.ci].definition}"`
                     : quiz.qs[quiz.ci].word}
                 </h2>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", maxWidth: "600px", margin: "0 auto" }}>
                   {quiz.qs[quiz.ci].options.map((opt, idx) => {
                     const sel = quiz.ans[quiz.ci] === idx;
                     const cor = idx === quiz.qs[quiz.ci].correctIndex;
@@ -422,8 +422,8 @@ export default function VocabularyPage() {
                     return (
                       <button key={idx} className={cls} onClick={() => handleAnswer(idx)} disabled={quiz.fb}>
                         <span className="quiz-option-letter">{String.fromCharCode(65 + idx)}</span>
-                        <span style={{ fontSize: "0.9375rem", lineHeight: 1.5, textAlign: "left" }}>
-                          {opt.length > 100 ? opt.substring(0, 100) + "…" : opt}
+                        <span style={{ fontSize: "1rem", lineHeight: 1.5, flex: 1 }}>
+                          {opt}
                         </span>
                       </button>
                     );
@@ -431,22 +431,27 @@ export default function VocabularyPage() {
                 </div>
 
                 {quiz.fb && (
-                  <div className="animate-fadeInFast" style={{ marginTop: "1rem" }}>
+                  <div className="animate-fadeInFast" style={{ marginTop: "2rem", maxWidth: "600px", margin: "2rem auto 0" }}>
                     <div style={{
-                      background: quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "var(--mint-glow)" : "var(--rose-glow)",
-                      border: `1px solid ${quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "var(--mint)" : "var(--rose)"}`,
-                      borderRadius: "var(--radius-md)", padding: "0.875rem 1rem",
+                      background: quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)",
+                      border: `1px solid ${quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "var(--mint)" : "var(--premium-red)"}`,
+                      borderRadius: "var(--radius-md)", padding: "1.25rem", textAlign: "left"
                     }}>
-                      <p style={{ margin: "0 0 0.375rem", fontWeight: 700, fontSize: "0.875rem", color: quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "var(--mint-light)" : "var(--rose)" }}>
-                        {quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? " Correct! +10 XP" : " Incorrect +2 XP"}
-                      </p>
-                      <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--foreground-muted)" }}>
-                        <strong style={{ color: "var(--foreground)" }}>{quiz.qs[quiz.ci].word}</strong>: {quiz.qs[quiz.ci].definition}
-                        {quiz.qs[quiz.ci].nativeTranslation && <span style={{ color: "var(--coral-light)" }}> ({quiz.qs[quiz.ci].nativeTranslation})</span>}
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                        {quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex 
+                          ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                          : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--premium-red)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        }
+                        <p style={{ margin: 0, fontWeight: 700, fontSize: "1rem", color: quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "var(--mint)" : "var(--premium-red)" }}>
+                          {quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "Correct!" : "Incorrect"}
+                        </p>
+                      </div>
+                      <p style={{ margin: 0, fontSize: "0.9375rem", color: "var(--foreground)" }}>
+                        <strong>{quiz.qs[quiz.ci].word}</strong>: {quiz.qs[quiz.ci].definition}
                       </p>
                     </div>
-                    <button className="btn-primary" onClick={nextQ} style={{ marginTop: "0.75rem", width: "100%", justifyContent: "center" }}>
-                      {quiz.ci + 1 >= quiz.qs.length ? "See Results" : "Next →"}
+                    <button className="btn-primary" onClick={nextQ} style={{ marginTop: "1.5rem", width: "100%", padding: "1rem", fontSize: "1.125rem" }}>
+                      {quiz.ci + 1 >= quiz.qs.length ? "See Results" : "Next Question"}
                     </button>
                   </div>
                 )}
@@ -457,38 +462,23 @@ export default function VocabularyPage() {
           {/* ===== RESULTS ===== */}
           {view === "results" && quiz && (
             <div className="animate-scaleIn">
-              <div className="card" style={{ textAlign: "center", padding: "2rem 1.5rem" }}>
-                <p style={{ fontSize: "3rem", margin: "0 0 0.75rem" }}>
-                  {getScore().correct === getScore().total ? "" : getScore().correct >= getScore().total * 0.7 ? "" : ""}
-                </p>
-                <h2 style={{ margin: "0 0 0.25rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>
+              <div className="card" style={{ textAlign: "center", padding: "4rem 2rem" }}>
+                <div style={{ margin: "0 auto 1.5rem" }}>
+                  <div className="score-badge">
+                    <span className="score-value">{getScore().correct} / {getScore().total}</span>
+                    <span className="score-label">Final Score</span>
+                  </div>
+                </div>
+                <h2 style={{ margin: "0 0 0.5rem", color: "var(--foreground)" }}>
                   {getScore().correct === getScore().total ? "Perfect!" : "Quiz Complete"}
                 </h2>
-                <p style={{ margin: "0 0 1.25rem", fontSize: "1.25rem", color: "var(--foreground)" }}>
-                  <strong style={{ color: "var(--mint-light)" }}>{getScore().correct}</strong> / {getScore().total}
+                <p style={{ margin: "0 0 2rem", fontSize: "1.125rem" }}>
+                  You earned {getScore().correct * 10} XP. Keep reviewing to lock these words in your memory.
                 </p>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem", marginBottom: "1.25rem", textAlign: "left" }}>
-                  {quiz.qs.map((q, i) => {
-                    const ok = quiz.ans[i] === q.correctIndex;
-                    return (
-                      <div key={q.word} style={{
-                        display: "flex", alignItems: "center", gap: "0.625rem",
-                        padding: "0.5rem 0.75rem", borderRadius: "var(--radius-md)",
-                        background: ok ? "var(--mint-glow)" : "var(--rose-glow)",
-                        border: `1px solid ${ok ? "rgba(0,201,167,0.2)" : "rgba(255,77,109,0.2)"}`,
-                      }}>
-                        <span>{ok ? "" : ""}</span>
-                        <span style={{ fontWeight: 700, color: "var(--foreground)", fontSize: "0.9375rem" }}>{q.word}</span>
-                        {q.nativeTranslation && <span className="badge badge-coral" style={{ fontSize: "0.625rem" }}>{q.nativeTranslation}</span>}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
                   <button className="btn-primary" onClick={() => startQuiz(activeSet)}>Retry Set</button>
-                  <button className="btn-secondary" onClick={() => { setView("sets"); refresh(); }}>Back to Sets</button>
+                  <button className="btn-secondary" onClick={() => { setView("sets"); refresh(); }}>Back to Dictionary</button>
                 </div>
               </div>
             </div>

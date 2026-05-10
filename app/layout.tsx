@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import SignupModal from "@/components/SignupModal";
 
 export const metadata: Metadata = {
   title: "PracticeForge — AI-Powered IELTS & TOEFL Practice",
   description:
-    "Turn any article or transcript into personalised IELTS Academic and TOEFL iBT exam-style practice in seconds. Reading questions, vocabulary, writing prompts, and a 7-day study plan.",
+    "Turn any article or YouTube video into personalised IELTS Academic and TOEFL iBT exam-style practice in seconds. Unlock dynamic Reading, Vocabulary, and AI Speaking tests.",
   keywords: [
     "IELTS practice",
     "TOEFL practice",
@@ -14,9 +15,33 @@ export const metadata: Metadata = {
     "AI study tool",
     "reading comprehension",
     "academic vocabulary",
+    "AI language tutor",
+    "General English"
   ],
   authors: [{ name: "PracticeForge" }],
   robots: "index, follow",
+  openGraph: {
+    title: "PracticeForge — AI-Powered IELTS & TOEFL Practice",
+    description: "Personalised exam practice in seconds. Unlock dynamic Reading, Vocabulary, and AI Speaking tests.",
+    url: "https://practiceforge.com",
+    siteName: "PracticeForge",
+    images: [
+      {
+        url: "https://practiceforge.com/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "PracticeForge Dashboard",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PracticeForge — AI-Powered IELTS & TOEFL Practice",
+    description: "Personalised exam practice in seconds. Unlock dynamic Reading, Vocabulary, and AI Speaking tests.",
+    images: ["https://practiceforge.com/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({
@@ -34,6 +59,7 @@ export default function RootLayout({
         <Nav />
         <main style={{ flex: 1 }}>{children}</main>
         <Footer />
+        <SignupModal />
       </body>
     </html>
   );

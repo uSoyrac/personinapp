@@ -84,7 +84,7 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
 
   return (
     <div className="card" style={{ padding: "2rem" }}>
-      <div className="badge badge-accent" style={{ marginBottom: "1rem", display: "inline-flex" }}>
+      <div className="badge badge-primary" style={{ marginBottom: "1rem", display: "inline-flex" }}>
         Premium Speaking Agent 🎙️
       </div>
       
@@ -92,11 +92,11 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
         Part 2: Long Turn
       </h3>
       
-      <div style={{ background: "var(--surface)", padding: "1.5rem", borderLeft: "4px solid var(--brutal-yellow)", marginBottom: "2rem" }}>
-        <p style={{ margin: 0, fontSize: "1rem", fontWeight: 600 }}>{result.speakingPrompt}</p>
+      <div style={{ background: "rgba(124, 58, 237, 0.05)", padding: "1.5rem", borderLeft: "4px solid var(--primary)", marginBottom: "2rem", borderRadius: "var(--radius-sm)" }}>
+        <p style={{ margin: 0, fontSize: "1.0625rem", fontWeight: 500, color: "var(--foreground)", lineHeight: 1.6 }}>{result.speakingPrompt}</p>
         {result.speakingFollowUps.length > 0 && (
           <ul style={{ marginTop: "1rem", paddingLeft: "1.5rem", color: "var(--foreground-muted)" }}>
-            {result.speakingFollowUps.map((q, i) => <li key={i}>{q}</li>)}
+            {result.speakingFollowUps.map((q, i) => <li key={i} style={{ marginBottom: "0.25rem" }}>{q}</li>)}
           </ul>
         )}
       </div>
@@ -118,7 +118,7 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
           <button 
             onClick={startExam} 
             className="btn-primary"
-            style={{ width: "100%", justifyContent: "center", background: "var(--brutal-green)", color: "#000", padding: "1.5rem", fontSize: "1.25rem" }}
+            style={{ width: "100%", justifyContent: "center", padding: "1.25rem", fontSize: "1.125rem", borderRadius: "var(--radius-md)" }}
             disabled={!recognitionRef.current}
           >
             🎤 Start 2-Minute Speaking Exam
@@ -128,7 +128,7 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
             <button 
               onClick={finishExam} 
               className="btn-secondary"
-              style={{ width: "100%", justifyContent: "center", background: "var(--rose)", color: "#fff" }}
+              style={{ width: "100%", justifyContent: "center", borderColor: "var(--rose)", color: "var(--rose)" }}
             >
               🛑 Finish Early
             </button>
@@ -136,9 +136,9 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
         )}
 
         {transcript && (
-          <div style={{ padding: "1rem", border: "2px solid #000", background: "#fff", minHeight: "100px" }}>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: "0.875rem", color: "var(--foreground-muted)", marginBottom: "0.5rem" }}>Live Transcript:</p>
-            <p style={{ margin: 0 }}>{transcript}</p>
+          <div style={{ padding: "1.5rem", border: "1px solid var(--border)", background: "var(--surface-2)", borderRadius: "var(--radius-sm)", minHeight: "100px" }}>
+            <p style={{ margin: 0, fontWeight: 700, fontSize: "0.875rem", color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.75rem" }}>Live Transcript</p>
+            <p style={{ margin: 0, color: "var(--foreground)", lineHeight: 1.6 }}>{transcript}</p>
           </div>
         )}
 
@@ -146,17 +146,19 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
           <button 
             onClick={analyzeSpeech} 
             className="btn-primary"
-            style={{ background: "var(--brutal-yellow)", color: "#000", padding: "1rem" }}
+            style={{ background: "linear-gradient(135deg, var(--gold), #D97706)", color: "#fff", padding: "1rem", border: "none" }}
             disabled={isAnalyzing}
           >
-            {isAnalyzing ? "Analyzing with AI..." : "✨ Calculate Score (Gold Plan)"}
+            {isAnalyzing ? "Analyzing with AI..." : "✨ Calculate Score (Elite Mastery)"}
           </button>
         )}
 
         {feedback && (
-          <div className="animate-scaleIn" style={{ padding: "1.5rem", background: "var(--surface)", border: "4px solid #000", boxShadow: "6px 6px 0px #000", marginTop: "1rem" }}>
-            <h4 style={{ margin: "0 0 1rem", fontSize: "1.5rem", borderBottom: "2px solid #000", paddingBottom: "0.5rem" }}>AI Examiner Report</h4>
-            <div style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.6, fontSize: "1.0625rem" }}>{feedback}</div>
+          <div className="animate-scaleIn" style={{ padding: "2rem", background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)", borderRadius: "var(--radius-md)", marginTop: "1rem" }}>
+            <h4 style={{ margin: "0 0 1rem", fontSize: "1.25rem", borderBottom: "1px solid var(--border)", paddingBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span style={{ color: "var(--primary)" }}>🤖</span> AI Examiner Report
+            </h4>
+            <div style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.6, fontSize: "1rem", color: "var(--foreground)" }}>{feedback}</div>
           </div>
         )}
       </div>

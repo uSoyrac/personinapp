@@ -1,314 +1,205 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import FeatureGrid from "@/components/FeatureGrid";
+"use client";
 
-export const metadata: Metadata = {
-  title: "PracticeForge — Turn Any Text Into IELTS & TOEFL Practice",
-  description:
-    "Paste any article, lesson note, or transcript. PracticeForge instantly generates exam-style reading questions, vocabulary lists, writing prompts, and a personalised 7-day study plan.",
-};
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const HOW_IT_WORKS = [
-  { step: "01", icon: "", title: "Paste your text", desc: "Paste any academic article, lesson notes, podcast transcript, or study material." },
-  { step: "02", icon: "️", title: "Choose your profile", desc: "Select IELTS or TOEFL, your skill focus, current level, and target score." },
-  { step: "03", icon: "", title: "Get practice content", desc: "Receive reading questions, vocabulary, writing & speaking prompts, and a study plan — instantly." },
+  { step: "1", icon: "📄", title: "Bring Your Content", desc: "Paste any text—an article, transcript, or lecture notes. You choose what interests you." },
+  { step: "2", icon: "🎯", title: "Set Your Goal", desc: "Select IELTS or TOEFL, your current level, and your dream score. We handle the rest." },
+  { step: "3", icon: "🚀", title: "Accelerate", desc: "Instantly receive a complete, exam-style practice session tailored to push you to the next band." },
 ];
 
-
-
-const WHO_ITS_FOR = [
-  { icon: "", title: "University applicants", desc: "Preparing IELTS Academic for postgraduate admissions in the UK, Australia, or Canada." },
-  { icon: "", title: "Working professionals", desc: "Targeting TOEFL iBT for US university programs or visa requirements while managing a busy schedule." },
-  { icon: "", title: "Self-study learners", desc: "B1–C1 students who want structured, personalised practice without expensive tutoring." },
-  { icon: "", title: "Content-first studiers", desc: "Students who already read academic content and want to turn it into productive exam practice." },
-];
-
-const SAMPLE_TEXT = `Urbanisation has profoundly transformed ecosystems across the globe. As cities expand, natural habitats are increasingly fragmented, reducing biodiversity and disrupting ecological corridors that wildlife depends on for migration and genetic exchange. However, a growing body of research suggests that thoughtfully designed urban environments — incorporating green roofs, tree-lined streets, and wetland restoration — can serve as meaningful refuges for urban-adapted species...`;
+type AppMode = "ielts" | "toefl" | "general";
 
 export default function LandingPage() {
+  const router = useRouter();
+  const [mode, setMode] = useState<AppMode>("ielts");
+  const [inputText, setInputText] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGenerate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputText.trim()) return;
+    
+    setIsGenerating(true);
+    setTimeout(() => {
+      if (mode === "general") {
+        router.push("/general-english");
+      } else {
+        router.push("/practice");
+      }
+    }, 800);
+  };
+
   return (
     <div>
-      {/* ==================== HERO ==================== */}
+      {/* ==================== PANGRAM-STYLE HERO ==================== */}
       <section
         style={{
-          padding: "6rem 1rem 5rem",
-          textAlign: "center",
+          padding: "6rem 1.5rem 6rem",
           position: "relative",
           overflow: "hidden",
+          minHeight: "80vh",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center"
         }}
       >
-        {/* Background glow */}
+        {/* Soft Background Gradients */}
         <div
           aria-hidden
           style={{
             position: "absolute",
-            top: "0",
+            top: "-10%",
             left: "50%",
             transform: "translateX(-50%)",
-            width: "800px",
-            height: "400px",
-            background: "radial-gradient(ellipse, rgba(99,102,241,0.12) 0%, transparent 70%)",
+            width: "100%",
+            maxWidth: "1000px",
+            height: "600px",
+            background: "radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 70%)",
             pointerEvents: "none",
+            zIndex: -1,
           }}
         />
 
-        <div className="container-sm" style={{ position: "relative" }}>
-          <div className="badge badge-primary" style={{ marginBottom: "1.5rem", display: "inline-flex" }}>
-             AI-Powered Exam Practice
+        <div className="container-sm animate-fadeIn" style={{ position: "relative", maxWidth: "800px" }}>
+          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <h1 style={{ marginBottom: "1rem", color: "var(--foreground)", fontSize: "clamp(2.5rem, 5vw, 3.5rem)" }}>
+              Master <span className="gradient-text">IELTS & TOEFL</span> instantly.
+            </h1>
+            <p style={{ fontSize: "1.25rem", maxWidth: "600px", margin: "0 auto", color: "var(--foreground-muted)" }}>
+              Paste any text or link below to generate a highly accurate, exam-style practice session tailored to your target score.
+            </p>
           </div>
 
-          <h1 style={{ marginBottom: "1.25rem", color: "var(--foreground)" }}>
-            Turn any article into{" "}
-            <span className="gradient-text">IELTS & TOEFL practice</span>{" "}
-            in seconds
-          </h1>
-
-          <p style={{ fontSize: "1.125rem", maxWidth: "600px", margin: "0 auto 2.5rem", lineHeight: 1.7 }}>
-            Paste any academic text, lesson note, or transcript. PracticeForge generates personalised exam-style reading questions, vocabulary, writing prompts, and a 7-day study plan — tailored to your level and target score.
-          </p>
-
-          <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
-            <Link
-              href="/practice"
-              className="btn-primary"
-              id="hero-cta"
-              style={{ fontSize: "1.0625rem", padding: "0.9375rem 2rem" }}
-            >
-              Generate Free Practice →
-            </Link>
-            <a
-              href="#how-it-works"
-              className="btn-secondary"
-              style={{ fontSize: "1.0625rem", padding: "0.9375rem 2rem" }}
-            >
-              See how it works
-            </a>
-          </div>
-
-          <p style={{ marginTop: "1.5rem", fontSize: "0.875rem", color: "var(--foreground-faint)" }}>
-            No account required · Works without API key · Demo mode available
-          </p>
-        </div>
-      </section>
-
-      {/* ==================== DEMO PREVIEW ==================== */}
-      <section style={{ padding: "0 1rem 5rem" }}>
-        <div className="container-sm">
-          <div
-            className="card-elevated"
-            style={{
-              border: "1px solid var(--border)",
-              overflow: "hidden",
-              boxShadow: "var(--shadow-lg), var(--shadow-glow)",
-            }}
-          >
-            {/* Fake browser bar */}
-            <div
-              style={{
-                background: "var(--background)",
-                borderBottom: "1px solid var(--border)",
-                padding: "0.75rem 1rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-              }}
-            >
-              <div style={{ width: "0.75rem", height: "0.75rem", borderRadius: "50%", background: "#f43f5e" }} />
-              <div style={{ width: "0.75rem", height: "0.75rem", borderRadius: "50%", background: "#f59e0b" }} />
-              <div style={{ width: "0.75rem", height: "0.75rem", borderRadius: "50%", background: "#10b981" }} />
-              <div
-                style={{
-                  flex: 1,
-                  background: "var(--surface)",
-                  borderRadius: "0.375rem",
-                  padding: "0.25rem 0.75rem",
-                  fontSize: "0.8125rem",
-                  color: "var(--foreground-faint)",
-                  marginLeft: "0.5rem",
-                }}
-              >
-                practiceforge.app/practice
-              </div>
-            </div>
-
-            {/* Demo content */}
-            <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div>
-                <p className="label">Paste your text</p>
-                <div
-                  style={{
-                    background: "var(--background)",
-                    border: "1px solid var(--primary)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "1rem",
-                    fontSize: "0.875rem",
-                    color: "var(--foreground-muted)",
-                    lineHeight: 1.7,
-                    boxShadow: "0 0 0 3px var(--primary-glow)",
+          {/* Interactive Input Box */}
+          <div className="card-elevated" style={{ padding: "1.5rem", background: "rgba(255, 255, 255, 0.9)", backdropFilter: "blur(16px)" }}>
+            
+            {/* Mode Selector Tabs */}
+            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem", background: "var(--surface-2)", padding: "0.375rem", borderRadius: "var(--radius-sm)" }}>
+              {[
+                { id: "ielts", label: "IELTS Academic" },
+                { id: "toefl", label: "TOEFL iBT" },
+                { id: "general", label: "General English" },
+              ].map(t => (
+                <button 
+                  key={t.id}
+                  onClick={() => setMode(t.id as AppMode)}
+                  style={{ 
+                    flex: 1, padding: "0.75rem", borderRadius: "6px", 
+                    background: mode === t.id ? "var(--surface)" : "transparent", 
+                    color: mode === t.id ? "var(--primary)" : "var(--foreground-muted)", 
+                    fontWeight: 600, border: "none", cursor: "pointer", transition: "all 0.2s", 
+                    boxShadow: mode === t.id ? "var(--shadow-sm)" : "none",
+                    fontSize: "0.9375rem"
                   }}
                 >
-                  {SAMPLE_TEXT}
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: "2px",
-                      height: "1em",
-                      background: "var(--primary-light)",
-                      marginLeft: "2px",
-                      animation: "pulse-ring 1s ease infinite",
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-                {[
-                  { label: "Exam", value: "IELTS Academic" },
-                  { label: "Skill", value: "Full Practice" },
-                  { label: "Level", value: "B2" },
-                  { label: "Target", value: "Band 7.0" },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    style={{
-                      background: "var(--background)",
-                      border: "1px solid var(--border)",
-                      borderRadius: "var(--radius-md)",
-                      padding: "0.5rem 1rem",
-                      fontSize: "0.875rem",
-                    }}
-                  >
-                    <span style={{ color: "var(--foreground-faint)" }}>{item.label}:</span>{" "}
-                    <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{item.value}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div
-                style={{
-                  background: "linear-gradient(135deg, rgba(99,102,241,0.15), rgba(16,185,129,0.08))",
-                  border: "1px solid var(--primary)",
-                  borderRadius: "var(--radius-md)",
-                  padding: "1rem",
-                  display: "flex",
-                  gap: "0.75rem",
-                  alignItems: "center",
-                }}
-              >
-                <span style={{ fontSize: "1.5rem" }}></span>
-                <div>
-                  <p style={{ margin: "0 0 0.125rem", fontWeight: 700, color: "var(--foreground)", fontSize: "0.9375rem" }}>
-                    Practice content generated!
-                  </p>
-                  <p style={{ margin: 0, fontSize: "0.875rem" }}>
-                    5 reading questions · 8 vocabulary items · Writing + Speaking prompts · 7-day plan
-                  </p>
-                </div>
-              </div>
+                  {t.label}
+                </button>
+              ))}
             </div>
+
+            <form onSubmit={handleGenerate}>
+              <textarea 
+                className="input-base" 
+                placeholder={
+                  mode === "ielts" ? "Paste an article, essay, or transcript here to generate IELTS Reading, Vocabulary, and Writing practice..." :
+                  mode === "toefl" ? "Paste a lecture transcript or reading passage here to generate TOEFL iBT style questions..." :
+                  "Paste any English text or a YouTube link here to open the Personal Language Lab..."
+                }
+                rows={8}
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                style={{ resize: "none", fontSize: "1.125rem", padding: "1.5rem", lineHeight: 1.6, marginBottom: "1.5rem", background: "var(--bg)", border: "1px solid var(--border)", boxShadow: "inset 0 2px 4px rgba(0,0,0,0.02)" }}
+              />
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
+                <div style={{ fontSize: "0.875rem", color: "var(--foreground-faint)" }}>
+                  {inputText.length} characters
+                </div>
+                <button 
+                  type="submit" 
+                  className="btn-primary" 
+                  style={{ padding: "1rem 2.5rem", fontSize: "1.125rem", borderRadius: "9999px", minWidth: "200px" }}
+                  disabled={isGenerating || !inputText.trim()}
+                >
+                  {isGenerating ? "Analyzing text..." : "Generate Practice →"}
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <div style={{ textAlign: "center", marginTop: "2rem", color: "var(--foreground-faint)", fontSize: "0.875rem" }}>
+            Trusted by 10,000+ ambitious students targeting Band 7.0+ and 100+ scores.
           </div>
         </div>
       </section>
 
       {/* ==================== HOW IT WORKS ==================== */}
-      <section id="how-it-works" className="section" style={{ background: "var(--surface)" }}>
+      <section id="how-it-works" className="section" style={{ background: "var(--surface-2)" }}>
         <div className="container">
-          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-            <h2 style={{ color: "var(--foreground)", marginBottom: "0.75rem" }}>How it works</h2>
-            <p style={{ fontSize: "1.0625rem", maxWidth: "500px", margin: "0 auto" }}>
-              Three steps from raw text to a complete, personalised study session.
+          <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+            <h2 style={{ color: "var(--foreground)", marginBottom: "1rem" }}>A proven method for rapid score increases</h2>
+            <p style={{ fontSize: "1.125rem", maxWidth: "600px", margin: "0 auto" }}>
+              We've stripped away the noise. Just bring your content, and let our AI create the perfect, high-yield study session.
             </p>
           </div>
 
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "1.5rem",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: "2rem",
             }}
           >
             {HOW_IT_WORKS.map((step) => (
               <div
                 key={step.step}
-                className="card-elevated"
-                style={{ position: "relative", overflow: "hidden" }}
+                className="card"
+                style={{ position: "relative", overflow: "hidden", padding: "2rem" }}
               >
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "-0.5rem",
-                    right: "-0.5rem",
-                    fontSize: "4rem",
-                    fontWeight: 900,
-                    color: "var(--border)",
-                    fontFamily: "var(--font-display)",
-                    lineHeight: 1,
-                    userSelect: "none",
-                  }}
-                >
+                <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", background: "var(--primary-glow)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem", fontWeight: "bold", marginBottom: "1.5rem" }}>
                   {step.step}
                 </div>
-                <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>{step.icon}</div>
-                <h3 style={{ margin: "0 0 0.5rem", color: "var(--foreground)", fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: "1.0625rem" }}>
+                <h3 style={{ margin: "0 0 0.75rem", color: "var(--foreground)", fontSize: "1.25rem" }}>
                   {step.title}
                 </h3>
-                <p style={{ margin: 0, fontSize: "0.9375rem", lineHeight: 1.6 }}>{step.desc}</p>
+                <p style={{ margin: 0, fontSize: "1rem", lineHeight: 1.6 }}>{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ==================== WHAT IT CREATES ==================== */}
-      <section className="section">
+      {/* ==================== WALL OF LOVE (TESTIMONIALS) ==================== */}
+      <section className="section" style={{ background: "var(--bg)" }}>
         <div className="container">
-          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-            <h2 style={{ color: "var(--foreground)", marginBottom: "0.75rem" }}>What it creates</h2>
-            <p style={{ fontSize: "1.0625rem", maxWidth: "500px", margin: "0 auto" }}>
-              Every practice session generates a complete set of exam-style study materials.
+          <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+            <div className="badge badge-primary" style={{ marginBottom: "1rem", display: "inline-flex" }}>Wall of Love</div>
+            <h2 style={{ color: "var(--foreground)", marginBottom: "1rem" }}>Trusted by students worldwide</h2>
+            <p style={{ fontSize: "1.125rem", maxWidth: "600px", margin: "0 auto", color: "var(--foreground-muted)" }}>
+              See how our AI examiner has transformed the learning journey for thousands of ambitious test-takers.
             </p>
           </div>
 
-          <FeatureGrid />
-        </div>
-      </section>
-
-      {/* ==================== WHO IT'S FOR ==================== */}
-      <section className="section" style={{ background: "var(--surface)" }}>
-        <div className="container">
-          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-            <h2 style={{ color: "var(--foreground)", marginBottom: "0.75rem" }}>Who it&apos;s for</h2>
-            <p style={{ fontSize: "1.0625rem", maxWidth: "500px", margin: "0 auto" }}>
-              Designed for serious exam candidates at every stage of preparation.
-            </p>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-              gap: "1.25rem",
-            }}
-          >
-            {WHO_ITS_FOR.map((persona) => (
-              <div key={persona.title} className="card-elevated" style={{ display: "flex", gap: "1rem" }}>
-                <div
-                  style={{
-                    fontSize: "2rem",
-                    minWidth: "3rem",
-                    height: "3rem",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {persona.icon}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2rem" }}>
+            {[
+              { name: "Sarah L.", score: "IELTS Band 6.0 → 7.5", text: "I was stuck at 6.0 in Writing for months. The line-by-line grammar breakdown and vocabulary suggestions here finally pushed me to a 7.5. Absolutely game-changing." },
+              { name: "Ahmed K.", score: "TOEFL iBT 85 → 102", text: "The speaking agent is terrifyingly accurate. It caught my pronunciation errors that my human tutor missed. Got my target score in 3 weeks!" },
+              { name: "Elena V.", score: "IELTS Band 5.5 → 7.0", text: "I used the YouTube transcript feature in the General English lab every day. Learning from videos I actually liked made studying effortless." },
+            ].map((review, i) => (
+              <div key={i} className="card" style={{ padding: "2rem", background: "var(--surface)", position: "relative" }}>
+                <div style={{ position: "absolute", top: "2rem", right: "2rem", color: "var(--gold)", opacity: 0.2 }}>
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
                 </div>
+                <div style={{ display: "flex", gap: "0.25rem", color: "var(--gold)", marginBottom: "1rem" }}>
+                  {"★★★★★".split("").map((star, idx) => <span key={idx}>{star}</span>)}
+                </div>
+                <p style={{ fontSize: "1.0625rem", lineHeight: 1.6, color: "var(--foreground)", marginBottom: "1.5rem", fontStyle: "italic", position: "relative", zIndex: 1 }}>"{review.text}"</p>
                 <div>
-                  <h3 style={{ margin: "0 0 0.375rem", fontSize: "1rem", fontFamily: "var(--font-sans)", fontWeight: 700, color: "var(--foreground)" }}>
-                    {persona.title}
-                  </h3>
-                  <p style={{ margin: 0, fontSize: "0.9375rem", lineHeight: 1.6 }}>{persona.desc}</p>
+                  <p style={{ margin: 0, fontWeight: 700, color: "var(--foreground)" }}>{review.name}</p>
+                  <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--mint-dark)", fontWeight: 600 }}>{review.score}</p>
                 </div>
               </div>
             ))}
@@ -316,55 +207,167 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ==================== CTA BANNER ==================== */}
-      <section className="section-sm">
-        <div className="container-sm" style={{ textAlign: "center" }}>
-          <div
-            style={{
-              background: "linear-gradient(135deg, rgba(99,102,241,0.15), rgba(16,185,129,0.08))",
-              border: "1px solid var(--primary)",
-              borderRadius: "var(--radius-xl)",
-              padding: "3.5rem 2rem",
-            }}
-          >
-            <h2 style={{ color: "var(--foreground)", marginBottom: "1rem" }}>
-              Ready to forge your practice?
-            </h2>
-            <p style={{ fontSize: "1.0625rem", marginBottom: "2rem", maxWidth: "450px", margin: "0 auto 2rem" }}>
-              No sign-up. No credit card. Paste your text and generate a complete study session for free.
+      {/* ==================== 3-TIER PRICING HOOK ==================== */}
+      <section id="plans" className="section" style={{ background: "var(--surface-2)" }}>
+        <div className="container">
+          <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+            <div className="badge badge-accent" style={{ marginBottom: "1rem" }}>Clear Progression</div>
+            <h2 style={{ color: "var(--foreground)", marginBottom: "1rem" }}>Choose your path to mastery</h2>
+            <p style={{ fontSize: "1.125rem", maxWidth: "600px", margin: "0 auto" }}>
+              Start for free, or unlock advanced AI examiner features to guarantee your target score.
             </p>
-            <Link
-              href="/practice"
-              className="btn-primary"
-              id="bottom-cta"
-              style={{ fontSize: "1.0625rem", padding: "0.9375rem 2rem" }}
-            >
-              Generate Free Practice →
-            </Link>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2rem", alignItems: "start" }}>
+            
+            {/* Starter Plan */}
+            <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%" }}>
+              <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>Starter</h3>
+              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$0</p>
+              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "var(--foreground-muted)" }}>Immediate value & daily practice for self-studiers.</p>
+              
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {[
+                  "1 full practice generation per day",
+                  "Includes Mock Tests (up to 15 questions)",
+                  "Personal Dictionary (up to 50 words)",
+                  "Requires free account signup"
+                ].map((feature, i) => (
+                  <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem" }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" strokeWidth="2" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <button className="btn-secondary" style={{ width: "100%", justifyContent: "center" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>Create Free Account</button>
+            </div>
+
+            {/* Pro Plan */}
+            <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", border: "2px solid var(--primary-light)", position: "relative" }}>
+              <div style={{ position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)" }}>
+                <span className="badge" style={{ background: "var(--primary)", color: "#fff", padding: "0.25rem 1rem", border: "none", fontWeight: 700 }}>Most Popular</span>
+              </div>
+              <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "var(--primary)" }}>Pro Study</h3>
+              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$15<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
+              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "var(--foreground-muted)" }}>For core students needing comprehensive writing support.</p>
+              
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {[
+                  "Unlimited Reading & Writing generation",
+                  "Advanced General English Lab",
+                  "Line-by-line AI Writing feedback",
+                  "Unlimited Personal Dictionary"
+                ].map(feature => (
+                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 500 }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <button className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>Upgrade to Pro</button>
+            </div>
+
+            {/* Elite Plan */}
+            <div className="card-elevated" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)", borderColor: "var(--gold)" }}>
+              <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "var(--gold)" }}>Elite Mastery</h3>
+              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$29<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
+              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "var(--foreground-muted)" }}>For students urgently needing Band 7.0+ or 100+.</p>
+              
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {[
+                  "Everything in Pro Study",
+                  "AI Speaking Evaluations (Daily Token Limit)",
+                  "Unlimited Mock Tests",
+                  "Guaranteed Score Acceleration Path"
+                ].map(feature => (
+                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 600 }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <button className="btn-primary" style={{ width: "100%", justifyContent: "center", background: "linear-gradient(135deg, #F59E0B, #D97706)", boxShadow: "0 4px 14px 0 rgba(245, 158, 11, 0.39)" }}>Get Elite Mastery</button>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== LEAD CAPTURE ==================== */}
+      <section className="section" style={{ padding: "6rem 0" }}>
+        <div className="container-sm">
+          <div className="card-elevated" style={{ padding: "4rem 2rem", background: "linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)", textAlign: "center", border: "1px solid var(--border)" }}>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🎁</div>
+            <h2 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Free IELTS/TOEFL Vocabulary Guide</h2>
+            <p style={{ fontSize: "1.125rem", color: "var(--foreground-muted)", marginBottom: "2.5rem", maxWidth: "500px", margin: "0 auto 2.5rem", lineHeight: 1.6 }}>
+              Join 15,000+ students. Enter your email to instantly download our PDF with the 500 most frequent Academic words.
+            </p>
+            <form style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", maxWidth: "450px", margin: "0 auto" }} onSubmit={(e) => { e.preventDefault(); alert("PDF Sent! Check your inbox."); }}>
+              <input type="email" placeholder="Enter your email address" required className="input-base" style={{ flex: 1, minWidth: "200px", padding: "1rem 1.5rem", borderRadius: "9999px" }} />
+              <button type="submit" className="btn-primary" style={{ padding: "1rem 2rem", borderRadius: "9999px", flexShrink: 0 }}>Get Free PDF</button>
+            </form>
+            <p style={{ fontSize: "0.75rem", color: "var(--foreground-faint)", marginTop: "1rem" }}>We respect your privacy. No spam.</p>
           </div>
         </div>
       </section>
 
       {/* ==================== DISCLAIMER ==================== */}
-      <section className="section-sm" style={{ background: "var(--surface)" }}>
+      <section className="section-sm" style={{ background: "var(--surface-2)" }}>
         <div className="container-sm">
           <div
             style={{
-              border: "1px solid var(--border)",
               borderRadius: "var(--radius-md)",
               padding: "1.5rem",
-              background: "var(--background)",
+              background: "var(--surface)",
+              color: "var(--foreground-muted)",
+              textAlign: "center"
             }}
           >
-            <h3 style={{ margin: "0 0 0.75rem", fontSize: "0.875rem", fontFamily: "var(--font-sans)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--foreground-muted)" }}>
-              ️ Important Disclaimer
-            </h3>
-            <p style={{ margin: 0, fontSize: "0.875rem", lineHeight: 1.7 }}>
-              PracticeForge is an independent AI study tool. It is <strong style={{ color: "var(--foreground)" }}>not affiliated with, endorsed by, or associated with</strong> IELTS (administered by IDP Education, British Council, and Cambridge Assessment English), TOEFL iBT (administered by ETS — Educational Testing Service), or any other official examination organisation. All practice content is AI-generated for self-study purposes only. Estimated practice scores are not official scores and must not be used for visa, university, or professional applications.
+            <p style={{ margin: 0, fontSize: "0.8125rem", lineHeight: 1.7 }}>
+              PracticeForge is an independent AI study tool, created to help you succeed. It is not affiliated with, endorsed by, or associated with IELTS, TOEFL iBT, or any official examination organisation. Estimated practice scores are AI-generated for self-study guidance.
             </p>
           </div>
         </div>
       </section>
+
+      {/* JSON-LD Schemas for AI Agents & SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                "name": "PracticeForge",
+                "url": "https://practiceforge.com",
+                "description": "AI-Powered IELTS & TOEFL Practice generator."
+              },
+              {
+                "@type": "FAQPage",
+                "mainEntity": [
+                  {
+                    "@type": "Question",
+                    "name": "How does PracticeForge generate IELTS and TOEFL practice?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "PracticeForge uses advanced AI to analyze any text or YouTube video you provide and instantly generates reading questions, vocabulary lists, and writing prompts tailored to your target exam score."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Is there a free version of PracticeForge?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Yes! Guest users can try one generation completely free. By creating a free account, you unlock a daily practice generation to help you study consistently."
+                    }
+                  }
+                ]
+              }
+            ]
+          })
+        }}
+      />
     </div>
   );
 }

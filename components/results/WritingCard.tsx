@@ -76,23 +76,29 @@ export default function WritingCard({ result }: WritingCardProps) {
         {prompts.map((p, i) => (
           <div
             key={i}
-            className={`prompt-card ${selectedIdx === i ? "selected" : ""}`}
+            className={`card ${selectedIdx === i ? "animate-scaleIn" : ""}`}
             onClick={() => handleSelectPrompt(i)}
             id={`prompt-${i}`}
+            style={{ 
+              cursor: "pointer", 
+              transition: "all 0.2s ease",
+              border: selectedIdx === i ? "2px solid var(--primary)" : "1px solid var(--border)",
+              background: selectedIdx === i ? "var(--primary-glow)" : "var(--surface)",
+              boxShadow: selectedIdx === i ? "var(--shadow-md)" : "var(--shadow-sm)"
+            }}
           >
-            <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
+            <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
               <span style={{
                 minWidth: "2rem", height: "2rem", borderRadius: "50%",
-                background: selectedIdx === i ? "var(--coral)" : "var(--surface-2)",
-                border: `2px solid ${selectedIdx === i ? "var(--coral)" : "var(--border)"}`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "0.8125rem", fontWeight: 700,
+                background: selectedIdx === i ? "var(--primary)" : "var(--surface-2)",
                 color: selectedIdx === i ? "white" : "var(--foreground-muted)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "0.875rem", fontWeight: 700,
                 transition: "all 0.2s",
               }}>
                 {i + 1}
               </span>
-              <p style={{ margin: 0, fontSize: "0.9375rem", lineHeight: 1.6, color: "var(--foreground)" }}>
+              <p style={{ margin: 0, fontSize: "1.0625rem", lineHeight: 1.6, color: "var(--foreground)" }}>
                 {p}
               </p>
             </div>
@@ -117,10 +123,10 @@ export default function WritingCard({ result }: WritingCardProps) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
         <div style={{
-          background: "var(--surface)", border: "var(--border-width) solid #000",
-          borderRadius: "var(--radius-md)", padding: "1rem", boxShadow: "var(--shadow-md)",
+          background: "var(--surface-2)", borderLeft: "4px solid var(--primary)",
+          borderRadius: "var(--radius-sm)", padding: "1.25rem",
         }}>
-          <p style={{ margin: 0, fontSize: "0.9375rem", lineHeight: 1.6, color: "var(--foreground)" }}>
+          <p style={{ margin: 0, fontSize: "1.0625rem", lineHeight: 1.6, color: "var(--foreground)" }}>
             {prompts[selectedIdx!]}
           </p>
         </div>
@@ -188,32 +194,33 @@ export default function WritingCard({ result }: WritingCardProps) {
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
                 <span style={{ fontSize: "1.25rem" }}>{d.icon}</span>
                 <div style={{ flex: 1 }}>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: "0.875rem", color: "var(--foreground)" }}>{d.label}</p>
-                  <div style={{ width: "100%", height: "8px", background: "var(--surface-2)", border: "2px solid #000", marginTop: "0.375rem" }}>
+                  <p style={{ margin: 0, fontWeight: 700, fontSize: "0.9375rem", color: "var(--foreground)" }}>{d.label}</p>
+                  <div style={{ width: "100%", height: "6px", background: "var(--surface-2)", borderRadius: "9999px", marginTop: "0.5rem", overflow: "hidden" }}>
                     <div style={{
                       width: `${d.score}%`, height: "100%",
-                      background: d.score >= 70 ? "var(--mint)" : d.score >= 45 ? "var(--lavender)" : "var(--coral)",
-                      transition: "width 0.6s ease",
-                      borderRight: "2px solid #000"
+                      background: d.score >= 70 ? "var(--mint)" : d.score >= 45 ? "var(--lavender)" : "var(--rose)",
+                      transition: "width 0.6s ease"
                     }} />
                   </div>
                 </div>
-                <span style={{ fontSize: "0.875rem", fontWeight: 700, color: d.score >= 70 ? "var(--mint-light)" : d.score >= 45 ? "var(--lavender-light)" : "var(--coral-light)" }}>
+                <span style={{ fontSize: "1rem", fontWeight: 700, color: d.score >= 70 ? "var(--mint-dark)" : d.score >= 45 ? "var(--lavender-dark)" : "var(--rose)" }}>
                   {d.score}
                 </span>
               </div>
 
               {d.strengths.length > 0 && (
-                <div style={{ marginBottom: "0.5rem" }}>
+                <div style={{ marginBottom: "0.75rem", padding: "0.75rem", background: "rgba(16, 185, 129, 0.05)", borderRadius: "var(--radius-sm)" }}>
+                  <p style={{ margin: "0 0 0.25rem", fontSize: "0.75rem", fontWeight: 700, color: "var(--mint-dark)", textTransform: "uppercase" }}>Strengths</p>
                   {d.strengths.map((s, i) => (
-                    <p key={i} style={{ margin: "0.125rem 0", fontSize: "0.8125rem", color: "var(--mint-light)" }}> {s}</p>
+                    <p key={i} style={{ margin: "0.125rem 0", fontSize: "0.875rem", color: "var(--foreground)" }}>✓ {s}</p>
                   ))}
                 </div>
               )}
               {d.improvements.length > 0 && (
-                <div>
+                <div style={{ padding: "0.75rem", background: "rgba(244, 63, 94, 0.05)", borderRadius: "var(--radius-sm)" }}>
+                  <p style={{ margin: "0 0 0.25rem", fontSize: "0.75rem", fontWeight: 700, color: "var(--rose)", textTransform: "uppercase" }}>Areas to Improve</p>
                   {d.improvements.map((s, i) => (
-                    <p key={i} style={{ margin: "0.125rem 0", fontSize: "0.8125rem", color: "var(--coral-light)" }}>→ {s}</p>
+                    <p key={i} style={{ margin: "0.125rem 0", fontSize: "0.875rem", color: "var(--foreground)" }}>→ {s}</p>
                   ))}
                 </div>
               )}
@@ -223,12 +230,14 @@ export default function WritingCard({ result }: WritingCardProps) {
 
         {/* Suggestions */}
         {analysis.suggestions.length > 0 && (
-          <div className="card" style={{ background: "var(--surface)", border: "3px solid #000" }}>
-            <p style={{ margin: "0 0 0.75rem", fontWeight: 700, fontSize: "0.875rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>
-              Improvement Tips
+          <div style={{ background: "var(--surface-2)", borderLeft: "4px solid var(--primary)", borderRadius: "var(--radius-sm)", padding: "1.5rem" }}>
+            <p style={{ margin: "0 0 0.75rem", fontWeight: 700, fontSize: "1.125rem", color: "var(--foreground)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              💡 General Improvement Tips
             </p>
             {analysis.suggestions.map((s, i) => (
-              <p key={i} style={{ margin: "0.25rem 0", fontSize: "0.875rem", color: "var(--foreground-muted)" }}>• {s}</p>
+              <p key={i} style={{ margin: "0.5rem 0", fontSize: "0.9375rem", color: "var(--foreground-muted)", display: "flex", gap: "0.5rem" }}>
+                <span style={{ color: "var(--primary)" }}>•</span> {s}
+              </p>
             ))}
           </div>
         )}

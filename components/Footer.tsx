@@ -6,7 +6,7 @@ export default function Footer() {
       style={{
         borderTop: "1px solid var(--border)",
         background: "var(--surface)",
-        padding: "3rem 1rem 2rem",
+        padding: "4rem 1rem 2rem",
         marginTop: "auto",
       }}
     >
@@ -15,80 +15,96 @@ export default function Footer() {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "2rem",
-            marginBottom: "2rem",
+            gap: "3rem",
+            marginBottom: "3rem",
           }}
         >
-          {/* Brand */}
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
+          {/* Brand & SEO Paragraph */}
+          <div style={{ gridColumn: "span 2" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
               <div
                 style={{
-                  width: "1.75rem",
-                  height: "1.75rem",
-                  borderRadius: "0.375rem",
+                  width: "2rem",
+                  height: "2rem",
+                  borderRadius: "0.5rem",
                   background: "linear-gradient(135deg, var(--primary), var(--accent))",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "0.875rem",
                 }}
-              >
-                
-              </div>
-              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.125rem" }}>
+              ></div>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1.25rem" }}>
                 PracticeForge
               </span>
             </div>
-            <p style={{ fontSize: "0.875rem", maxWidth: "20rem" }}>
-              AI-powered IELTS & TOEFL exam-style practice. Turn any text into personalised study material.
+            <p style={{ fontSize: "0.9375rem", color: "var(--foreground-muted)", lineHeight: 1.7, maxWidth: "400px", marginBottom: "1.5rem" }}>
+              PracticeForge is an AI-powered language tutor designed to help students achieve Band 8+ in IELTS Academic and 100+ in TOEFL iBT through instantly generated, personalized exam-style practice.
             </p>
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <span className="badge badge-gray">IELTS</span>
+              <span className="badge badge-gray">TOEFL</span>
+              <span className="badge badge-gray">General English</span>
+            </div>
           </div>
 
-          {/* Links */}
+          {/* Product Links */}
           <div>
-            <p style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--foreground-muted)", marginBottom: "0.75rem" }}>
+            <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--foreground)", marginBottom: "1rem" }}>
               Product
             </p>
-            {[
-              { href: "/practice", label: "Practice Generator" },
-              { href: "/pricing", label: "Pricing" },
-            ].map((l) => (
-              <div key={l.href} style={{ marginBottom: "0.5rem" }}>
-                <Link
-                  href={l.href}
-                  style={{ fontSize: "0.875rem", color: "var(--foreground-muted)", transition: "color 0.2s" }}
-                >
-                  {l.label}
-                </Link>
-              </div>
-            ))}
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              {[
+                { href: "/practice", label: "IELTS & TOEFL Practice" },
+                { href: "/general-english", label: "General English Lab" },
+                { href: "/vocabulary", label: "My Dictionary" },
+                { href: "/question-bank", label: "Question Bank" },
+              ].map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} style={{ fontSize: "0.875rem", color: "var(--foreground-muted)" }}>
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Disclaimer */}
-          <div style={{ gridColumn: "1 / -1" }}>
-            <hr className="divider" />
-            <p style={{ fontSize: "0.75rem", color: "var(--foreground-faint)", lineHeight: 1.7 }}>
-              <strong style={{ color: "var(--foreground-muted)" }}>Disclaimer:</strong> PracticeForge is an independent study tool and is <strong>not affiliated with, endorsed by, or associated with</strong> IELTS (IDP Education, British Council, or Cambridge Assessment English), TOEFL (Educational Testing Service / ETS), or any other official examination body. All practice content is AI-generated and intended for self-study purposes only. Estimated band scores and practice feedback are not official scores and should not be used for official purposes.
+          {/* Resources & Legal */}
+          <div>
+            <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--foreground)", marginBottom: "1rem" }}>
+              Resources & Legal
             </p>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              {[
+                { href: "/academy", label: "PracticeForge Academy" },
+                { href: "/pricing", label: "Pricing & Plans" },
+                { href: "/affiliate", label: "Partner Program" },
+                { href: "#", label: "Privacy Policy" },
+              ].map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} style={{ fontSize: "0.875rem", color: "var(--foreground-muted)" }}>
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "1rem",
-          }}
-        >
-          <p style={{ fontSize: "0.8125rem", color: "var(--foreground-faint)" }}>
-            © {new Date().getFullYear()} PracticeForge. For study purposes only.
+        {/* Disclaimer & Copyright */}
+        <div>
+          <hr className="divider" style={{ marginBottom: "1.5rem" }} />
+          <p style={{ fontSize: "0.75rem", color: "var(--foreground-faint)", lineHeight: 1.7, marginBottom: "1.5rem" }}>
+            <strong>Disclaimer:</strong> PracticeForge is an independent study tool and is not affiliated with, endorsed by, or associated with IELTS (IDP Education, British Council, or Cambridge Assessment English) or TOEFL (Educational Testing Service / ETS). All content is AI-generated for self-study purposes.
           </p>
-          <span className="badge badge-gray" style={{ fontSize: "0.7rem" }}>
-             MVP — Not for official exam use
-          </span>
+          
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
+            <p style={{ fontSize: "0.8125rem", color: "var(--foreground-faint)", margin: 0 }}>
+              © {new Date().getFullYear()} PracticeForge. Accelerate your fluency.
+            </p>
+            <span className="badge badge-accent" style={{ fontSize: "0.7rem", opacity: 0.8 }}>
+               Beta Release
+            </span>
+          </div>
         </div>
       </div>
     </footer>
