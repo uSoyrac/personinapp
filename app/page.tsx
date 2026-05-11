@@ -77,7 +77,7 @@ export default function LandingPage() {
           <div className="card-elevated" style={{ padding: "1.5rem", background: "rgba(255, 255, 255, 0.9)", backdropFilter: "blur(16px)" }}>
             
             {/* Mode Selector Tabs */}
-            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem", background: "var(--surface-2)", padding: "0.375rem", borderRadius: "var(--radius-sm)" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1.5rem", background: "var(--surface-2)", padding: "0.375rem", borderRadius: "var(--radius-sm)" }}>
               {[
                 { id: "ielts", label: "IELTS Academic" },
                 { id: "toefl", label: "TOEFL iBT" },
@@ -149,7 +149,7 @@ export default function LandingPage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
               gap: "2rem",
             }}
           >
@@ -183,7 +183,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem" }}>
             {[
               { name: "Sarah L.", score: "IELTS Band 6.0 → 7.5", text: "I was stuck at 6.0 in Writing for months. The line-by-line grammar breakdown and vocabulary suggestions here finally pushed me to a 7.5. Absolutely game-changing." },
               { name: "Ahmed K.", score: "TOEFL iBT 85 → 102", text: "The speaking agent is terrifyingly accurate. It caught my pronunciation errors that my human tutor missed. Got my target score in 3 weeks!" },
@@ -196,7 +196,7 @@ export default function LandingPage() {
                 <div style={{ display: "flex", gap: "0.25rem", color: "var(--gold)", marginBottom: "1rem" }}>
                   {"★★★★★".split("").map((star, idx) => <span key={idx}>{star}</span>)}
                 </div>
-                <p style={{ fontSize: "1.0625rem", lineHeight: 1.6, color: "var(--foreground)", marginBottom: "1.5rem", fontStyle: "italic", position: "relative", zIndex: 1 }}>"{review.text}"</p>
+                <p style={{ fontSize: "1.0625rem", lineHeight: 1.6, color: "var(--foreground)", marginBottom: "1.5rem", fontStyle: "italic", position: "relative", zIndex: 1, paddingRight: "2rem" }}>"{review.text}"</p>
                 <div>
                   <p style={{ margin: 0, fontWeight: 700, color: "var(--foreground)" }}>{review.name}</p>
                   <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--mint-dark)", fontWeight: 600 }}>{review.score}</p>
@@ -218,7 +218,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2rem", alignItems: "start" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem", alignItems: "start" }}>
             
             {/* Starter Plan */}
             <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%" }}>

@@ -86,7 +86,7 @@ h1, h2, h3, h4 {
   font-weight: 700;
   color: var(--foreground);
 }
-h1 { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; }
+h1 { font-size: clamp(2rem, 5vw, 4rem); font-weight: 800; }
 h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
 h3 { font-size: 1.25rem; font-weight: 600; }
 p { color: var(--foreground-muted); font-weight: 400; }
@@ -434,3 +434,140 @@ img { max-width: 100%; height: auto; }
 @media (min-width: 769px) {
   .hide-desktop { display: none !important; }
 }
+
+/* ==============================
+   Academy & Blog Specific
+   ============================== */
+.hover-card {
+  display: block;
+  text-decoration: none;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.hover-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.article-content {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: var(--foreground);
+}
+.article-content p {
+  margin-bottom: 1.5rem;
+}
+.article-content h2 {
+  font-size: 1.75rem;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+}
+.article-content h3 {
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.article-content ul, .article-content ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+.article-content li {
+  margin-bottom: 0.5rem;
+}
+
+/* ==============================
+   Rich Media & Funnel (Academy)
+   ============================== */
+.article-image {
+  width: 100%;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  margin: 2rem 0;
+  border: 1px solid var(--border);
+  object-fit: cover;
+}
+
+.article-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  font-size: 0.9375rem;
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.article-table th {
+  background: var(--surface-2);
+  color: var(--foreground);
+  font-weight: 600;
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+.article-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground-muted);
+}
+.article-table tr:hover td {
+  background: rgba(124, 58, 237, 0.02);
+}
+
+.article-link {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s ease;
+}
+.article-link:hover {
+  border-bottom-color: var(--primary);
+}
+
+.toc {
+  background: var(--surface-2);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  margin: 2rem 0;
+  border-left: 4px solid var(--primary);
+}
+.toc h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+}
+.toc ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.toc li {
+  margin-bottom: 0.5rem;
+}
+.toc a {
+  color: var(--foreground-muted);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  transition: color 0.2s ease;
+}
+.toc a:hover {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.alert-hook {
+  background: var(--primary-glow);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 1.5rem;
+  border-radius: var(--radius-sm);
+  margin: 2rem 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.alert-hook p {
+  margin: 0;
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+

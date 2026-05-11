@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import type { SavedWord } from "@/lib/wordList";
 import { getWordList, saveWords, removeWord, clearWordList, getWordStats, updateWordProgress } from "@/lib/wordList";
 import { addXP, awardBadge } from "@/lib/gamification";
+import { useAppContext } from "@/lib/AppContext";
 import ProgressBar from "@/components/ProgressBar";
 import Confetti from "@/components/Confetti";
 
@@ -61,12 +62,13 @@ function buildQuiz(words: SavedWord[], mode: QuizDirection): QuizQ[] {
 }
 
 export default function VocabularyPage() {
+  const { isPremium, userProfile, updateUserProfile } = useAppContext();
   const [view, setView] = useState<ViewMode>("sets");
   const [words, setWords] = useState<SavedWord[]>([]);
   const [stats, setStats] = useState({ total: 0, learned: 0, needsReview: 0, accuracy: 0 });
   const [activeSet, setActiveSet] = useState(0);
   const [quizMode, setQuizMode] = useState<QuizDirection>("word-def");
-  const [quiz, setQuiz] = useState<{ qs: QuizQ[]; ci: number; ans: (number | null)[]; fb: boolean } | null>(null);
+  const [quiz, setQuiz] = useState<{ qs: QuizQ[]; ci: number; ans: (number | null)[] } | null>(null);
   const [confetti, setConfetti] = useState(false);
   const [mounted, setMounted] = useState(false);
   
@@ -88,6 +90,11 @@ export default function VocabularyPage() {
   const [isStartingQuiz, setIsStartingQuiz] = useState(false);
 
   function startQuiz(setIdx: number) {
+    if (!isPremium && words.length > 20) {
+      alert("Free users can only practice up to 20 words. Please upgrade to Premium to unlock unlimited practice.");
+      return;
+    }
+
     let s: SavedWord[] = [];
     if (setIdx === -1) s = hardWords;
     else s = sets[setIdx] ?? [];
@@ -96,22 +103,32 @@ export default function VocabularyPage() {
 
     setIsStartingQuiz(true);
     
-    const qs = buildQuiz(shuffleArray(s).slice(0, Math.min(20, s.length)), quizMode);
-    setQuiz({ qs, ci: 0, ans: new Array(qs.length).fill(null), fb: false });
+    const limit = isPremium ? s.length : Math.min(20, s.length);
+    const qs = buildQuiz(shuffleArray(s).slice(0, limit), quizMode);
+    setQuiz({ qs, ci: 0, ans: new Array(qs.length).fill(null) });
     setActiveSet(setIdx);
     setView("quiz");
     setIsStartingQuiz(false);
   }
 
   function handleAnswer(idx: number) {
-    if (!quiz || quiz.fb) return;
+    if (!quiz || quiz.ans[quiz.ci] !== null) return; // Prevent changing answer
     const a = [...quiz.ans]; a[quiz.ci] = idx;
     const q = quiz.qs[quiz.ci];
     const ok = idx === q.correctIndex;
     updateWordProgress(q.word, ok);
-    addXP(ok ? 10 : 2);
-    if (ok) { setConfetti(true); setTimeout(() => setConfetti(false), 1500); }
-    setQuiz({ ...quiz, ans: a, fb: true });
+    
+    // Add XP to Context Profile
+    if (ok) {
+      addXP(10);
+      updateUserProfile({ points: userProfile.points + 10 });
+      setConfetti(true); setTimeout(() => setConfetti(false), 1500);
+    } else {
+      addXP(2);
+      updateUserProfile({ points: userProfile.points + 2 });
+    }
+    
+    setQuiz({ ...quiz, ans: a });
   }
 
   function nextQ() {
@@ -122,8 +139,13 @@ export default function VocabularyPage() {
       refresh();
       setView("results");
     } else {
-      setQuiz({ ...quiz, ci: quiz.ci + 1, fb: false });
+      setQuiz({ ...quiz, ci: quiz.ci + 1 });
     }
+  }
+
+  function prevQ() {
+    if (!quiz || quiz.ci <= 0) return;
+    setQuiz({ ...quiz, ci: quiz.ci - 1 });
   }
 
   function getScore() {
@@ -396,11 +418,26 @@ export default function VocabularyPage() {
                   <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--mint)" }}>{quiz.ans.filter((a, i) => a === quiz.qs[i].correctIndex).length} Correct</span>
                 </div>
                 <div className="quiz-progress-bar">
-                  <div className="quiz-progress-fill" style={{ width: `${((quiz.ci + (quiz.fb ? 1 : 0)) / quiz.qs.length) * 100}%` }} />
+                  <div className="quiz-progress-fill" style={{ width: `${((quiz.ci) / quiz.qs.length) * 100}%` }} />
                 </div>
               </div>
 
               <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
+                {/* Save to Difficult Words Button */}
+                <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
+                  <button 
+                    onClick={() => {
+                      if (!isPremium) { alert("Adding to Difficult Words is a Premium feature."); return; }
+                      // Simulate adding to difficult words
+                      alert("Added to difficult words folder!");
+                    }}
+                    className="btn-secondary" 
+                    style={{ fontSize: "0.75rem", padding: "0.5rem 0.75rem" }}
+                  >
+                    + Add to Difficult Words
+                  </button>
+                </div>
+
                 <p style={{ margin: "0 0 0.5rem", fontSize: "0.875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--primary)" }}>
                   {quiz.qs[quiz.ci].direction === "def-word" 
                     ? "Which word matches this definition?" 
@@ -414,13 +451,14 @@ export default function VocabularyPage() {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", maxWidth: "600px", margin: "0 auto" }}>
                   {quiz.qs[quiz.ci].options.map((opt, idx) => {
+                    const hasAnswered = quiz.ans[quiz.ci] !== null;
                     const sel = quiz.ans[quiz.ci] === idx;
                     const cor = idx === quiz.qs[quiz.ci].correctIndex;
                     let cls = "quiz-option";
-                    if (quiz.fb) { if (cor) cls += " correct"; else if (sel && !cor) cls += " incorrect"; }
+                    if (hasAnswered) { if (cor) cls += " correct"; else if (sel && !cor) cls += " incorrect"; }
 
                     return (
-                      <button key={idx} className={cls} onClick={() => handleAnswer(idx)} disabled={quiz.fb}>
+                      <button key={idx} className={cls} onClick={() => handleAnswer(idx)} disabled={hasAnswered}>
                         <span className="quiz-option-letter">{String.fromCharCode(65 + idx)}</span>
                         <span style={{ fontSize: "1rem", lineHeight: 1.5, flex: 1 }}>
                           {opt}
@@ -430,8 +468,18 @@ export default function VocabularyPage() {
                   })}
                 </div>
 
-                {quiz.fb && (
-                  <div className="animate-fadeInFast" style={{ marginTop: "2rem", maxWidth: "600px", margin: "2rem auto 0" }}>
+                {/* Navigation Controls */}
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "2rem", maxWidth: "600px", margin: "2rem auto 0" }}>
+                  <button className="btn-secondary" onClick={prevQ} disabled={quiz.ci <= 0} style={{ padding: "0.75rem 1.5rem" }}>
+                    ← Previous
+                  </button>
+                  <button className="btn-primary" onClick={nextQ} style={{ padding: "0.75rem 1.5rem" }}>
+                    {quiz.ci + 1 >= quiz.qs.length ? "See Results" : "Next →"}
+                  </button>
+                </div>
+
+                {quiz.ans[quiz.ci] !== null && (
+                  <div className="animate-fadeInFast" style={{ marginTop: "1rem", maxWidth: "600px", margin: "1rem auto 0" }}>
                     <div style={{
                       background: quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)",
                       border: `1px solid ${quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "var(--mint)" : "var(--premium-red)"}`,
@@ -450,9 +498,6 @@ export default function VocabularyPage() {
                         <strong>{quiz.qs[quiz.ci].word}</strong>: {quiz.qs[quiz.ci].definition}
                       </p>
                     </div>
-                    <button className="btn-primary" onClick={nextQ} style={{ marginTop: "1.5rem", width: "100%", padding: "1rem", fontSize: "1.125rem" }}>
-                      {quiz.ci + 1 >= quiz.qs.length ? "See Results" : "Next Question"}
-                    </button>
                   </div>
                 )}
               </div>

@@ -1,4 +1,15 @@
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Academy | PracticeForge",
+  description: "Expert strategies, AI-driven tips, and comprehensive guides to ace your IELTS and TOEFL exams. Learn how to maximize your band score.",
+  openGraph: {
+    title: "Academy | PracticeForge",
+    description: "Expert strategies and AI-driven tips to ace your exams.",
+    type: "website",
+  }
+};
 
 export default function BlogIndex() {
   const posts = [
@@ -15,7 +26,7 @@ export default function BlogIndex() {
         
         <div style={{ display: "grid", gap: "2rem", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
           {posts.map(post => (
-            <Link key={post.slug} href={`/academy/${post.slug}`} className="card" style={{ display: "block", textDecoration: "none", transition: "transform 0.2s" }} onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
+            <Link key={post.slug} href={`/academy/${post.slug}`} className="card hover-card">
               <div className="badge badge-primary" style={{ marginBottom: "1rem", display: "inline-block" }}>{post.category}</div>
               <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>{post.title}</h3>
               <p style={{ color: "var(--primary)", fontWeight: 600 }}>Read Article →</p>

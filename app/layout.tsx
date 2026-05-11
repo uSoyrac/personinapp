@@ -3,6 +3,7 @@ import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import SignupModal from "@/components/SignupModal";
+import { AppProvider } from "@/lib/AppContext";
 
 export const metadata: Metadata = {
   title: "PracticeForge — AI-Powered IELTS & TOEFL Practice",
@@ -56,10 +57,12 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-        <Nav />
-        <main style={{ flex: 1 }}>{children}</main>
-        <Footer />
-        <SignupModal />
+        <AppProvider>
+          <Nav />
+          <main style={{ flex: 1 }}>{children}</main>
+          <Footer />
+          <SignupModal />
+        </AppProvider>
       </body>
     </html>
   );

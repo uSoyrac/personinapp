@@ -3,11 +3,14 @@
 import { useState, useEffect, useMemo } from "react";
 import { getLeaderboard, Timeframe, Region, LeaderboardUser } from "@/lib/leaderboard";
 import { LANGUAGE_FLAGS } from "@/lib/translations";
+import { useAppContext } from "@/lib/AppContext";
 
 export default function LeaderboardPage() {
   const [timeframe, setTimeframe] = useState<Timeframe>("weekly");
   const [region, setRegion] = useState<Region>("worldwide");
+  const { userProfile, updateUserProfile } = useAppContext();
   const [mounted, setMounted] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -15,8 +18,31 @@ export default function LeaderboardPage() {
 
   const board = useMemo(() => {
     if (!mounted) return [];
-    return getLeaderboard(timeframe, region).slice(0, 50); // Top 50
-  }, [timeframe, region, mounted]);
+    const baseBoard = getLeaderboard(timeframe, region).slice(0, 50); // Top 50
+    
+    // Inject our real context user, removing the mock 'isCurrentUser' if it exists
+    const filteredBoard = baseBoard.filter(u => !u.isCurrentUser);
+    const currentUser: LeaderboardUser = {
+      id: "current-user",
+      name: userProfile.name,
+      country: userProfile.country.toLowerCase().substring(0, 2), // Mock country code extraction
+      avatarColor: "var(--brutal-green)",
+      xpWeekly: userProfile.points,
+      xpMonthly: userProfile.points,
+      xpAllTime: userProfile.points,
+      isCurrentUser: true,
+      streak: 5
+    };
+    
+    // Insert user and re-sort by points
+    const newBoard = [...filteredBoard, currentUser].sort((a, b) => {
+      const aXp = timeframe === "weekly" ? a.xpWeekly : timeframe === "monthly" ? a.xpMonthly : a.xpAllTime;
+      const bXp = timeframe === "weekly" ? b.xpWeekly : timeframe === "monthly" ? b.xpMonthly : b.xpAllTime;
+      return bXp - aXp;
+    });
+
+    return newBoard;
+  }, [timeframe, region, mounted, userProfile]);
 
   const top3 = board.slice(0, 3);
   const rest = board.slice(3);
@@ -43,7 +69,44 @@ export default function LeaderboardPage() {
               </h1>
               <p style={{ margin: 0, fontSize: "1rem", fontWeight: 700, color: "var(--foreground-muted)" }}>Compete with learners worldwide.</p>
             </div>
+            <button onClick={() => setIsEditingProfile(!isEditingProfile)} className="btn-secondary">
+              {isEditingProfile ? "Close Profile" : "Edit Profile ⚙️"}
+            </button>
           </div>
+
+          {/* Profile Editor */}
+          {isEditingProfile && (
+            <div className="card" style={{ marginBottom: "2rem", background: "var(--surface-2)" }}>
+              <h3 style={{ marginTop: 0 }}>Your Profile</h3>
+              <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: "200px" }}>
+                  <label className="label">Display Name</label>
+                  <input type="text" className="input-base" value={userProfile.name} onChange={e => updateUserProfile({ name: e.target.value })} />
+                </div>
+                <div style={{ flex: 1, minWidth: "200px" }}>
+                  <label className="label">Country (Flag)</label>
+                  <select className="input-base" value={userProfile.flag} onChange={e => updateUserProfile({ flag: e.target.value, country: e.target.options[e.target.selectedIndex].text })}>
+                    <option value="🇹🇷">Turkey</option>
+                    <option value="🇺🇸">United States</option>
+                    <option value="🇬🇧">United Kingdom</option>
+                    <option value="🇩🇪">Germany</option>
+                    <option value="🇫🇷">France</option>
+                    <option value="🇧🇷">Brazil</option>
+                  </select>
+                </div>
+                <div style={{ flex: 1, minWidth: "200px" }}>
+                  <label className="label">Target Score</label>
+                  <select className="input-base" value={userProfile.targetScore} onChange={e => updateUserProfile({ targetScore: e.target.value })}>
+                    <option value="IELTS 6.5">IELTS 6.5</option>
+                    <option value="IELTS 7.0">IELTS 7.0</option>
+                    <option value="IELTS 7.5+">IELTS 7.5+</option>
+                    <option value="TOEFL 90">TOEFL 90</option>
+                    <option value="TOEFL 100+">TOEFL 100+</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Filters */}
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "2rem" }}>
@@ -111,8 +174,8 @@ export default function LeaderboardPage() {
                     {p.u.isCurrentUser && <div style={{ position: "absolute", top: -5, right: -5, background: "var(--brutal-green)", border: "2px solid #000", borderRadius: "50%", width: 14, height: 14 }} />}
                   </div>
                   <div style={{ textAlign: "center" }}>
-                    <p style={{ margin: 0, fontWeight: 900, fontSize: "1rem", color: "var(--foreground)" }}>{p.u.isCurrentUser ? "YOU" : p.u.name}</p>
-                    <p style={{ margin: 0, fontSize: "0.75rem", fontWeight: 700, color: "var(--foreground-muted)" }}>{getFlag(p.u.country)} {getXP(p.u)} XP</p>
+                    <p style={{ margin: 0, fontWeight: 900, fontSize: "1rem", color: "var(--foreground)" }}>{p.u.isCurrentUser ? userProfile.name : p.u.name}</p>
+                    <p style={{ margin: 0, fontSize: "0.75rem", fontWeight: 700, color: "var(--foreground-muted)" }}>{p.u.isCurrentUser ? userProfile.flag : getFlag(p.u.country)} {getXP(p.u)} XP</p>
                   </div>
                   <div className="card" style={{ width: "100%", height: p.height, background: p.color, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "1rem", borderTopLeftRadius: "16px", borderTopRightRadius: "16px", borderBottomWidth: 0, boxShadow: "none" }}>
                     <span style={{ fontSize: "3rem", fontWeight: 900, fontFamily: "var(--font-display)", opacity: 0.5, color: "#000" }}>{p.rank}</span>
@@ -140,10 +203,10 @@ export default function LeaderboardPage() {
                   </div>
                   <div style={{ flex: 1 }}>
                     <p style={{ margin: 0, fontWeight: 900, fontSize: "1rem", color: u.isCurrentUser ? "#000" : "var(--foreground)" }}>
-                      {u.name} {u.isCurrentUser && "(You)"}
+                      {u.isCurrentUser ? userProfile.name : u.name} {u.isCurrentUser && <span style={{fontSize:"0.8em", opacity:0.7}}>({userProfile.targetScore})</span>}
                     </p>
                     <p style={{ margin: 0, fontSize: "0.75rem", fontWeight: 700, color: u.isCurrentUser ? "rgba(0,0,0,0.7)" : "var(--foreground-muted)" }}>
-                      {getFlag(u.country)}
+                      {u.isCurrentUser ? userProfile.flag : getFlag(u.country)}
                     </p>
                   </div>
                   <div style={{ fontWeight: 900, fontSize: "1.125rem", fontFamily: "var(--font-display)", color: u.isCurrentUser ? "#000" : "var(--foreground)" }}>

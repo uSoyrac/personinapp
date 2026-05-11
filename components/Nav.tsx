@@ -9,6 +9,8 @@ const NAV_LINKS = [
   { href: "/practice", label: "IELTS & TOEFL Practice" },
   { href: "/general-english", label: "General English" },
   { href: "/vocabulary", label: "My Dictionary" },
+  { href: "/library", label: "My Library" },
+  { href: "/community", label: "Community" },
   { href: "/question-bank", label: "Question Bank" },
   { href: "/pricing", label: "Pricing" },
   { href: "/academy", label: "Academy" },
