@@ -67,7 +67,7 @@ export default function VocabularyPage() {
   const [view, setView] = useState<ViewMode>("sets");
   const [words, setWords] = useState<SavedWord[]>([]);
   const [stats, setStats] = useState({ total: 0, learned: 0, needsReview: 0, accuracy: 0 });
-  const [activeSet, setActiveSet] = useState(0);
+  const [activeSet, setActiveSet] = useState("Set 1");
   const [quizMode, setQuizMode] = useState<QuizDirection>("word-def");
   const [quiz, setQuiz] = useState<{ qs: QuizQ[]; ci: number; ans: (number | null)[] } | null>(null);
   const [confetti, setConfetti] = useState(false);
@@ -76,29 +76,35 @@ export default function VocabularyPage() {
   // Manual word entry state
   const [manualWord, setManualWord] = useState("");
   const [manualDef, setManualDef] = useState("");
+  const [manualSet, setManualSet] = useState("Set 1");
 
   const refresh = useCallback(() => { setWords(getWordList()); setStats(getWordStats()); }, []);
 
   useEffect(() => { setMounted(true); refresh(); }, [refresh]);
 
-  const sets: SavedWord[][] = [];
-  for (let i = 0; i < words.length; i += SET_SIZE) sets.push(words.slice(i, i + SET_SIZE));
-  if (sets.length === 0) sets.push([]);
+  // Group words by setName
+  const setsMap: Record<string, SavedWord[]> = {};
+  words.forEach(w => {
+    const setName = w.setName || "Set 1";
+    if (!setsMap[setName]) setsMap[setName] = [];
+    setsMap[setName].push(w);
+  });
+  const setNames = Object.keys(setsMap).length > 0 ? Object.keys(setsMap) : ["Set 1"];
 
-  const currentSet = activeSet === -1 ? words.filter(w => w.difficulty === "hard") : (sets[activeSet] ?? []);
+  const currentSet = activeSet === "hard" ? words.filter(w => w.difficulty === "hard") : (setsMap[activeSet] ?? []);
   const hardWords = words.filter(w => w.difficulty === "hard");
 
   const [isStartingQuiz, setIsStartingQuiz] = useState(false);
 
-  function startQuiz(setIdx: number) {
+  function startQuiz(setName: string) {
     if (!isPremium && words.length > 20) {
-      alert("Free users can only practice up to 20 words. Please upgrade to Premium to unlock unlimited practice.");
+      showToast("Free users can only practice up to 20 words. Please upgrade to Premium to unlock unlimited practice.", "warning");
       return;
     }
 
     let s: SavedWord[] = [];
-    if (setIdx === -1) s = hardWords;
-    else s = sets[setIdx] ?? [];
+    if (setName === "hard") s = hardWords;
+    else s = setsMap[setName] ?? [];
     
     if (s.length < 2) return;
 
@@ -107,7 +113,7 @@ export default function VocabularyPage() {
     const limit = isPremium ? s.length : Math.min(20, s.length);
     const qs = buildQuiz(shuffleArray(s).slice(0, limit), quizMode);
     setQuiz({ qs, ci: 0, ans: new Array(qs.length).fill(null) });
-    setActiveSet(setIdx);
+    setActiveSet(setName);
     setView("quiz");
     setIsStartingQuiz(false);
   }
@@ -167,27 +173,23 @@ export default function VocabularyPage() {
       definition: manualDef.trim(),
       contextSentence: "Manually added.",
       partOfSpeech: "unknown",
-      difficulty: "manual"
+      difficulty: "manual",
+      setName: manualSet.trim() || "Set 1"
     }]);
     
     setManualWord("");
     setManualDef("");
+    setManualSet("Set 1");
     refresh();
   }
 
   function handleAddAndTest() {
     if (!manualWord.trim() || !manualDef.trim()) return;
-    const w = manualWord.trim();
+    const sName = manualSet.trim() || "Set 1";
     addWordInternal();
     
-    // Find the word in the updated list
-    const updatedWords = getWordList();
-    const idx = updatedWords.findIndex(x => x.word === w);
-    if (idx !== -1) {
-      const setIdx = Math.floor(idx / SET_SIZE);
-      // Wait a tick for states to sync before starting quiz
-      setTimeout(() => startQuiz(setIdx), 50);
-    }
+    // Wait a tick for states to sync before starting quiz
+    setTimeout(() => startQuiz(sName), 50);
   }
 
   if (!mounted) return null;
@@ -260,7 +262,7 @@ export default function VocabularyPage() {
                   <h3 style={{ margin: 0, fontSize: "1.125rem" }}>Add New Word</h3>
                 </div>
                 <form onSubmit={handleAddManualWord} style={{ display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "flex-end" }}>
-                  <div style={{ flex: "1 1 200px" }}>
+                  <div style={{ flex: "1 1 150px" }}>
                     <label className="label">Word</label>
                     <input 
                       type="text" 
@@ -270,15 +272,31 @@ export default function VocabularyPage() {
                       onChange={(e) => setManualWord(e.target.value)}
                     />
                   </div>
-                  <div style={{ flex: "2 1 300px" }}>
-                    <label className="label">English Definition</label>
+                  <div style={{ flex: "2 1 250px" }}>
+                    <label className="label">Definition</label>
                     <input 
                       type="text" 
                       className="input-base" 
-                      placeholder="e.g., Present, appearing, or found everywhere." 
+                      placeholder="e.g., Present, everywhere." 
                       value={manualDef}
                       onChange={(e) => setManualDef(e.target.value)}
                     />
+                  </div>
+                  <div style={{ flex: "1 1 150px" }}>
+                    <label className="label">Set</label>
+                    <input 
+                      type="text" 
+                      className="input-base" 
+                      placeholder="e.g., Set 1" 
+                      value={manualSet}
+                      onChange={(e) => setManualSet(e.target.value)}
+                      list="set-names"
+                    />
+                    <datalist id="set-names">
+                      {setNames.map(name => (
+                        <option key={name} value={name} />
+                      ))}
+                    </datalist>
                   </div>
                   <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
                     <button type="submit" className="btn-secondary" style={{ padding: "0.875rem 1.25rem" }}>
@@ -314,7 +332,7 @@ export default function VocabularyPage() {
                           </h3>
                           <p style={{ margin: 0, fontSize: "0.875rem" }}>{hardWords.length} words require attention. Practice to remove the 'hard' tag.</p>
                         </div>
-                        <button onClick={() => startQuiz(-1)} className="btn-primary" style={{ background: "var(--premium-red)", boxShadow: "0 4px 14px 0 rgba(239, 68, 68, 0.39)" }} disabled={hardWords.length < 2 || isStartingQuiz}>
+                        <button onClick={() => startQuiz("hard")} className="btn-primary" style={{ background: "var(--premium-red)", boxShadow: "0 4px 14px 0 rgba(239, 68, 68, 0.39)" }} disabled={hardWords.length < 2 || isStartingQuiz}>
                           {isStartingQuiz ? "Preparing..." : "Practice Hard Words"}
                         </button>
                       </div>
@@ -322,20 +340,20 @@ export default function VocabularyPage() {
                   )}
 
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "1rem" }}>
-                    {sets.map((s, si) => {
+                    {Object.entries(setsMap).map(([setName, s]) => {
                       const learned = s.filter(w => w.correctCount >= 3).length;
                       const pct = s.length > 0 ? (learned / s.length) * 100 : 0;
                       const isComplete = pct === 100;
 
                       return (
                         <div
-                          key={si}
+                          key={setName}
                           className="card"
-                          onClick={() => setActiveSet(si)}
+                          onClick={() => setActiveSet(setName)}
                           style={{ 
                             cursor: "pointer",
-                            borderColor: activeSet === si ? "var(--primary)" : "var(--border)",
-                            boxShadow: activeSet === si ? "0 0 0 1px var(--primary)" : "var(--shadow-sm)",
+                            borderColor: activeSet === setName ? "var(--primary)" : "var(--border)",
+                            boxShadow: activeSet === setName ? "0 0 0 1px var(--primary)" : "var(--shadow-sm)",
                             padding: "1.25rem",
                             display: "flex",
                             flexDirection: "column",
@@ -345,7 +363,7 @@ export default function VocabularyPage() {
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                             <div>
                               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-                                <h4 style={{ margin: 0, fontSize: "1.125rem" }}>Set {si + 1}</h4>
+                                <h4 style={{ margin: 0, fontSize: "1.125rem" }}>{setName}</h4>
                                 {isComplete && <span className="badge badge-accent" style={{ padding: "0.125rem 0.5rem" }}>Mastered</span>}
                               </div>
                               <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-faint)" }}>
@@ -353,7 +371,7 @@ export default function VocabularyPage() {
                               </p>
                             </div>
                             <button
-                              onClick={(e) => { e.stopPropagation(); startQuiz(si); }}
+                              onClick={(e) => { e.stopPropagation(); startQuiz(setName); }}
                               className="btn-secondary"
                               style={{ padding: "0.375rem 0.75rem", fontSize: "0.8125rem" }}
                               disabled={s.length < 2 || isStartingQuiz}
@@ -374,7 +392,7 @@ export default function VocabularyPage() {
                   <div className="card" style={{ marginTop: "1rem", padding: "1.5rem" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", paddingBottom: "1rem", borderBottom: "1px solid var(--border)" }}>
                       <h3 style={{ margin: 0, fontSize: "1.25rem" }}>
-                        {activeSet === -1 ? "Review Words" : `Dictionary Set ${activeSet + 1}`}
+                        {activeSet === "hard" ? "Review Words" : `Dictionary ${activeSet}`}
                       </h3>
                       {words.length > 0 && (
                         <button onClick={() => { if (confirm("Clear all words in dictionary?")) { clearWordList(); refresh(); } }} className="btn-secondary" style={{ fontSize: "0.75rem", padding: "0.375rem 0.75rem", color: "var(--premium-red)", borderColor: "rgba(239, 68, 68, 0.2)" }}>

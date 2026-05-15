@@ -14,6 +14,7 @@ export interface SavedWord {
   lastReviewed: string | null;
   nextReview: string | null;
   addedAt: string;
+  setName?: string; // Optional set name
 }
 
 const STORAGE_KEY = "practiceforge_wordlist";
@@ -53,6 +54,7 @@ export function saveWords(newWords: Omit<SavedWord, "correctCount" | "totalAttem
       lastReviewed: null,
       nextReview: null,
       addedAt: new Date().toISOString(),
+      setName: w.setName || "Set 1", // Default to Set 1 if not provided
     });
     existingSet.add(w.word.toLowerCase());
     added++;
@@ -134,4 +136,21 @@ export function getWordStats() {
         )
       : 0,
   };
+}
+
+/** Update word set. */
+export function updateWordSet(word: string, setName: string) {
+  const words = getStorage();
+  const idx = words.findIndex(w => w.word.toLowerCase() === word.toLowerCase());
+  if (idx !== -1) {
+    words[idx].setName = setName;
+    setStorage(words);
+  }
+}
+
+/** Get available set names. */
+export function getWordSets(): string[] {
+  const words = getStorage();
+  const sets = new Set(words.map(w => w.setName || "Set 1"));
+  return Array.from(sets);
 }
