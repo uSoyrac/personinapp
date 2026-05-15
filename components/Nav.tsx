@@ -2,24 +2,24 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import XPBar from "@/components/XPBar";
+import { showToast } from "@/components/Toast";
 import type { UserTier } from "@/types";
 
 const NAV_LINKS = [
-  { href: "/practice", label: "IELTS & TOEFL Practice" },
-  { href: "/general-english", label: "General English" },
-  { href: "/vocabulary", label: "My Dictionary" },
-  { href: "/library", label: "My Library" },
-  { href: "/community", label: "Community" },
-  { href: "/question-bank", label: "Question Bank" },
-  { href: "/pricing", label: "Pricing" },
+  { href: "/practice", label: "Practice" },
+  { href: "/vocabulary", label: "Dictionary" },
+  { href: "/library", label: "Library" },
   { href: "/academy", label: "Academy" },
+  { href: "/pricing", label: "Pricing" },
 ];
 
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [tier, setTier] = useState<UserTier>("guest");
   const [profileOpen, setProfileOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     // Hidden Dev Tool: Clear cache if ?reset=true
@@ -73,21 +73,25 @@ export default function Nav() {
 
         {/* Desktop */}
         <div className="hide-mobile" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          {NAV_LINKS.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              style={{
-                padding: "0.5rem 0.875rem", borderRadius: "var(--radius-sm)",
-                fontSize: "0.875rem", fontWeight: 500, color: "var(--foreground-muted)",
-                transition: "all 0.2s", display: "flex", alignItems: "center"
-              }}
-              onMouseEnter={e => { (e.target as HTMLElement).style.color = "var(--primary)"; (e.target as HTMLElement).style.background = "var(--primary-glow)"; }}
-              onMouseLeave={e => { (e.target as HTMLElement).style.color = "var(--foreground-muted)"; (e.target as HTMLElement).style.background = "transparent"; }}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map(link => {
+            const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                style={{
+                  padding: "0.5rem 0.875rem", borderRadius: "var(--radius-sm)",
+                  fontSize: "0.875rem", fontWeight: isActive ? 600 : 500,
+                  color: isActive ? "var(--primary)" : "var(--foreground-muted)",
+                  background: isActive ? "var(--primary-glow)" : "transparent",
+                  transition: "all 0.2s", display: "flex", alignItems: "center",
+                  borderBottom: isActive ? "2px solid var(--primary)" : "2px solid transparent",
+                }}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
 
           <div style={{ width: "1px", height: "1.5rem", background: "var(--border)", margin: "0 0.5rem" }} />
 
@@ -137,9 +141,16 @@ export default function Nav() {
                       🚀 Upgrade to Gold
                     </button>
                   )}
+
+                  <Link href="/question-bank" style={{ width: "100%", display: "block", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--foreground)", fontSize: "0.875rem", cursor: "pointer", marginBottom: "0.5rem" }}>
+                    📚 Question Bank
+                  </Link>
+                  <Link href="/community" style={{ width: "100%", display: "block", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--foreground)", fontSize: "0.875rem", cursor: "pointer", marginBottom: "0.5rem" }}>
+                    👥 Community
+                  </Link>
                   
                   <button 
-                    onClick={() => { alert("Settings / Subscription Management\n\n- Viewing renewal date\n- Update payment method\n- Cancel Subscription (Funbridge style)"); }}
+                    onClick={() => showToast("Subscription management coming soon. Contact support@practiceforge.com", "info")}
                     style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--foreground)", border: "none", fontSize: "0.875rem", cursor: "pointer", marginBottom: "0.5rem" }}
                     onMouseEnter={e => (e.target as HTMLElement).style.background = "var(--surface-2)"}
                     onMouseLeave={e => (e.target as HTMLElement).style.background = "transparent"}
@@ -234,7 +245,7 @@ export default function Nav() {
                 </button>
               )}
               <button 
-                onClick={() => { alert("Settings / Subscription Management\n\n- Viewing renewal date\n- Update payment method\n- Cancel Subscription (Funbridge style)"); }}
+                onClick={() => showToast("Subscription management coming soon. Contact support@practiceforge.com", "info")}
                 className="btn-secondary"
                 style={{ justifyContent: "center", padding: "0.75rem", borderRadius: "var(--radius-sm)" }}
               >

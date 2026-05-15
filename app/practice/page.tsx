@@ -83,6 +83,13 @@ export default function PracticePage() {
       const count = parseInt(localStorage.getItem("practiceforge_usage_count") || "0", 10);
       setUsageCount(count);
     }
+
+    // Load saved text from homepage
+    const savedText = sessionStorage.getItem("practiceforge_initial_text");
+    if (savedText) {
+      setInputText(savedText);
+      sessionStorage.removeItem("practiceforge_initial_text");
+    }
   }, []);
 
   function toggleTier() {
@@ -178,14 +185,16 @@ export default function PracticePage() {
                 {tier === "gold" && " · Writing · Study plan · AI Speaking Agent"}
               </p>
             </div>
-            <button
-              onClick={toggleTier}
-              id="tier-toggle"
-              className={tier === "guest" || tier === "free" ? "btn-primary" : "btn-secondary"}
-              style={{ fontSize: "0.875rem", padding: "0.5rem 1.25rem", whiteSpace: "nowrap" }}
-            >
-              Cycle Tier: {tier} ➔ {tier === "guest" ? "free" : tier === "free" ? "pro" : tier === "pro" ? "gold" : "guest"}
-            </button>
+            {process.env.NODE_ENV === "development" && (
+              <button
+                onClick={toggleTier}
+                id="tier-toggle"
+                className={tier === "guest" || tier === "free" ? "btn-primary" : "btn-secondary"}
+                style={{ fontSize: "0.875rem", padding: "0.5rem 1.25rem", whiteSpace: "nowrap" }}
+              >
+                Cycle Tier: {tier} ➔ {tier === "guest" ? "free" : tier === "free" ? "pro" : tier === "pro" ? "gold" : "guest"}
+              </button>
+            )}
           </div>
 
           {/* Upsell Walls */}
@@ -392,7 +401,7 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
             </button>
 
             <p style={{ textAlign: "center", fontSize: "0.8125rem", color: "var(--foreground-faint)" }}>
-               No API key needed — all content is generated locally on our server.
+               No API key needed — all content is generated instantly by our system.
             </p>
           </div>
 

@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useAppContext } from "@/lib/AppContext";
+import { showToast } from "@/components/Toast";
 
 export default function LibraryPage() {
   const { isPremium, setIsPremium, folders, addFolder, deleteFolder, renameFolder } = useAppContext();
   const [newFolderName, setNewFolderName] = useState("");
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [expandedFolderId, setExpandedFolderId] = useState<string | null>(null);
 
   const totalWords = folders.reduce((acc, f) => acc + f.words.length, 0);
   const totalQuestions = folders.reduce((acc, f) => acc + f.questions.length, 0);
@@ -129,11 +131,18 @@ export default function LibraryPage() {
                   <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--foreground-muted)" }}>{folder.questions.length} questions</p>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1.5rem" }}>
-                  <button className="btn-secondary" style={{ padding: "0.375rem 0.75rem", fontSize: "0.8125rem" }}>View Content</button>
+                  <button 
+                    className="btn-secondary" 
+                    style={{ padding: "0.375rem 0.75rem", fontSize: "0.8125rem" }}
+                    onClick={() => setExpandedFolderId(expandedFolderId === folder.id ? null : folder.id)}
+                  >
+                    {expandedFolderId === folder.id ? "Hide Content ▲" : "View Content ▼"}
+                  </button>
                   <button 
                     onClick={() => {
                       if (confirm(`Delete folder "${folder.name}"?`)) {
                         deleteFolder(folder.id);
+                        showToast(`Folder "${folder.name}" deleted.`, "success");
                       }
                     }} 
                     className="btn-secondary" 
@@ -142,6 +151,39 @@ export default function LibraryPage() {
                     Delete
                   </button>
                 </div>
+
+                {/* Expanded Content Panel */}
+                {expandedFolderId === folder.id && (
+                  <div style={{ marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid var(--border)" }}>
+                    {folder.words.length === 0 && folder.questions.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "1.5rem", color: "var(--foreground-faint)", fontSize: "0.875rem" }}>
+                        <div style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>📂</div>
+                        <p style={{ margin: 0 }}>This folder is empty.</p>
+                        <p style={{ margin: "0.5rem 0 0", fontSize: "0.8125rem" }}>Words and questions from practice sessions will appear here.</p>
+                      </div>
+                    ) : (
+                      <div>
+                        {folder.words.length > 0 && (
+                          <div style={{ marginBottom: "1rem" }}>
+                            <p style={{ margin: "0 0 0.5rem", fontSize: "0.8125rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--foreground-muted)" }}>Words ({folder.words.length})</p>
+                            {folder.words.slice(0, 5).map((w, i) => (
+                              <div key={i} style={{ fontSize: "0.875rem", padding: "0.375rem 0", borderBottom: "1px solid var(--border-subtle)", color: "var(--foreground)" }}>{String(w)}</div>
+                            ))}
+                            {folder.words.length > 5 && <p style={{ margin: "0.5rem 0 0", fontSize: "0.75rem", color: "var(--foreground-faint)" }}>+{folder.words.length - 5} more words</p>}
+                          </div>
+                        )}
+                        {folder.questions.length > 0 && (
+                          <div>
+                            <p style={{ margin: "0 0 0.5rem", fontSize: "0.8125rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--foreground-muted)" }}>Questions ({folder.questions.length})</p>
+                            {folder.questions.slice(0, 3).map((q, i) => (
+                              <div key={i} style={{ fontSize: "0.875rem", padding: "0.375rem 0", borderBottom: "1px solid var(--border-subtle)", color: "var(--foreground)" }}>{String(q)}</div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>

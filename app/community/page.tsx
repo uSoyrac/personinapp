@@ -52,11 +52,18 @@ export default function CommunityPage() {
           <div className="card" style={{ padding: "2rem", marginBottom: "2rem", background: "linear-gradient(135deg, var(--surface), var(--primary-glow))", border: "1px solid var(--primary-light)" }}>
             <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>💬</div>
             <h3 style={{ marginBottom: "0.5rem" }}>Join Our Discord</h3>
-            <p style={{ color: "var(--foreground-muted)", marginBottom: "1.5rem" }}>
+            <p style={{ color: "var(--foreground-muted)", marginBottom: "0.75rem" }}>
               Get access to exclusive channels where you can find real speaking partners, participate in live study sessions, and interact with teachers.
             </p>
-            <a href="https://discord.gg/example" target="_blank" rel="noopener noreferrer" className="btn-primary">
-              Join Discord Server
+            <div style={{ background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", borderRadius: "8px", padding: "0.75rem 1rem", marginBottom: "1.5rem", fontSize: "0.875rem", color: "#92400E", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span>🚧</span>
+              <span>Discord server launching soon — join the waitlist to be first!</span>
+            </div>
+            <a 
+              href="mailto:community@practiceforge.com?subject=Discord Waitlist" 
+              className="btn-primary"
+            >
+              Join Waitlist →
             </a>
           </div>
 

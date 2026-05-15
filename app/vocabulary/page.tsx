@@ -7,6 +7,7 @@ import { addXP, awardBadge } from "@/lib/gamification";
 import { useAppContext } from "@/lib/AppContext";
 import ProgressBar from "@/components/ProgressBar";
 import Confetti from "@/components/Confetti";
+import { showToast } from "@/components/Toast";
 
 type ViewMode = "sets" | "quiz" | "results";
 type QuizDirection = "word-def" | "def-word";
@@ -118,7 +119,7 @@ export default function VocabularyPage() {
     const ok = idx === q.correctIndex;
     updateWordProgress(q.word, ok);
     
-    // Add XP to Context Profile
+    // Add XP to Context Profile (only once, here in handleAnswer)
     if (ok) {
       addXP(10);
       updateUserProfile({ points: userProfile.points + 10 });
@@ -427,9 +428,20 @@ export default function VocabularyPage() {
                 <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
                   <button 
                     onClick={() => {
-                      if (!isPremium) { alert("Adding to Difficult Words is a Premium feature."); return; }
-                      // Simulate adding to difficult words
-                      alert("Added to difficult words folder!");
+                      if (!isPremium) { 
+                        showToast("Adding to Difficult Words is a Premium feature. Upgrade to unlock!", "warning");
+                        return; 
+                      }
+                      const currentWord = quiz.qs[quiz.ci].word;
+                      // Actually mark as hard in localStorage
+                      const allWords = getWordList();
+                      const wordData = allWords.find(w => w.word === currentWord);
+                      if (wordData) {
+                        saveWords([{ ...wordData, difficulty: "hard" }]);
+                        showToast(`"${currentWord}" added to Difficult Words folder!`, "success");
+                      } else {
+                        showToast(`"${currentWord}" marked for review!`, "success");
+                      }
                     }}
                     className="btn-secondary" 
                     style={{ fontSize: "0.75rem", padding: "0.5rem 0.75rem" }}
@@ -515,10 +527,13 @@ export default function VocabularyPage() {
                   </div>
                 </div>
                 <h2 style={{ margin: "0 0 0.5rem", color: "var(--foreground)" }}>
-                  {getScore().correct === getScore().total ? "Perfect!" : "Quiz Complete"}
+                  {getScore().correct === getScore().total ? "Perfect Score! 🎉" : "Quiz Complete"}
                 </h2>
                 <p style={{ margin: "0 0 2rem", fontSize: "1.125rem" }}>
-                  You earned {getScore().correct * 10} XP. Keep reviewing to lock these words in your memory.
+                  {getScore().correct === getScore().total
+                    ? "Outstanding! You answered every question correctly."
+                    : `Keep reviewing to lock these words in your memory.`
+                  }
                 </p>
 
                 <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>

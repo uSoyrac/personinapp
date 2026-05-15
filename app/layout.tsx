@@ -3,6 +3,7 @@ import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import SignupModal from "@/components/SignupModal";
+import ToastContainer from "@/components/Toast";
 import { AppProvider } from "@/lib/AppContext";
 
 export const metadata: Metadata = {
@@ -62,6 +63,7 @@ export default function RootLayout({
           <main style={{ flex: 1 }}>{children}</main>
           <Footer />
           <SignupModal />
+          <ToastContainer />
         </AppProvider>
       </body>
     </html>

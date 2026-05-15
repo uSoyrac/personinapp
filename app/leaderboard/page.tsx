@@ -25,13 +25,12 @@ export default function LeaderboardPage() {
     const currentUser: LeaderboardUser = {
       id: "current-user",
       name: userProfile.name,
-      country: userProfile.country.toLowerCase().substring(0, 2), // Mock country code extraction
+      country: userProfile.flag ? userProfile.flag.substring(0, 2).toLowerCase() : "tr", // Keep for type compat
       avatarColor: "var(--brutal-green)",
       xpWeekly: userProfile.points,
       xpMonthly: userProfile.points,
       xpAllTime: userProfile.points,
       isCurrentUser: true,
-      streak: 5
     };
     
     // Insert user and re-sort by points

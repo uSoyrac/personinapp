@@ -15,7 +15,10 @@ export default function BlogIndex() {
   const posts = [
     { slug: "how-to-score-band-8-ielts-writing", title: "How to Score Band 8 in IELTS Writing Task 2", category: "IELTS Tips" },
     { slug: "toefl-speaking-templates", title: "The Ultimate TOEFL Speaking Templates (2026)", category: "TOEFL Strategies" },
-    { slug: "mastering-academic-vocabulary", title: "Mastering Academic Vocabulary for Beginners", category: "General English" }
+    { slug: "mastering-academic-vocabulary", title: "Mastering Academic Vocabulary for Beginners", category: "General English" },
+    { slug: "ielts-reading-time-management", title: "Time Management Strategies for IELTS Reading", category: "IELTS Tips" },
+    { slug: "toefl-listening-note-taking", title: "Note-Taking Techniques for TOEFL Listening", category: "TOEFL Strategies" },
+    { slug: "idioms-for-speaking-success", title: "Common Idioms for Speaking Success", category: "General English" }
   ];
 
   return (

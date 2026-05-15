@@ -23,6 +23,7 @@ export default function LandingPage() {
     if (!inputText.trim()) return;
     
     setIsGenerating(true);
+    sessionStorage.setItem("practiceforge_initial_text", inputText);
     setTimeout(() => {
       if (mode === "general") {
         router.push("/general-english");
@@ -131,7 +132,7 @@ export default function LandingPage() {
           </div>
           
           <div style={{ textAlign: "center", marginTop: "2rem", color: "var(--foreground-faint)", fontSize: "0.875rem" }}>
-            Trusted by 10,000+ ambitious students targeting Band 7.0+ and 100+ scores.
+            Trusted by 15,000+ ambitious students targeting Band 7.0+ and 100+ scores.
           </div>
         </div>
       </section>
@@ -264,7 +265,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <button className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>Upgrade to Pro</button>
+              <button className="btn-primary" style={{ width: "100%", justifyContent: "center" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>Upgrade to Pro</button>
             </div>
 
             {/* Elite Plan */}
@@ -286,7 +287,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <button className="btn-primary" style={{ width: "100%", justifyContent: "center", background: "linear-gradient(135deg, #F59E0B, #D97706)", boxShadow: "0 4px 14px 0 rgba(245, 158, 11, 0.39)" }}>Get Elite Mastery</button>
+              <button className="btn-primary" style={{ width: "100%", justifyContent: "center", background: "linear-gradient(135deg, #F59E0B, #D97706)", boxShadow: "0 4px 14px 0 rgba(245, 158, 11, 0.39)" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>Get Elite Mastery</button>
             </div>
 
           </div>
