@@ -148,6 +148,22 @@ export function updateWordSet(word: string, setName: string) {
   }
 }
 
+/** Delete an entire set (removes all words in that set). */
+export function deleteSet(setName: string) {
+  const words = getStorage().filter(w => (w.setName || "Set 1") !== setName);
+  setStorage(words);
+}
+
+/** Rename a set across all its words. */
+export function renameSet(oldName: string, newName: string) {
+  if (!newName.trim() || oldName === newName) return;
+  const words = getStorage();
+  words.forEach(w => {
+    if ((w.setName || "Set 1") === oldName) w.setName = newName.trim();
+  });
+  setStorage(words);
+}
+
 /** Get available set names. */
 export function getWordSets(): string[] {
   const words = getStorage();

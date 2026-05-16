@@ -2,7 +2,17 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { SavedWord } from "@/lib/wordList";
-import { getWordList, saveWords, removeWord, clearWordList, getWordStats, updateWordProgress } from "@/lib/wordList";
+import { 
+  getWordList, 
+  saveWords, 
+  removeWord, 
+  clearWordList, 
+  getWordStats, 
+  updateWordProgress,
+  deleteSet,
+  renameSet,
+  updateWordSet
+} from "@/lib/wordList";
 import { addXP, awardBadge } from "@/lib/gamification";
 import { useAppContext } from "@/lib/AppContext";
 import ProgressBar from "@/components/ProgressBar";
@@ -11,7 +21,6 @@ import { showToast } from "@/components/Toast";
 
 type ViewMode = "sets" | "quiz" | "results";
 type QuizDirection = "word-def" | "def-word";
-const SET_SIZE = 20;
 
 interface QuizQ { 
   word: string; 
@@ -35,11 +44,9 @@ function buildQuiz(words: SavedWord[], mode: QuizDirection): QuizQ[] {
   const allDefs = words.map(w => w.definition);
   
   return words.map(w => {
-    // If mode is mixed (optional later), we could randomize, but let's stick to chosen direction
     const isReverse = mode === "def-word";
     
     if (isReverse) {
-      // Show definition, guess word
       const correctWord = w.word;
       const wrongs = shuffleArray(allEnWords.filter(e => e !== correctWord)).slice(0, 3);
       while (wrongs.length < 3) wrongs.push(["ubiquitous", "ephemeral", "pragmatic", "lucid"][wrongs.length] ?? "—");
@@ -49,7 +56,6 @@ function buildQuiz(words: SavedWord[], mode: QuizDirection): QuizQ[] {
         options: opts, correctIndex: opts.indexOf(correctWord), direction: "def-word" 
       };
     } else {
-      // Show word, guess definition
       const correctDef = w.definition;
       const wrongs = shuffleArray(allDefs.filter(d => d !== correctDef)).slice(0, 3);
       while (wrongs.length < 3) wrongs.push(["A common misconception", "Relating to the study of stars", "Without logical reasoning", "To increase in volume"][wrongs.length] ?? "—");
@@ -73,23 +79,35 @@ export default function VocabularyPage() {
   const [confetti, setConfetti] = useState(false);
   const [mounted, setMounted] = useState(false);
   
-  // Manual word entry state
   const [manualWord, setManualWord] = useState("");
   const [manualDef, setManualDef] = useState("");
   const [manualSet, setManualSet] = useState("Set 1");
+  const [isEditingSet, setIsEditingSet] = useState<string | null>(null);
+  const [newSetName, setNewSetName] = useState("");
 
-  const refresh = useCallback(() => { setWords(getWordList()); setStats(getWordStats()); }, []);
+  const refresh = useCallback(() => { 
+    const currentWords = getWordList();
+    setWords(currentWords); 
+    setStats(getWordStats()); 
+    
+    // Ensure activeSet still exists, otherwise default to first available or "Set 1"
+    const sets = Array.from(new Set(currentWords.map(w => w.setName || "Set 1")));
+    if (activeSet !== "hard" && sets.length > 0 && !sets.includes(activeSet)) {
+      setActiveSet(sets[0]);
+    } else if (sets.length === 0 && activeSet !== "hard") {
+      setActiveSet("Set 1");
+    }
+  }, [activeSet]);
 
   useEffect(() => { setMounted(true); refresh(); }, [refresh]);
 
-  // Group words by setName
   const setsMap: Record<string, SavedWord[]> = {};
   words.forEach(w => {
     const setName = w.setName || "Set 1";
     if (!setsMap[setName]) setsMap[setName] = [];
     setsMap[setName].push(w);
   });
-  const setNames = Object.keys(setsMap).length > 0 ? Object.keys(setsMap) : ["Set 1"];
+  const setNames = Object.keys(setsMap).sort();
 
   const currentSet = activeSet === "hard" ? words.filter(w => w.difficulty === "hard") : (setsMap[activeSet] ?? []);
   const hardWords = words.filter(w => w.difficulty === "hard");
@@ -98,7 +116,7 @@ export default function VocabularyPage() {
 
   function startQuiz(setName: string) {
     if (!isPremium && words.length > 20) {
-      showToast("Free users can only practice up to 20 words. Please upgrade to Premium to unlock unlimited practice.", "warning");
+      showToast("Free users can only practice up to 20 words. Please upgrade to Premium.", "warning");
       return;
     }
 
@@ -106,10 +124,12 @@ export default function VocabularyPage() {
     if (setName === "hard") s = hardWords;
     else s = setsMap[setName] ?? [];
     
-    if (s.length < 2) return;
+    if (s.length < 2) {
+      showToast("Need at least 2 words to start a quiz.", "info");
+      return;
+    }
 
     setIsStartingQuiz(true);
-    
     const limit = isPremium ? s.length : Math.min(20, s.length);
     const qs = buildQuiz(shuffleArray(s).slice(0, limit), quizMode);
     setQuiz({ qs, ci: 0, ans: new Array(qs.length).fill(null) });
@@ -119,13 +139,12 @@ export default function VocabularyPage() {
   }
 
   function handleAnswer(idx: number) {
-    if (!quiz || quiz.ans[quiz.ci] !== null) return; // Prevent changing answer
+    if (!quiz || quiz.ans[quiz.ci] !== null) return;
     const a = [...quiz.ans]; a[quiz.ci] = idx;
     const q = quiz.qs[quiz.ci];
     const ok = idx === q.correctIndex;
     updateWordProgress(q.word, ok);
     
-    // Add XP to Context Profile (only once, here in handleAnswer)
     if (ok) {
       addXP(10);
       updateUserProfile({ points: userProfile.points + 10 });
@@ -166,7 +185,10 @@ export default function VocabularyPage() {
   }
 
   function addWordInternal() {
-    if (!manualWord.trim() || !manualDef.trim()) return;
+    if (!manualWord.trim() || !manualDef.trim()) {
+      showToast("Word and definition are required.", "error");
+      return;
+    }
     
     saveWords([{
       word: manualWord.trim(),
@@ -179,17 +201,31 @@ export default function VocabularyPage() {
     
     setManualWord("");
     setManualDef("");
-    setManualSet("Set 1");
     refresh();
+    showToast(`Added "${manualWord.trim()}" to ${manualSet.trim() || "Set 1"}`, "success");
   }
 
-  function handleAddAndTest() {
-    if (!manualWord.trim() || !manualDef.trim()) return;
-    const sName = manualSet.trim() || "Set 1";
-    addWordInternal();
-    
-    // Wait a tick for states to sync before starting quiz
-    setTimeout(() => startQuiz(sName), 50);
+  function handleDeleteSet(setName: string) {
+    if (confirm(`Are you sure you want to delete the entire set "${setName}" and all its words?`)) {
+      deleteSet(setName);
+      refresh();
+      showToast(`Set "${setName}" deleted.`, "success");
+    }
+  }
+
+  function handleRenameSet(oldName: string) {
+    if (!newSetName.trim()) return;
+    renameSet(oldName, newSetName.trim());
+    setIsEditingSet(null);
+    setNewSetName("");
+    refresh();
+    showToast(`Set renamed to "${newSetName.trim()}".`, "success");
+  }
+
+  function handleMoveWord(word: string, newSet: string) {
+    updateWordSet(word, newSet);
+    refresh();
+    showToast(`Moved to ${newSet}`, "success");
   }
 
   if (!mounted) return null;
@@ -197,234 +233,234 @@ export default function VocabularyPage() {
   return (
     <div className="section" style={{ paddingTop: "2.5rem" }}>
       <div className="container">
-        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
           {confetti && <Confetti />}
 
           {/* Header */}
-          <div style={{ marginBottom: "2rem", textAlign: "center" }}>
-            <h1 style={{ margin: "0 0 0.75rem", fontSize: "clamp(2rem, 5vw, 3rem)" }}>
-              <span className="gradient-text">My Dictionary</span>
+          <div style={{ marginBottom: "2.5rem", textAlign: "center" }}>
+            <h1 style={{ margin: "0 0 0.75rem", fontSize: "clamp(2.5rem, 6vw, 3.5rem)" }}>
+              <span className="gradient-text">Vocabulary Master</span>
             </h1>
-            <p style={{ margin: "0 auto", fontSize: "1.125rem", maxWidth: "600px" }}>Build your ultimate English vocabulary. Master definitions contextually to boost your IELTS score.</p>
+            <p style={{ margin: "0 auto", fontSize: "1.25rem", maxWidth: "700px", color: "var(--foreground-muted)" }}>
+              Organize your learning with custom sets and track your progress to fluency.
+            </p>
           </div>
 
-          {/* Stats row */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
+          {/* Stats Section */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1.25rem", marginBottom: "2.5rem" }}>
             {[
-              { l: "Total Words", v: stats.total, c: "var(--primary)" },
-              { l: "Learned", v: stats.learned, c: "var(--mint)" },
-              { l: "To Review", v: stats.needsReview, c: "var(--gold)" },
-              { l: "Accuracy", v: `${stats.accuracy}%`, c: "var(--sky)" },
+              { l: "Total Vocabulary", v: stats.total, c: "var(--primary)", icon: "📚" },
+              { l: "Mastered Words", v: stats.learned, c: "var(--mint)", icon: "🏆" },
+              { l: "Needs Review", v: stats.needsReview, c: "var(--gold)", icon: "⏳" },
+              { l: "Quiz Accuracy", v: `${stats.accuracy}%`, c: "var(--sky)", icon: "🎯" },
             ].map(s => (
-              <div key={s.l} className="card" style={{ textAlign: "center", padding: "1.5rem 1rem", borderTop: `4px solid ${s.c}` }}>
-                <p style={{ margin: 0, fontSize: "2rem", fontWeight: 800, color: "var(--foreground)", fontFamily: "var(--font-display)", lineHeight: 1.2 }}>{s.v}</p>
-                <p style={{ margin: "0.25rem 0 0", fontSize: "0.8125rem", color: "var(--foreground-muted)", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.05em" }}>{s.l}</p>
+              <div key={s.l} className="card" style={{ textAlign: "center", padding: "1.75rem 1rem", borderBottom: `4px solid ${s.c}`, position: "relative", overflow: "hidden" }}>
+                <span style={{ position: "absolute", top: "0.5rem", right: "0.5rem", opacity: 0.15, fontSize: "1.5rem" }}>{s.icon}</span>
+                <p style={{ margin: 0, fontSize: "2.25rem", fontWeight: 800, color: "var(--foreground)", fontFamily: "var(--font-display)", lineHeight: 1 }}>{s.v}</p>
+                <p style={{ margin: "0.5rem 0 0", fontSize: "0.875rem", color: "var(--foreground-muted)", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.05em" }}>{s.l}</p>
               </div>
             ))}
           </div>
 
-          {/* Quiz Mode Selector */}
-          {words.length > 0 && (
-            <div className="card" style={{ marginBottom: "2rem", display: "flex", flexDirection: "column", gap: "1rem", padding: "1.25rem" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
-                <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "0.05em" }}>QUIZ MODE:</span>
-                {[
-                  { id: "word-def", label: "Guess Definition" },
-                  { id: "def-word", label: "Guess Word" },
-                ].map(m => (
-                  <button
-                    key={m.id}
-                    onClick={() => setQuizMode(m.id as QuizDirection)}
-                    style={{
-                      padding: "0.5rem 1rem", borderRadius: "9999px", fontSize: "0.875rem", fontWeight: 600,
-                      background: quizMode === m.id ? "var(--primary-glow)" : "transparent",
-                      border: `1px solid ${quizMode === m.id ? "var(--primary)" : "var(--border)"}`,
-                      color: quizMode === m.id ? "var(--primary-dark)" : "var(--foreground-muted)",
-                      cursor: "pointer", transition: "all 0.2s",
-                    }}
-                  >
-                    {m.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* ===== SETS VIEW ===== */}
           {view === "sets" && (
             <div className="animate-fadeIn">
-              {/* Add Manual Word Form */}
-              <div className="card" style={{ marginBottom: "2rem", padding: "1.5rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
-                  <div style={{ width: "2rem", height: "2rem", borderRadius: "50%", background: "var(--primary-glow)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              
+              {/* Quick Add & Set Management Row */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem", marginBottom: "2.5rem" }}>
+                
+                {/* Add Word Card */}
+                <div className="card" style={{ padding: "1.75rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
+                    <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "12px", background: "var(--primary-glow)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                    <h3 style={{ margin: 0, fontSize: "1.25rem" }}>Quick Add</h3>
                   </div>
-                  <h3 style={{ margin: 0, fontSize: "1.125rem" }}>Add New Word</h3>
-                </div>
-                <form onSubmit={handleAddManualWord} style={{ display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "flex-end" }}>
-                  <div style={{ flex: "1 1 150px" }}>
-                    <label className="label">Word</label>
-                    <input 
-                      type="text" 
-                      className="input-base" 
-                      placeholder="e.g., Ubiquitous" 
-                      value={manualWord}
-                      onChange={(e) => setManualWord(e.target.value)}
-                    />
-                  </div>
-                  <div style={{ flex: "2 1 250px" }}>
-                    <label className="label">Definition</label>
-                    <input 
-                      type="text" 
-                      className="input-base" 
-                      placeholder="e.g., Present, everywhere." 
-                      value={manualDef}
-                      onChange={(e) => setManualDef(e.target.value)}
-                    />
-                  </div>
-                  <div style={{ flex: "1 1 150px" }}>
-                    <label className="label">Set</label>
-                    <input 
-                      type="text" 
-                      className="input-base" 
-                      placeholder="e.g., Set 1" 
-                      value={manualSet}
-                      onChange={(e) => setManualSet(e.target.value)}
-                      list="set-names"
-                    />
-                    <datalist id="set-names">
-                      {setNames.map(name => (
-                        <option key={name} value={name} />
-                      ))}
-                    </datalist>
-                  </div>
-                  <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
-                    <button type="submit" className="btn-secondary" style={{ padding: "0.875rem 1.25rem" }}>
-                      Add Only
-                    </button>
-                    <button type="button" onClick={handleAddAndTest} className="btn-primary" style={{ padding: "0.875rem 1.25rem" }}>
-                      Add & Test Now
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-              {words.length === 0 ? (
-                <div className="card" style={{ textAlign: "center", padding: "4rem 2rem", borderStyle: "dashed" }}>
-                  <div style={{ width: "4rem", height: "4rem", margin: "0 auto 1.5rem", borderRadius: "50%", background: "var(--primary-glow)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-                  </div>
-                  <h3 style={{ margin: "0 0 0.75rem", color: "var(--foreground)", fontFamily: "var(--font-display)", fontSize: "1.5rem" }}>Your Dictionary is Empty</h3>
-                  <p style={{ margin: "0 auto 2rem", fontSize: "1rem", maxWidth: "400px" }}>Start adding words manually above, or generate practice content from articles to build your vocabulary list automatically.</p>
-                  <a href="/practice" className="btn-primary">Generate from Reading →</a>
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                  
-                  {/* Hard Words Set */}
-                  {hardWords.length > 0 && (
-                    <div className="card" style={{ padding: "1.5rem", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
-                        <div>
-                          <h3 style={{ margin: "0 0 0.25rem", fontSize: "1.25rem", color: "var(--premium-red)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                            Words Needing Review
-                          </h3>
-                          <p style={{ margin: 0, fontSize: "0.875rem" }}>{hardWords.length} words require attention. Practice to remove the 'hard' tag.</p>
-                        </div>
-                        <button onClick={() => startQuiz("hard")} className="btn-primary" style={{ background: "var(--premium-red)", boxShadow: "0 4px 14px 0 rgba(239, 68, 68, 0.39)" }} disabled={hardWords.length < 2 || isStartingQuiz}>
-                          {isStartingQuiz ? "Preparing..." : "Practice Hard Words"}
-                        </button>
+                  <form onSubmit={handleAddManualWord} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                      <div>
+                        <label className="label">Word</label>
+                        <input type="text" className="input-base" placeholder="Abundant" value={manualWord} onChange={(e) => setManualWord(e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="label">Set Name</label>
+                        <input type="text" className="input-base" placeholder="Set 1" value={manualSet} onChange={(e) => setManualSet(e.target.value)} list="set-names-list" />
+                        <datalist id="set-names-list">{setNames.map(n => <option key={n} value={n} />)}</datalist>
                       </div>
                     </div>
-                  )}
+                    <div>
+                      <label className="label">Definition</label>
+                      <input type="text" className="input-base" placeholder="Existing in large quantities; plentiful." value={manualDef} onChange={(e) => setManualDef(e.target.value)} />
+                    </div>
+                    <button type="submit" className="btn-primary" style={{ width: "100%", marginTop: "0.5rem" }}>Add Word</button>
+                  </form>
+                </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "1rem" }}>
-                    {Object.entries(setsMap).map(([setName, s]) => {
-                      const learned = s.filter(w => w.correctCount >= 3).length;
-                      const pct = s.length > 0 ? (learned / s.length) * 100 : 0;
-                      const isComplete = pct === 100;
-
-                      return (
-                        <div
-                          key={setName}
-                          className="card"
-                          onClick={() => setActiveSet(setName)}
-                          style={{ 
-                            cursor: "pointer",
-                            borderColor: activeSet === setName ? "var(--primary)" : "var(--border)",
-                            boxShadow: activeSet === setName ? "0 0 0 1px var(--primary)" : "var(--shadow-sm)",
-                            padding: "1.25rem",
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "1rem"
+                {/* Quiz Settings Card */}
+                <div className="card" style={{ padding: "1.75rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
+                    <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "12px", background: "var(--accent-glow)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)" }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </div>
+                    <h3 style={{ margin: 0, fontSize: "1.25rem" }}>Quiz Mode</h3>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    <p style={{ margin: 0, fontSize: "0.9375rem" }}>Choose how you want to be tested:</p>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                      {[
+                        { id: "word-def", label: "Word → Def" },
+                        { id: "def-word", label: "Def → Word" },
+                      ].map(m => (
+                        <button
+                          key={m.id}
+                          onClick={() => setQuizMode(m.id as QuizDirection)}
+                          style={{
+                            padding: "0.75rem", borderRadius: "var(--radius-sm)", fontSize: "0.875rem", fontWeight: 600,
+                            background: quizMode === m.id ? "var(--primary)" : "var(--surface-2)",
+                            border: `1px solid ${quizMode === m.id ? "var(--primary)" : "var(--border)"}`,
+                            color: quizMode === m.id ? "#fff" : "var(--foreground-muted)",
+                            cursor: "pointer", transition: "all 0.2s",
                           }}
                         >
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                            <div>
-                              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-                                <h4 style={{ margin: 0, fontSize: "1.125rem" }}>{setName}</h4>
-                                {isComplete && <span className="badge badge-accent" style={{ padding: "0.125rem 0.5rem" }}>Mastered</span>}
-                              </div>
-                              <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--foreground-faint)" }}>
-                                {s.length} words
-                              </p>
-                            </div>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); startQuiz(setName); }}
-                              className="btn-secondary"
-                              style={{ padding: "0.375rem 0.75rem", fontSize: "0.8125rem" }}
-                              disabled={s.length < 2 || isStartingQuiz}
-                            >
-                              Quiz
-                            </button>
-                          </div>
-                          
-                          <div style={{ width: "100%" }}>
-                            <ProgressBar progress={pct} color={isComplete ? "var(--mint)" : "var(--primary)"} label={`${learned}/${s.length} Learned`} />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Word list for active set */}
-                  <div className="card" style={{ marginTop: "1rem", padding: "1.5rem" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", paddingBottom: "1rem", borderBottom: "1px solid var(--border)" }}>
-                      <h3 style={{ margin: 0, fontSize: "1.25rem" }}>
-                        {activeSet === "hard" ? "Review Words" : `Dictionary ${activeSet}`}
-                      </h3>
-                      {words.length > 0 && (
-                        <button onClick={() => { if (confirm("Clear all words in dictionary?")) { clearWordList(); refresh(); } }} className="btn-secondary" style={{ fontSize: "0.75rem", padding: "0.375rem 0.75rem", color: "var(--premium-red)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
-                          Clear Dictionary
+                          {m.label}
                         </button>
-                      )}
-                    </div>
-
-                    <div style={{ display: "grid", gap: "0.75rem" }}>
-                      {currentSet.map(w => (
-                        <div key={w.word} style={{ display: "flex", alignItems: "flex-start", gap: "1rem", padding: "1rem", background: "var(--surface-2)", borderRadius: "var(--radius-sm)" }}>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
-                              <span style={{ fontWeight: 700, color: "var(--foreground)", fontSize: "1rem" }}>{w.word}</span>
-                              {w.correctCount >= 3 && <span className="badge badge-accent" style={{ padding: "0.125rem 0.5rem" }}>Learned</span>}
-                            </div>
-                            <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--foreground-muted)" }}>{w.definition}</p>
-                          </div>
-                          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.5rem" }}>
-                            {w.totalAttempts > 0 && (
-                              <span className="badge badge-primary" style={{ fontSize: "0.75rem" }}>{w.correctCount}/{w.totalAttempts} Score</span>
-                            )}
-                            <button onClick={() => { removeWord(w.word); refresh(); }} style={{ background: "none", border: "none", color: "var(--foreground-faint)", cursor: "pointer", fontSize: "0.875rem", padding: "0.25rem", transition: "color 0.2s" }} onMouseOver={(e) => e.currentTarget.style.color = "var(--premium-red)"} onMouseOut={(e) => e.currentTarget.style.color = "var(--foreground-faint)"}>
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                            </button>
-                          </div>
-                        </div>
                       ))}
                     </div>
+                    <div style={{ marginTop: "0.5rem" }}>
+                      <button onClick={() => startQuiz(activeSet)} className="btn-secondary" style={{ width: "100%", borderColor: "var(--primary)", color: "var(--primary)" }} disabled={currentSet.length < 2}>
+                        Start {activeSet} Quiz
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Hard Words Alert */}
+              {hardWords.length > 0 && (
+                <div className="card" style={{ marginBottom: "2rem", background: "linear-gradient(to right, rgba(239, 68, 68, 0.08), transparent)", borderLeft: "4px solid var(--premium-red)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                      <div style={{ color: "var(--premium-red)", fontSize: "1.5rem" }}>⚠️</div>
+                      <div>
+                        <h4 style={{ margin: 0, color: "var(--premium-red)" }}>Review Needed</h4>
+                        <p style={{ margin: 0, fontSize: "0.875rem" }}>You have {hardWords.length} words that need extra attention.</p>
+                      </div>
+                    </div>
+                    <button onClick={() => startQuiz("hard")} className="btn-primary" style={{ background: "var(--premium-red)", boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)" }}>
+                      Practice Hard Words
+                    </button>
                   </div>
                 </div>
               )}
+
+              {/* Set Navigation Tabs */}
+              <div style={{ display: "flex", gap: "0.75rem", overflowX: "auto", paddingBottom: "1rem", marginBottom: "1rem", scrollbarWidth: "none" }}>
+                {setNames.map(name => (
+                  <button
+                    key={name}
+                    onClick={() => setActiveSet(name)}
+                    style={{
+                      padding: "0.625rem 1.25rem", borderRadius: "999px", whiteSpace: "nowrap",
+                      fontSize: "0.9375rem", fontWeight: 600, cursor: "pointer", transition: "all 0.2s",
+                      background: activeSet === name ? "var(--primary)" : "var(--surface)",
+                      color: activeSet === name ? "#fff" : "var(--foreground-muted)",
+                      border: `1px solid ${activeSet === name ? "var(--primary)" : "var(--border)"}`,
+                      boxShadow: activeSet === name ? "var(--shadow-md)" : "none"
+                    }}
+                  >
+                    {name} ({setsMap[name]?.length || 0})
+                  </button>
+                ))}
+              </div>
+
+              {/* Active Set Content */}
+              <div className="card" style={{ padding: "2rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", paddingBottom: "1rem", borderBottom: "1px solid var(--border)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                    {isEditingSet === activeSet ? (
+                      <div style={{ display: "flex", gap: "0.5rem" }}>
+                        <input 
+                          autoFocus
+                          className="input-base" 
+                          style={{ padding: "0.4rem 0.75rem", fontSize: "1.125rem" }} 
+                          value={newSetName} 
+                          onChange={e => setNewSetName(e.target.value)}
+                          onKeyDown={e => e.key === "Enter" && handleRenameSet(activeSet)}
+                        />
+                        <button className="btn-primary" style={{ padding: "0.4rem 0.75rem" }} onClick={() => handleRenameSet(activeSet)}>Save</button>
+                        <button className="btn-secondary" style={{ padding: "0.4rem 0.75rem" }} onClick={() => setIsEditingSet(null)}>Cancel</button>
+                      </div>
+                    ) : (
+                      <>
+                        <h2 style={{ margin: 0 }}>{activeSet}</h2>
+                        <button onClick={() => { setIsEditingSet(activeSet); setNewSetName(activeSet); }} style={{ background: "none", border: "none", color: "var(--foreground-faint)", cursor: "pointer" }}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  
+                  <div style={{ display: "flex", gap: "0.75rem" }}>
+                    <button 
+                      onClick={() => handleDeleteSet(activeSet)} 
+                      className="btn-secondary" 
+                      style={{ color: "var(--premium-red)", borderColor: "rgba(239, 68, 68, 0.2)", padding: "0.5rem 1rem", fontSize: "0.875rem" }}
+                    >
+                      Delete Set
+                    </button>
+                    <button 
+                      onClick={() => startQuiz(activeSet)} 
+                      className="btn-primary" 
+                      style={{ padding: "0.5rem 1.25rem", fontSize: "0.875rem" }}
+                      disabled={currentSet.length < 2}
+                    >
+                      Quiz Now
+                    </button>
+                  </div>
+                </div>
+
+                {currentSet.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "3rem" }}>
+                    <p style={{ color: "var(--foreground-muted)" }}>This set is empty. Add some words above!</p>
+                  </div>
+                ) : (
+                  <div style={{ display: "grid", gap: "1rem" }}>
+                    {currentSet.map(w => (
+                      <div key={w.word} className="animate-fadeIn" style={{ display: "flex", alignItems: "center", gap: "1.25rem", padding: "1.25rem", background: "var(--surface-2)", borderRadius: "var(--radius-md)", border: "1px solid transparent", transition: "all 0.2s" }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.35rem" }}>
+                            <span style={{ fontWeight: 800, color: "var(--foreground)", fontSize: "1.125rem" }}>{w.word}</span>
+                            {w.correctCount >= 3 && <span className="badge badge-accent">Mastered</span>}
+                            {w.difficulty === "hard" && <span className="badge badge-coral">Hard</span>}
+                          </div>
+                          <p style={{ margin: 0, fontSize: "0.9375rem", color: "var(--foreground-muted)", lineHeight: 1.5 }}>{w.definition}</p>
+                        </div>
+                        
+                        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                          <div style={{ textAlign: "right" }}>
+                            <p style={{ margin: 0, fontSize: "0.75rem", fontWeight: 700, color: "var(--foreground-faint)", textTransform: "uppercase" }}>Progress</p>
+                            <p style={{ margin: 0, fontSize: "1rem", fontWeight: 800, color: "var(--primary)" }}>{w.correctCount}/{w.totalAttempts}</p>
+                          </div>
+                          
+                          <div style={{ display: "flex", gap: "0.5rem" }}>
+                            <select 
+                              onChange={(e) => handleMoveWord(w.word, e.target.value)} 
+                              value={activeSet}
+                              style={{ padding: "0.4rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", fontSize: "0.75rem", background: "var(--surface)" }}
+                            >
+                              {setNames.map(n => <option key={n} value={n}>{n}</option>)}
+                            </select>
+                            <button onClick={() => { removeWord(w.word); refresh(); }} style={{ background: "none", border: "none", color: "var(--foreground-faint)", cursor: "pointer", padding: "0.5rem" }} title="Remove word">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -432,54 +468,34 @@ export default function VocabularyPage() {
           {view === "quiz" && quiz && (
             <div className="animate-fadeIn">
               <div style={{ marginBottom: "2rem" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                  <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--foreground-muted)" }}>Question {quiz.ci + 1} of {quiz.qs.length}</span>
-                  <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--mint)" }}>{quiz.ans.filter((a, i) => a === quiz.qs[i].correctIndex).length} Correct</span>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
+                  <span style={{ fontSize: "1rem", fontWeight: 700, color: "var(--foreground-muted)" }}>Question {quiz.ci + 1} of {quiz.qs.length}</span>
+                  <div style={{ display: "flex", gap: "1rem" }}>
+                    <span style={{ fontSize: "1rem", fontWeight: 700, color: "var(--mint)" }}>✓ {quiz.ans.filter((a, i) => a === quiz.qs[i].correctIndex).length}</span>
+                    <span style={{ fontSize: "1rem", fontWeight: 700, color: "var(--premium-red)" }}>✗ {quiz.ans.filter((a, i) => a !== null && a !== quiz.qs[i].correctIndex).length}</span>
+                  </div>
                 </div>
                 <div className="quiz-progress-bar">
-                  <div className="quiz-progress-fill" style={{ width: `${((quiz.ci) / quiz.qs.length) * 100}%` }} />
+                  <div className="quiz-progress-fill" style={{ width: `${((quiz.ci + 1) / quiz.qs.length) * 100}%` }} />
                 </div>
               </div>
 
-              <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
-                {/* Save to Difficult Words Button */}
-                <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
-                  <button 
-                    onClick={() => {
-                      if (!isPremium) { 
-                        showToast("Adding to Difficult Words is a Premium feature. Upgrade to unlock!", "warning");
-                        return; 
-                      }
-                      const currentWord = quiz.qs[quiz.ci].word;
-                      // Actually mark as hard in localStorage
-                      const allWords = getWordList();
-                      const wordData = allWords.find(w => w.word === currentWord);
-                      if (wordData) {
-                        saveWords([{ ...wordData, difficulty: "hard" }]);
-                        showToast(`"${currentWord}" added to Difficult Words folder!`, "success");
-                      } else {
-                        showToast(`"${currentWord}" marked for review!`, "success");
-                      }
-                    }}
-                    className="btn-secondary" 
-                    style={{ fontSize: "0.75rem", padding: "0.5rem 0.75rem" }}
-                  >
-                    + Add to Difficult Words
-                  </button>
-                </div>
+              <div className="card" style={{ padding: "4rem 2rem", textAlign: "center", position: "relative" }}>
+                <button 
+                  onClick={() => setView("sets")}
+                  style={{ position: "absolute", top: "1.5rem", left: "1.5rem", background: "none", border: "none", color: "var(--foreground-muted)", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 600 }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Exit Quiz
+                </button>
 
-                <p style={{ margin: "0 0 0.5rem", fontSize: "0.875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--primary)" }}>
-                  {quiz.qs[quiz.ci].direction === "def-word" 
-                    ? "Which word matches this definition?" 
-                    : "What is the definition of this word?"}
+                <p style={{ margin: "0 0 1rem", fontSize: "0.875rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--primary)" }}>
+                  {quiz.qs[quiz.ci].direction === "def-word" ? "Definition Match" : "Vocabulary Recall"}
                 </p>
-                <h2 style={{ margin: "0 auto 2rem", color: "var(--foreground)", fontSize: "1.75rem", maxWidth: "600px", lineHeight: 1.4 }}>
-                  {quiz.qs[quiz.ci].direction === "def-word" 
-                    ? `"${quiz.qs[quiz.ci].definition}"`
-                    : quiz.qs[quiz.ci].word}
+                <h2 style={{ margin: "0 auto 3rem", color: "var(--foreground)", fontSize: "2rem", maxWidth: "700px", lineHeight: 1.3, fontWeight: 800 }}>
+                  {quiz.qs[quiz.ci].direction === "def-word" ? `"${quiz.qs[quiz.ci].definition}"` : quiz.qs[quiz.ci].word}
                 </h2>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", maxWidth: "600px", margin: "0 auto" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "650px", margin: "0 auto" }}>
                   {quiz.qs[quiz.ci].options.map((opt, idx) => {
                     const hasAnswered = quiz.ans[quiz.ci] !== null;
                     const sel = quiz.ans[quiz.ci] === idx;
@@ -488,75 +504,49 @@ export default function VocabularyPage() {
                     if (hasAnswered) { if (cor) cls += " correct"; else if (sel && !cor) cls += " incorrect"; }
 
                     return (
-                      <button key={idx} className={cls} onClick={() => handleAnswer(idx)} disabled={hasAnswered}>
-                        <span className="quiz-option-letter">{String.fromCharCode(65 + idx)}</span>
-                        <span style={{ fontSize: "1rem", lineHeight: 1.5, flex: 1 }}>
-                          {opt}
-                        </span>
+                      <button key={idx} className={cls} onClick={() => handleAnswer(idx)} disabled={hasAnswered} style={{ padding: "1.25rem 1.5rem", fontSize: "1.125rem" }}>
+                        <span className="quiz-option-letter" style={{ width: "2.5rem", height: "2.5rem" }}>{String.fromCharCode(65 + idx)}</span>
+                        <span style={{ flex: 1 }}>{opt}</span>
+                        {hasAnswered && cor && <span style={{ color: "var(--mint)" }}>✓</span>}
+                        {hasAnswered && sel && !cor && <span style={{ color: "var(--premium-red)" }}>✗</span>}
                       </button>
                     );
                   })}
                 </div>
 
-                {/* Navigation Controls */}
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "2rem", maxWidth: "600px", margin: "2rem auto 0" }}>
-                  <button className="btn-secondary" onClick={prevQ} disabled={quiz.ci <= 0} style={{ padding: "0.75rem 1.5rem" }}>
-                    ← Previous
-                  </button>
-                  <button className="btn-primary" onClick={nextQ} style={{ padding: "0.75rem 1.5rem" }}>
-                    {quiz.ci + 1 >= quiz.qs.length ? "See Results" : "Next →"}
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "3rem", maxWidth: "650px", margin: "3rem auto 0" }}>
+                  <button className="btn-secondary" onClick={prevQ} disabled={quiz.ci <= 0} style={{ width: "120px" }}>Previous</button>
+                  <button className="btn-primary" onClick={nextQ} style={{ width: "120px" }} disabled={quiz.ans[quiz.ci] === null}>
+                    {quiz.ci + 1 >= quiz.qs.length ? "Finish" : "Next"}
                   </button>
                 </div>
-
-                {quiz.ans[quiz.ci] !== null && (
-                  <div className="animate-fadeInFast" style={{ marginTop: "1rem", maxWidth: "600px", margin: "1rem auto 0" }}>
-                    <div style={{
-                      background: quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)",
-                      border: `1px solid ${quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "var(--mint)" : "var(--premium-red)"}`,
-                      borderRadius: "var(--radius-md)", padding: "1.25rem", textAlign: "left"
-                    }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                        {quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex 
-                          ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                          : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--premium-red)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                        }
-                        <p style={{ margin: 0, fontWeight: 700, fontSize: "1rem", color: quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "var(--mint)" : "var(--premium-red)" }}>
-                          {quiz.ans[quiz.ci] === quiz.qs[quiz.ci].correctIndex ? "Correct!" : "Incorrect"}
-                        </p>
-                      </div>
-                      <p style={{ margin: 0, fontSize: "0.9375rem", color: "var(--foreground)" }}>
-                        <strong>{quiz.qs[quiz.ci].word}</strong>: {quiz.qs[quiz.ci].definition}
-                      </p>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           )}
 
-          {/* ===== RESULTS ===== */}
+          {/* ===== RESULTS VIEW ===== */}
           {view === "results" && quiz && (
             <div className="animate-scaleIn">
-              <div className="card" style={{ textAlign: "center", padding: "4rem 2rem" }}>
-                <div style={{ margin: "0 auto 1.5rem" }}>
-                  <div className="score-badge">
+              <div className="card" style={{ textAlign: "center", padding: "5rem 2rem" }}>
+                <div style={{ marginBottom: "2.5rem" }}>
+                  <div className="score-badge" style={{ transform: "scale(1.1)" }}>
                     <span className="score-value">{getScore().correct} / {getScore().total}</span>
-                    <span className="score-label">Final Score</span>
+                    <span className="score-label">Correct Answers</span>
                   </div>
                 </div>
-                <h2 style={{ margin: "0 0 0.5rem", color: "var(--foreground)" }}>
-                  {getScore().correct === getScore().total ? "Perfect Score! 🎉" : "Quiz Complete"}
+                <h2 style={{ margin: "0 0 1rem", fontSize: "2.5rem" }}>
+                  {getScore().correct === getScore().total ? "Masterful! 🌟" : "Quiz Finished"}
                 </h2>
-                <p style={{ margin: "0 0 2rem", fontSize: "1.125rem" }}>
+                <p style={{ margin: "0 0 3rem", fontSize: "1.25rem", color: "var(--foreground-muted)" }}>
                   {getScore().correct === getScore().total
-                    ? "Outstanding! You answered every question correctly."
-                    : `Keep reviewing to lock these words in your memory.`
+                    ? "Perfect score! You've mastered this set."
+                    : `You got ${getScore().correct} correct out of ${getScore().total}. Keep practicing!`
                   }
                 </p>
 
-                <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
-                  <button className="btn-primary" onClick={() => startQuiz(activeSet)}>Retry Set</button>
-                  <button className="btn-secondary" onClick={() => { setView("sets"); refresh(); }}>Back to Dictionary</button>
+                <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
+                  <button className="btn-primary" onClick={() => startQuiz(activeSet)} style={{ padding: "1rem 2.5rem" }}>Retry Set</button>
+                  <button className="btn-secondary" onClick={() => { setView("sets"); refresh(); }} style={{ padding: "1rem 2.5rem" }}>Return Home</button>
                 </div>
               </div>
             </div>
