@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowUpRight, Gift } from "lucide-react";
 
 const HOW_IT_WORKS = [
   { step: "1", icon: "📄", title: "Bring Your Content", desc: "Paste any text—an article, transcript, or lecture notes. You choose what interests you." },
