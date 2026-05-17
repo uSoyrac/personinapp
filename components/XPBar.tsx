@@ -76,8 +76,11 @@ export default function XPBar() {
           fontSize: "0.75rem",
           fontWeight: 900,
           boxShadow: "2px 2px 0px #1a1a1a",
-        }}>
-          {state.streak}
+          display: "flex",
+          alignItems: "center",
+          gap: "0.25rem",
+        }} title="Daily Streak">
+          🔥 {state.streak}
         </div>
       )}
     </div>

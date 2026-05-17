@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: "/vocabulary", label: "Dictionary" },
   { href: "/library", label: "Library" },
   { href: "/academy", label: "Academy" },
+  { href: "/leaderboard", label: "Leaderboard" },
   { href: "/pricing", label: "Pricing" },
 ];
 
