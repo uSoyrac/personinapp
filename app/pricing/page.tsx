@@ -1,10 +1,8 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Pricing — PracticeForge",
-  description: "Simple, transparent pricing for IELTS and TOEFL practice. Free plan available, no credit card required.",
-};
+// Metadata removed as this is now a client component
 
 const FAQ = [
   {
@@ -30,6 +28,11 @@ const FAQ = [
 ];
 
 export default function PricingPage() {
+  const handleUpgrade = (tier: "guest" | "free" | "pro" | "elite") => {
+    localStorage.setItem("practiceforge_tier", tier);
+    window.location.href = "/practice";
+  };
+
   return (
     <div>
       {/* Header */}
@@ -71,7 +74,7 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/practice" className="btn-secondary" style={{ width: "100%", justifyContent: "center" }}>Create Free Account</Link>
+              <button onClick={() => handleUpgrade("free")} className="btn-secondary" style={{ width: "100%", justifyContent: "center", border: "1px solid var(--border)", background: "var(--surface)", color: "var(--foreground)" }}>Create Free Account</button>
             </div>
 
             {/* Pro Plan */}
@@ -80,7 +83,7 @@ export default function PricingPage() {
                 <span className="badge" style={{ background: "var(--primary)", color: "#fff", padding: "0.375rem 1rem", border: "none", fontWeight: 700, boxShadow: "var(--shadow-sm)" }}>Most Popular</span>
               </div>
               <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "var(--primary)" }}>Pro Study</h3>
-              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$15<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
+              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$14.99<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
               <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "var(--foreground-muted)" }}>For core students needing comprehensive writing support.</p>
               
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -96,13 +99,13 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/practice" className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>Upgrade to Pro</Link>
+              <button onClick={() => handleUpgrade("pro")} className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>Upgrade to Pro</button>
             </div>
 
             {/* Elite Plan */}
             <div className="card-elevated" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)", borderColor: "var(--gold)", position: "relative" }}>
               <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "var(--gold)" }}>Elite Mastery</h3>
-              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$29<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
+              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$29.99<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
               <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "var(--foreground-muted)" }}>For students urgently needing Band 7.0+ or 100+.</p>
               
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -118,7 +121,7 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/practice" className="btn-primary" style={{ width: "100%", justifyContent: "center", background: "linear-gradient(135deg, #F59E0B, #D97706)", boxShadow: "0 4px 14px 0 rgba(245, 158, 11, 0.39)" }}>Get Elite Mastery</Link>
+              <button onClick={() => handleUpgrade("elite")} className="btn-primary" style={{ width: "100%", justifyContent: "center", background: "linear-gradient(135deg, #F59E0B, #D97706)", boxShadow: "0 4px 14px 0 rgba(245, 158, 11, 0.39)" }}>Get Elite Mastery</button>
             </div>
 
           </div>

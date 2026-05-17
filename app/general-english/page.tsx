@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { saveWords } from "@/lib/wordList";
 import type { UserTier } from "@/types";
 
@@ -9,8 +9,8 @@ type Activity = "hub" | "cloze" | "shadowing" | "grammar";
 const TIER_LIMITS: Record<UserTier, number> = {
   guest: 1,
   free: 1,
-  pro: 5,
-  gold: 99999,
+  pro: 20,
+  gold: 50,
 };
 
 // Mock extracted words for the UI
@@ -23,9 +23,11 @@ const MOCK_WORDS = [
 ];
 
 export default function GeneralEnglishPage() {
-  const [sourceType, setSourceType] = useState<"text" | "youtube">("youtube");
   const [inputValue, setInputValue] = useState("");
   const [selectedActivity, setSelectedActivity] = useState<Activity>("hub");
+  
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -79,7 +81,7 @@ export default function GeneralEnglishPage() {
     }
 
     if (isOverLimit) {
-      setError(`Daily limit reached. Your ${tier} plan allows ${limit} generation(s) per day.`);
+      setError("FREE_WALL");
       return;
     }
     
@@ -88,22 +90,8 @@ export default function GeneralEnglishPage() {
     setShowResults(false);
 
     try {
-      if (sourceType === "youtube") {
-        const res = await fetch("/api/youtube-transcript", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: inputValue })
-        });
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || "Failed to fetch transcript");
-        }
-        // Wait for mocked text to come back
-        await res.json();
-      } else {
-        // Text mode - simulate AI processing
-        await new Promise(r => setTimeout(r, 1200));
-      }
+      // Simulate AI processing
+      await new Promise(r => setTimeout(r, 1200));
 
       // Record usage
       const newCount = usageCount + 1;
@@ -112,6 +100,10 @@ export default function GeneralEnglishPage() {
 
       setIsGenerating(false);
       setShowResults(true);
+      setSelectedAnswer(null); // Reset quiz
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
       setIsGenerating(false);
@@ -149,7 +141,7 @@ export default function GeneralEnglishPage() {
             <span className="gradient-text">Personal Language Lab</span>
           </h1>
           <p style={{ fontSize: "1.25rem", maxWidth: "600px", margin: "0 auto", color: "var(--foreground-muted)" }}>
-            Learn General English dynamically. Drop a YouTube video or any text, and we'll instantly generate interactive learning activities just for you.
+            Learn General English dynamically. Drop any text, and we'll instantly generate interactive learning activities just for you.
           </p>
         </div>
 
@@ -178,8 +170,8 @@ export default function GeneralEnglishPage() {
             {error === "FREE_WALL" && (
               <div className="card-elevated animate-fadeIn" style={{ padding: "2rem", marginBottom: "1.75rem", background: "linear-gradient(to right, var(--surface), var(--surface-2))", borderLeft: "4px solid var(--primary)" }}>
                 <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>Daily Limit Reached</h3>
-                <p style={{ color: "var(--foreground-muted)", marginBottom: "1.5rem" }}>You've reached your free daily limit. Upgrade to Pro Study to unlock unlimited practice and AI writing feedback.</p>
-                <button className="btn-primary" onClick={() => { localStorage.setItem("practiceforge_tier", "pro"); window.location.reload(); }}>Upgrade to Pro Study</button>
+                <p style={{ color: "var(--foreground-muted)", marginBottom: "1.5rem" }}>To maintain quality and prevent system abuse, your plan has a daily limit of {limit} generations. Upgrade for more capacity, or come back tomorrow!</p>
+                {tier === "free" && <button className="btn-primary" onClick={() => { localStorage.setItem("practiceforge_tier", "pro"); window.location.reload(); }}>Upgrade to Pro Study</button>}
               </div>
             )}
 
@@ -189,52 +181,20 @@ export default function GeneralEnglishPage() {
               </div>
             )}
 
-            <div style={{ opacity: (error === "GUEST_WALL" || error === "FREE_WALL") ? 0.5 : 1, pointerEvents: (error === "GUEST_WALL" || error === "FREE_WALL") ? "none" : "auto" }}>
-              <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem", background: "var(--surface-2)", padding: "0.375rem", borderRadius: "var(--radius-sm)" }}>
-                <button 
-                  onClick={() => setSourceType("youtube")}
-                  style={{ flex: 1, padding: "0.5rem", borderRadius: "4px", background: sourceType === "youtube" ? "var(--surface)" : "transparent", color: sourceType === "youtube" ? "var(--primary)" : "var(--foreground-muted)", fontWeight: 600, border: "none", cursor: "pointer", transition: "all 0.2s", boxShadow: sourceType === "youtube" ? "var(--shadow-sm)" : "none" }}
-                >
-                YouTube Link
-              </button>
-              <button 
-                onClick={() => setSourceType("text")}
-                style={{ flex: 1, padding: "0.5rem", borderRadius: "4px", background: sourceType === "text" ? "var(--surface)" : "transparent", color: sourceType === "text" ? "var(--primary)" : "var(--foreground-muted)", fontWeight: 600, border: "none", cursor: "pointer", transition: "all 0.2s", boxShadow: sourceType === "text" ? "var(--shadow-sm)" : "none" }}
-              >
-                Raw Text
-              </button>
-            </div>
-
             <form onSubmit={handleGenerate}>
               <div style={{ marginBottom: "2rem" }}>
                 <label className="label">
-                  {sourceType === "youtube" ? "Paste YouTube Video URL" : "Paste your text here"}
+                  Paste your text here
                 </label>
-                {sourceType === "youtube" ? (
-                  <input 
-                    type="url" 
-                    className="input-base" 
-                    placeholder="https://www.youtube.com/watch?v=..."
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    required
-                  />
-                ) : (
-                  <textarea 
-                    className="input-base" 
-                    placeholder="Urbanisation has profoundly transformed ecosystems..."
-                    rows={6}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    required
-                    style={{ resize: "vertical" }}
-                  />
-                )}
-                {sourceType === "youtube" && (
-                  <p style={{ fontSize: "0.75rem", marginTop: "0.5rem", color: "var(--foreground-faint)" }}>
-                    *Video must have closed captions (subtitles) enabled.
-                  </p>
-                )}
+                <textarea 
+                  className="input-base" 
+                  placeholder="Urbanisation has profoundly transformed ecosystems..."
+                  rows={6}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  required
+                  style={{ resize: "vertical" }}
+                />
               </div>
 
               <div style={{ marginBottom: "2rem" }}>
@@ -269,11 +229,10 @@ export default function GeneralEnglishPage() {
                 {isGenerating ? "Transcribing & Generating..." : "Create Activity"}
               </button>
             </form>
-            </div>
           </div>
 
           {/* Results Panel */}
-          <div style={{ minHeight: "600px", display: "flex", flexDirection: "column" }}>
+          <div ref={resultsRef} style={{ minHeight: "600px", display: "flex", flexDirection: "column" }}>
             {showResults ? (
               <div className="card animate-fadeIn" style={{ flex: 1, padding: "2rem" }}>
                 
@@ -318,9 +277,35 @@ export default function GeneralEnglishPage() {
                         <h4 style={{ margin: "0 0 0.75rem", color: "var(--primary)", display: "flex", alignItems: "center", gap: "0.5rem" }}>🧠 Quick Check</h4>
                         <p style={{ margin: "0 0 1rem", fontWeight: 500, color: "var(--foreground)" }}>What is a proposed solution to urban habitat fragmentation?</p>
                         <div style={{ display: "grid", gap: "0.75rem" }}>
-                          <button className="btn-secondary" style={{ textAlign: "left", fontSize: "0.9375rem", padding: "0.75rem 1rem", justifyContent: "flex-start", background: "var(--surface)" }}>A) Expanding city limits further</button>
-                          <button className="btn-secondary" style={{ textAlign: "left", fontSize: "0.9375rem", padding: "0.75rem 1rem", justifyContent: "flex-start", background: "var(--surface)" }}>B) Thoughtfully designed green infrastructure</button>
-                          <button className="btn-secondary" style={{ textAlign: "left", fontSize: "0.9375rem", padding: "0.75rem 1rem", justifyContent: "flex-start", background: "var(--surface)" }}>C) Reducing global biodiversity</button>
+                          {[
+                            { id: "A", text: "A) Expanding city limits further", isCorrect: false },
+                            { id: "B", text: "B) Thoughtfully designed green infrastructure", isCorrect: true },
+                            { id: "C", text: "C) Reducing global biodiversity", isCorrect: false },
+                          ].map(option => {
+                            const isSelected = selectedAnswer === option.id;
+                            const showCorrect = selectedAnswer !== null && option.isCorrect;
+                            const showWrong = isSelected && !option.isCorrect;
+                            
+                            return (
+                              <button 
+                                key={option.id}
+                                onClick={() => { if (!selectedAnswer) setSelectedAnswer(option.id); }}
+                                className="btn-secondary" 
+                                style={{ 
+                                  textAlign: "left", fontSize: "0.9375rem", padding: "0.75rem 1rem", justifyContent: "flex-start", 
+                                  background: showCorrect ? "rgba(16,185,129,0.1)" : showWrong ? "rgba(239,68,68,0.1)" : "var(--surface)",
+                                  border: `1px solid ${showCorrect ? "var(--mint)" : showWrong ? "var(--rose)" : "transparent"}`,
+                                  color: showCorrect ? "var(--mint-dark)" : showWrong ? "var(--rose-dark)" : "var(--foreground)",
+                                  cursor: selectedAnswer ? "default" : "pointer",
+                                  display: "flex"
+                                }}
+                              >
+                                {option.text}
+                                {showCorrect && <span className="animate-fadeIn" style={{ marginLeft: "auto", fontWeight: 700 }}>✓ Correct</span>}
+                                {showWrong && <span className="animate-fadeIn" style={{ marginLeft: "auto", fontWeight: 700 }}>✗ Incorrect</span>}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>

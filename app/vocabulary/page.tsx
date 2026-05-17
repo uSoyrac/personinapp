@@ -84,20 +84,33 @@ export default function VocabularyPage() {
   const [manualSet, setManualSet] = useState("Set 1");
   const [isEditingSet, setIsEditingSet] = useState<string | null>(null);
   const [newSetName, setNewSetName] = useState("");
+  const [customSets, setCustomSets] = useState<string[]>([]);
 
   const refresh = useCallback(() => { 
     const currentWords = getWordList();
     setWords(currentWords); 
     setStats(getWordStats()); 
     
-    // Ensure activeSet still exists, otherwise default to first available or "Set 1"
-    const sets = Array.from(new Set(currentWords.map(w => w.setName || "Set 1")));
-    if (activeSet !== "hard" && sets.length > 0 && !sets.includes(activeSet)) {
-      setActiveSet(sets[0]);
-    } else if (sets.length === 0 && activeSet !== "hard") {
-      setActiveSet("Set 1");
+    let cSets: string[] = [];
+    if (typeof window !== "undefined") {
+      const str = localStorage.getItem("practiceforge_custom_sets");
+      if (str) cSets = JSON.parse(str);
     }
-  }, [activeSet]);
+    setCustomSets(cSets);
+
+    // Ensure activeSet still exists, otherwise default to first available or "Set 1"
+    const sets = Array.from(new Set([...currentWords.map(w => w.setName || "Set 1"), ...cSets]));
+    
+    // Use functional state update to break dependency cycle
+    setActiveSet(prevActive => {
+      if (prevActive !== "hard" && sets.length > 0 && !sets.includes(prevActive)) {
+        return sets[0];
+      } else if (sets.length === 0 && prevActive !== "hard") {
+        return "Set 1";
+      }
+      return prevActive;
+    });
+  }, []);
 
   useEffect(() => { setMounted(true); refresh(); }, [refresh]);
 
@@ -106,6 +119,9 @@ export default function VocabularyPage() {
     const setName = w.setName || "Set 1";
     if (!setsMap[setName]) setsMap[setName] = [];
     setsMap[setName].push(w);
+  });
+  customSets.forEach(c => {
+    if (!setsMap[c]) setsMap[c] = [];
   });
   const setNames = Object.keys(setsMap).sort();
 
@@ -208,6 +224,13 @@ export default function VocabularyPage() {
   function handleDeleteSet(setName: string) {
     if (confirm(`Are you sure you want to delete the entire set "${setName}" and all its words?`)) {
       deleteSet(setName);
+      if (typeof window !== "undefined") {
+        let cSets = [];
+        const str = localStorage.getItem("practiceforge_custom_sets");
+        if (str) cSets = JSON.parse(str);
+        cSets = cSets.filter((c: string) => c !== setName);
+        localStorage.setItem("practiceforge_custom_sets", JSON.stringify(cSets));
+      }
       refresh();
       showToast(`Set "${setName}" deleted.`, "success");
     }
@@ -261,6 +284,24 @@ export default function VocabularyPage() {
               </div>
             ))}
           </div>
+
+          {/* Premium Upgrade CTA */}
+          {!isPremium && (
+            <div className="card-elevated animate-fadeIn" style={{ marginBottom: "2.5rem", background: "linear-gradient(135deg, var(--primary-glow) 0%, rgba(124, 58, 237, 0.05) 100%)", border: "1px solid var(--primary-light)", padding: "2rem", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "2rem", justifyContent: "space-between", borderRadius: "var(--radius-lg)" }}>
+              <div style={{ flex: 1, minWidth: "250px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                  <span style={{ fontSize: "1.5rem" }}>🚀</span>
+                  <h3 style={{ margin: 0, fontSize: "1.25rem", color: "var(--primary)" }}>Unlock Unlimited Vocabulary</h3>
+                </div>
+                <p style={{ margin: 0, fontSize: "0.9375rem", color: "var(--foreground-muted)", lineHeight: 1.6 }}>
+                  Free users are limited to practicing 20 words per set. Upgrade to Premium to unlock unlimited quizzes, advanced AI analytics, and guaranteed score acceleration.
+                </p>
+              </div>
+              <button className="btn-primary" onClick={() => window.dispatchEvent(new Event("open-signup"))} style={{ padding: "0.875rem 1.5rem", whiteSpace: "nowrap", boxShadow: "0 4px 14px rgba(124, 58, 237, 0.3)", borderRadius: "999px" }}>
+                Upgrade to Premium
+              </button>
+            </div>
+          )}
 
           {/* ===== SETS VIEW ===== */}
           {view === "sets" && (
@@ -355,7 +396,37 @@ export default function VocabularyPage() {
               )}
 
               {/* Set Navigation Tabs */}
-              <div style={{ display: "flex", gap: "0.75rem", overflowX: "auto", paddingBottom: "1rem", marginBottom: "1rem", scrollbarWidth: "none" }}>
+              <div style={{ display: "flex", gap: "0.75rem", overflowX: "auto", paddingBottom: "1rem", marginBottom: "1rem", scrollbarWidth: "none", alignItems: "center" }}>
+                <button
+                  onClick={() => {
+                    const name = prompt("Enter new set name:");
+                    if (name && name.trim()) {
+                      const trimmed = name.trim();
+                      if (!setNames.includes(trimmed)) {
+                        let cSets: string[] = [];
+                        if (typeof window !== "undefined") {
+                          const str = localStorage.getItem("practiceforge_custom_sets");
+                          if (str) cSets = JSON.parse(str);
+                        }
+                        cSets.push(trimmed);
+                        localStorage.setItem("practiceforge_custom_sets", JSON.stringify(cSets));
+                        setActiveSet(trimmed);
+                        refresh();
+                      } else {
+                        showToast("Set already exists.", "info");
+                      }
+                    }
+                  }}
+                  style={{
+                    padding: "0.625rem 1rem", borderRadius: "999px", whiteSpace: "nowrap",
+                    fontSize: "0.9375rem", fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
+                    background: "var(--primary-glow)", color: "var(--primary)",
+                    border: "1px dashed var(--primary)", display: "flex", alignItems: "center", gap: "0.35rem"
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  New Set
+                </button>
                 {setNames.map(name => (
                   <button
                     key={name}

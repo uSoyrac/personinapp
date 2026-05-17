@@ -107,7 +107,7 @@ export default function LandingPage() {
                 placeholder={
                   mode === "ielts" ? "Paste an article, essay, or transcript here to generate IELTS Reading, Vocabulary, and Writing practice..." :
                   mode === "toefl" ? "Paste a lecture transcript or reading passage here to generate TOEFL iBT style questions..." :
-                  "Paste any English text or a YouTube link here to open the Personal Language Lab..."
+                  "Paste any English text here to open the Personal Language Lab..."
                 }
                 rows={8}
                 value={inputText}
@@ -188,7 +188,7 @@ export default function LandingPage() {
             {[
               { name: "Sarah L.", score: "IELTS Band 6.0 → 7.5", text: "I was stuck at 6.0 in Writing for months. The line-by-line grammar breakdown and vocabulary suggestions here finally pushed me to a 7.5. Absolutely game-changing." },
               { name: "Ahmed K.", score: "TOEFL iBT 85 → 102", text: "The speaking agent is terrifyingly accurate. It caught my pronunciation errors that my human tutor missed. Got my target score in 3 weeks!" },
-              { name: "Elena V.", score: "IELTS Band 5.5 → 7.0", text: "I used the YouTube transcript feature in the General English lab every day. Learning from videos I actually liked made studying effortless." },
+              { name: "Elena V.", score: "IELTS Band 5.5 → 7.0", text: "I used the text analysis feature in the General English lab every day. Learning from articles I actually liked made studying effortless." },
             ].map((review, i) => (
               <div key={i} className="card" style={{ padding: "2rem", background: "var(--surface)", position: "relative" }}>
                 <div style={{ position: "absolute", top: "2rem", right: "2rem", color: "var(--gold)", opacity: 0.2 }}>
@@ -345,6 +345,18 @@ export default function LandingPage() {
                 "description": "AI-Powered IELTS & TOEFL Practice generator."
               },
               {
+                "@type": "SoftwareApplication",
+                "name": "PracticeForge",
+                "operatingSystem": "All",
+                "applicationCategory": "EducationalApplication",
+                "description": "An AI-powered application that generates personalized IELTS and TOEFL practice sessions.",
+                "offers": {
+                  "@type": "Offer",
+                  "price": "0",
+                  "priceCurrency": "USD"
+                }
+              },
+              {
                 "@type": "FAQPage",
                 "mainEntity": [
                   {
@@ -352,7 +364,7 @@ export default function LandingPage() {
                     "name": "How does PracticeForge generate IELTS and TOEFL practice?",
                     "acceptedAnswer": {
                       "@type": "Answer",
-                      "text": "PracticeForge uses advanced AI to analyze any text or YouTube video you provide and instantly generates reading questions, vocabulary lists, and writing prompts tailored to your target exam score."
+                      "text": "PracticeForge uses advanced AI to analyze any text you provide and instantly generates reading questions, vocabulary lists, and writing prompts tailored to your target exam score."
                     }
                   },
                   {

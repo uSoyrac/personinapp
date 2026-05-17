@@ -90,6 +90,34 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Partner / Affiliate Callout CTA */}
+        <div 
+          className="card-elevated" 
+          style={{ 
+            marginBottom: "3rem", 
+            padding: "2rem", 
+            background: "linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)", 
+            border: "1px solid var(--border)", 
+            display: "flex", 
+            flexWrap: "wrap", 
+            alignItems: "center", 
+            justifyContent: "space-between", 
+            gap: "2rem", 
+            borderRadius: "var(--radius-lg)" 
+          }}
+        >
+          <div>
+            <div className="badge badge-accent" style={{ marginBottom: "0.5rem" }}>Partner Program</div>
+            <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.25rem", color: "var(--foreground)" }}>Partner ol affiliate ile</h3>
+            <p style={{ margin: 0, fontSize: "0.9375rem", color: "var(--foreground-muted)", maxWidth: "500px", lineHeight: 1.6 }}>
+              Refer your audience to PracticeForge and earn generous recurring commissions. Join our exclusive affiliate network today and grow with us.
+            </p>
+          </div>
+          <Link href="/affiliate" className="btn-primary" style={{ padding: "0.875rem 1.5rem", borderRadius: "999px", whiteSpace: "nowrap" }}>
+            Become a Partner →
+          </Link>
+        </div>
+
         {/* Disclaimer & Copyright */}
         <div>
           <hr className="divider" style={{ marginBottom: "1.5rem" }} />

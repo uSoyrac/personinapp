@@ -11,8 +11,8 @@ import { extractVocabulary } from "./vocabularyExtractor";
 export const TIER_LIMITS = {
   guest: { maxWords: 150, questionCount: 3, vocabCount: 3 },
   free: { maxWords: 300, questionCount: 5, vocabCount: 5 },
-  pro: { maxWords: 2000, questionCount: 15, vocabCount: 15 },
-  gold: { maxWords: 3000, questionCount: 15, vocabCount: 20 },
+  pro: { maxWords: 800, questionCount: 15, vocabCount: 15 },
+  gold: { maxWords: 1500, questionCount: 15, vocabCount: 20 },
 } as const;
 
 /**

@@ -7,9 +7,13 @@ import ToastContainer from "@/components/Toast";
 import { AppProvider } from "@/lib/AppContext";
 
 export const metadata: Metadata = {
-  title: "PracticeForge — AI-Powered IELTS & TOEFL Practice",
+  metadataBase: new URL("https://practiceforge.com"),
+  title: {
+    default: "PracticeForge — AI-Powered IELTS & TOEFL Practice",
+    template: "%s | PracticeForge"
+  },
   description:
-    "Turn any article or YouTube video into personalised IELTS Academic and TOEFL iBT exam-style practice in seconds. Unlock dynamic Reading, Vocabulary, and AI Speaking tests.",
+    "Turn any article or text into personalised IELTS Academic and TOEFL iBT exam-style practice in seconds. Unlock dynamic Reading, Vocabulary, and AI Speaking tests.",
   keywords: [
     "IELTS practice",
     "TOEFL practice",
@@ -18,10 +22,31 @@ export const metadata: Metadata = {
     "reading comprehension",
     "academic vocabulary",
     "AI language tutor",
-    "General English"
+    "General English",
+    "AI Search Engine Optimization"
   ],
   authors: [{ name: "PracticeForge" }],
-  robots: "index, follow",
+  creator: "PracticeForge Team",
+  publisher: "PracticeForge",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
     title: "PracticeForge — AI-Powered IELTS & TOEFL Practice",
     description: "Personalised exam practice in seconds. Unlock dynamic Reading, Vocabulary, and AI Speaking tests.",

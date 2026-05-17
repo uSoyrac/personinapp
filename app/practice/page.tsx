@@ -119,7 +119,7 @@ export default function PracticePage() {
     }
 
     if (isOverLimit) {
-      setError(`Word limit exceeded. ${tier === "free" ? "Free" : "Premium"} plan allows up to ${limits.maxWords} words. You have ${wordCount} words.`);
+      setError(`To maintain quality and prevent abuse, your ${tier} plan allows texts up to ${limits.maxWords} words. Your text has ${wordCount} words. Please shorten it or upgrade.`);
       return;
     }
 
@@ -162,8 +162,15 @@ export default function PracticePage() {
         <div style={{ maxWidth: "860px", margin: "0 auto" }}>
           {/* Page header */}
           <div style={{ marginBottom: "2.5rem" }}>
-            <div className="badge badge-primary" style={{ marginBottom: "0.75rem", display: "inline-flex" }}>
-              Practice Generator
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
+              <div className="badge badge-primary" style={{ display: "inline-flex" }}>
+                Practice Generator
+              </div>
+              {tier === "guest" && (
+                <div className="badge animate-fadeIn" style={{ display: "inline-flex", background: "var(--surface-2)", color: "var(--foreground)", border: "1px solid var(--border)", gap: "0.35rem" }}>
+                  <span style={{ color: "var(--mint)" }}>⚡</span> Free Trial: {Math.max(0, 1 - usageCount)} / 1 Remaining
+                </div>
+              )}
             </div>
             <h1 style={{ margin: "0 0 0.75rem", color: "var(--foreground)", fontSize: "clamp(1.75rem, 4vw, 2.5rem)" }}>
               Generate Your Practice
@@ -196,6 +203,24 @@ export default function PracticePage() {
               </button>
             )}
           </div>
+
+          {/* Upsell Banner for non-premium */}
+          {(tier === "guest" || tier === "free") && !error && (
+            <div className="card-elevated animate-fadeIn" style={{ padding: "2rem", marginBottom: "1.75rem", background: "linear-gradient(135deg, var(--primary-glow) 0%, rgba(124, 58, 237, 0.05) 100%)", border: "1px solid var(--primary-light)", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1.5rem", justifyContent: "space-between", borderRadius: "var(--radius-lg)" }}>
+              <div style={{ flex: 1, minWidth: "250px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                  <span style={{ fontSize: "1.5rem" }}>⭐</span>
+                  <h3 style={{ margin: 0, fontSize: "1.25rem", color: "var(--primary)" }}>Accelerate Your Score</h3>
+                </div>
+                <p style={{ margin: 0, fontSize: "0.9375rem", color: "var(--foreground-muted)", lineHeight: 1.6 }}>
+                  You are currently on the <strong style={{ textTransform: "capitalize" }}>{tier}</strong> plan. Upgrade to Pro or Gold to unlock unlimited generations, writing feedback, and AI Speaking Evaluations.
+                </p>
+              </div>
+              <button className="btn-primary" onClick={() => window.dispatchEvent(new Event("open-signup"))} style={{ padding: "0.875rem 1.5rem", whiteSpace: "nowrap", boxShadow: "0 4px 14px rgba(124, 58, 237, 0.3)", borderRadius: "999px" }}>
+                View Premium Plans
+              </button>
+            </div>
+          )}
 
           {/* Upsell Walls */}
           {error === "GUEST_WALL" && (

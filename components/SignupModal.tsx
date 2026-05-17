@@ -107,14 +107,25 @@ export default function SignupModal() {
               style={{ width: "100%", padding: "0.75rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", background: "var(--surface-2)", color: "var(--foreground)" }} 
             />
           </div>
-          <div style={{ marginTop: "0.5rem" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.875rem", fontWeight: 600, color: "var(--primary)" }}>Partner / Invite Code (Optional)</label>
+          <div style={{ marginTop: "0.5rem", padding: "1.25rem", borderRadius: "var(--radius-md)", background: "var(--surface-2)", border: "1px solid var(--border)", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, width: "4px", height: "100%", background: "var(--primary)" }} />
+            <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem", fontSize: "0.875rem", fontWeight: 700, color: "var(--foreground)" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                Referral / Affiliate Code
+              </span>
+              {inviteCode.length >= 3 && (
+                <span className="animate-fadeIn" style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: "var(--mint)", fontSize: "0.75rem", fontWeight: 800 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Valid
+                </span>
+              )}
+            </label>
             <input 
               type="text" 
               value={inviteCode}
               onChange={e => setInviteCode(e.target.value)}
-              placeholder="e.g. ACADEMY30" 
-              style={{ width: "100%", padding: "0.75rem", borderRadius: "var(--radius-sm)", border: "1px dashed var(--primary-light)", background: "var(--primary-glow)", color: "var(--primary)", fontWeight: 600 }} 
+              placeholder="e.g. PARTNER20" 
+              style={{ width: "100%", padding: "0.875rem", borderRadius: "var(--radius-sm)", border: `2px dashed ${inviteCode.length >= 3 ? "var(--mint)" : "var(--primary-light)"}`, background: "var(--surface)", color: inviteCode.length >= 3 ? "var(--mint-dark)" : "var(--primary)", fontWeight: 700, textAlign: "center", letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "1rem", transition: "all 0.3s" }} 
             />
           </div>
 
