@@ -113,13 +113,12 @@ export default function Nav() {
             <div style={{ position: "relative" }}>
               <button 
                 onClick={() => setProfileOpen(!profileOpen)}
-                className="btn-secondary" 
-                style={{ padding: "0.5rem 1rem", fontSize: "0.875rem", borderRadius: "var(--radius-sm)", whiteSpace: "nowrap", height: "fit-content", display: "flex", alignItems: "center", gap: "0.5rem" }}
+                style={{ padding: "0.25rem 0.75rem", fontSize: "0.75rem", fontWeight: 800, borderRadius: "9999px", whiteSpace: "nowrap", height: "fit-content", display: "flex", alignItems: "center", gap: "0.375rem", background: "#000", color: tier === "gold" ? "var(--gold)" : "#FFF", border: "1px solid #000", cursor: "pointer", transition: "transform 0.15s ease", boxShadow: "1px 1px 0px rgba(0,0,0,0.5)" }}
               >
-                <div style={{ width: "1.5rem", height: "1.5rem", borderRadius: "50%", background: "linear-gradient(135deg, var(--primary), var(--accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "0.75rem", fontWeight: "bold" }}>
+                <div style={{ width: "1.125rem", height: "1.125rem", borderRadius: "50%", background: tier === "gold" ? "linear-gradient(135deg, var(--gold), #D97706)" : "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center", color: tier === "gold" ? "#000" : "#FFF", fontSize: "0.6rem", fontWeight: "bold" }}>
                   U
                 </div>
-                <span>{tier.toUpperCase()} User</span>
+                <span>{tier.toUpperCase()}</span>
               </button>
               
               {profileOpen && (

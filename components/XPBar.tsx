@@ -28,24 +28,24 @@ export default function XPBar() {
       <div style={{
         background: "var(--sky, #00F0FF)",
         color: "#000",
-        border: "var(--border-width) solid var(--border)",
+        border: "1px solid var(--border)",
         borderRadius: "var(--radius-sm)",
-        padding: "0.5rem 0.75rem",
-        fontSize: "0.875rem",
-        fontWeight: 900,
-        boxShadow: "var(--shadow-sm)",
+        padding: "0.15rem 0.4rem",
+        fontSize: "0.7rem",
+        fontWeight: 800,
+        boxShadow: "1px 1px 0px #000",
       }}>
         Lvl {state.level}
       </div>
 
       {/* Progress Bar Container */}
-      <div style={{ display: "flex", flexDirection: "column", width: "120px" }}>
+      <div style={{ display: "flex", flexDirection: "column", width: "80px" }}>
         <div style={{
           width: "100%",
-          height: "16px",
+          height: "8px",
           background: "var(--surface)",
-          border: "var(--border-width) solid var(--border)",
-          borderRadius: "var(--radius-sm)",
+          border: "1px solid var(--border)",
+          borderRadius: "9999px",
           position: "relative",
           overflow: "hidden",
         }}>
@@ -56,13 +56,13 @@ export default function XPBar() {
             height: "100%",
             width: `${Math.min(Math.max(progress, 0), 100)}%`,
             background: "var(--gold)",
-            borderRight: progress > 0 && progress < 100 ? "var(--border-width) solid var(--border)" : "none",
+            borderRight: progress > 0 && progress < 100 ? "1px solid var(--border)" : "none",
             transition: "width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
           }} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.125rem" }}>
-          <span style={{ fontSize: "0.625rem", fontWeight: 800 }}>XP</span>
-          <span style={{ fontSize: "0.625rem", fontWeight: 800 }}>{state.xp}/{state.nextLevelXP}</span>
+          <span style={{ fontSize: "0.6rem", fontWeight: 700 }}>XP</span>
+          <span style={{ fontSize: "0.6rem", fontWeight: 700 }}>{state.xp}/{state.nextLevelXP}</span>
         </div>
       </div>
 
@@ -71,15 +71,15 @@ export default function XPBar() {
         <div style={{
           background: "var(--coral)",
           color: "#000",
-          border: "var(--border-width) solid var(--border)",
+          border: "1px solid var(--border)",
           borderRadius: "var(--radius-sm)",
-          padding: "0.5rem 0.75rem",
-          fontSize: "0.875rem",
-          fontWeight: 900,
-          boxShadow: "var(--shadow-sm)",
+          padding: "0.15rem 0.4rem",
+          fontSize: "0.7rem",
+          fontWeight: 800,
+          boxShadow: "1px 1px 0px #000",
           display: "flex",
           alignItems: "center",
-          gap: "0.25rem",
+          gap: "0.15rem",
         }} title="Daily Streak">
           🔥 {state.streak}
         </div>
