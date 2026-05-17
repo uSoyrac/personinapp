@@ -82,12 +82,13 @@ export default function Nav() {
                 key={link.href}
                 href={link.href}
                 style={{
-                  padding: "0.5rem 0.875rem", borderRadius: "var(--radius-sm)",
-                  fontSize: "0.875rem", fontWeight: isActive ? 600 : 500,
-                  color: isActive ? "var(--primary)" : "var(--foreground-muted)",
-                  background: isActive ? "var(--primary-glow)" : "transparent",
-                  transition: "all 0.2s", display: "flex", alignItems: "center",
-                  borderBottom: isActive ? "2px solid var(--primary)" : "2px solid transparent",
+                  padding: "0.5rem 1rem", borderRadius: "6px",
+                  fontSize: "0.875rem", fontWeight: isActive ? 900 : 700,
+                  color: isActive ? "#000" : "var(--foreground-faint)",
+                  background: isActive ? "#D2FF3A" : "transparent",
+                  border: isActive ? "3px solid #000" : "3px solid transparent",
+                  boxShadow: isActive ? "3px 3px 0px #000" : "none",
+                  transition: "transform 0.1s, box-shadow 0.1s", display: "flex", alignItems: "center",
                 }}
               >
                 {link.label}
