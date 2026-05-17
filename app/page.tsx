@@ -234,13 +234,13 @@ export default function LandingPage() {
             </div>
 
             {/* Pro Plan */}
-            <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "var(--surface)", position: "relative" }}>
-              <div style={{ position: "absolute", top: "-16px", left: "50%", transform: "translateX(-50%) rotate(-2deg)" }}>
-                <span className="badge" style={{ background: "var(--lavender)", color: "#000", padding: "0.375rem 1rem", border: "var(--border-width) solid var(--border)", boxShadow: "var(--shadow-sm)", fontWeight: 900, textTransform: "uppercase" }}>Most Popular</span>
+            <div style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "#FFFFFF", position: "relative", border: "2px solid #D8B4FE", borderRadius: "8px", boxShadow: "4px 4px 0px #000" }}>
+              <div style={{ position: "absolute", top: "-14px", left: "50%", transform: "translateX(-50%)" }}>
+                <span style={{ background: "#D8B4FE", color: "#FFF", padding: "0.25rem 1rem", border: "2px solid #000", borderRadius: "4px", fontWeight: 800, textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>Most Popular</span>
               </div>
-              <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#000", fontWeight: 900 }}>Pro Study</h3>
-              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$15<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
-              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "var(--foreground-muted)" }}>For core students needing comprehensive writing support.</p>
+              <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#A855F7", fontWeight: 800 }}>Pro Study</h3>
+              <p style={{ fontSize: "2.5rem", fontWeight: 900, fontFamily: "var(--font-display)", color: "#000", marginBottom: "0.5rem", display: "flex", alignItems: "baseline", gap: "0.1rem" }}>$14.99<span style={{ fontSize: "1rem", color: "#000", fontWeight: 800 }}>/mo</span></p>
+              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "#4B5563", fontWeight: 500, lineHeight: 1.5 }}>For core students needing comprehensive writing support.</p>
               
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
                 {[
@@ -249,20 +249,20 @@ export default function LandingPage() {
                   "Line-by-line AI Writing feedback",
                   "Unlimited Personal Dictionary"
                 ].map(feature => (
-                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 600, color: "#000" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="3" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
+                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 600, color: "#111827" }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" strokeWidth="3" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
                     {feature}
                   </li>
                 ))}
               </ul>
-              <button className="btn-primary" style={{ width: "100%", justifyContent: "center" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>UPGRADE TO PRO</button>
+              <button style={{ width: "100%", justifyContent: "center", background: "#D8B4FE", color: "#000", border: "2px solid #000", padding: "1rem", fontWeight: 800, borderRadius: "4px", cursor: "pointer", textTransform: "uppercase" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>UPGRADE TO PRO</button>
             </div>
 
             {/* Elite Plan */}
-            <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "var(--gold)" }}>
-              <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#000", fontWeight: 900 }}>Elite Mastery</h3>
-              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "#000", marginBottom: "0.5rem" }}>$29<span style={{ fontSize: "1rem", color: "#333", fontWeight: 500 }}>/mo</span></p>
-              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "#222" }}>For students urgently needing Band 7.0+ or 100+.</p>
+            <div style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "#FFFFFF", position: "relative", border: "2px solid #FDE047", borderRadius: "8px", boxShadow: "4px 4px 0px #000" }}>
+              <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#EAB308", fontWeight: 800 }}>Elite Mastery</h3>
+              <p style={{ fontSize: "2.5rem", fontWeight: 900, fontFamily: "var(--font-display)", color: "#000", marginBottom: "0.5rem", display: "flex", alignItems: "baseline", gap: "0.1rem" }}>$29.99<span style={{ fontSize: "1rem", color: "#000", fontWeight: 800 }}>/mo</span></p>
+              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "#4B5563", fontWeight: 500, lineHeight: 1.5 }}>For students urgently needing Band 7.0+ or 100+.</p>
               
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
                 {[
@@ -271,13 +271,13 @@ export default function LandingPage() {
                   "Unlimited Mock Tests",
                   "Guaranteed Score Acceleration Path"
                 ].map(feature => (
-                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 700, color: "#000" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="3" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
+                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 700, color: "#111827" }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FDE047" strokeWidth="3" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
                     {feature}
                   </li>
                 ))}
               </ul>
-              <button className="btn-secondary" style={{ width: "100%", justifyContent: "center" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>GET ELITE MASTERY</button>
+              <button style={{ width: "100%", justifyContent: "center", background: "linear-gradient(to right, #F59E0B, #D97706)", color: "#000", border: "2px solid #000", padding: "1rem", fontWeight: 800, borderRadius: "4px", cursor: "pointer", textTransform: "uppercase" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>GET ELITE MASTERY</button>
             </div>
 
           </div>
