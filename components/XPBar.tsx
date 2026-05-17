@@ -26,7 +26,7 @@ export default function XPBar() {
     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
       {/* Level Badge */}
       <div style={{
-        background: "var(--sky, #00F0FF)",
+        background: "#60A5FA",
         color: "#000",
         border: "1px solid var(--border)",
         borderRadius: "var(--radius-sm)",
@@ -55,7 +55,7 @@ export default function XPBar() {
             left: 0,
             height: "100%",
             width: `${Math.min(Math.max(progress, 0), 100)}%`,
-            background: "var(--gold)",
+            background: "#FDE047",
             borderRight: progress > 0 && progress < 100 ? "1px solid var(--border)" : "none",
             transition: "width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
           }} />
@@ -69,7 +69,7 @@ export default function XPBar() {
       {/* Streak Badge */}
       {state.streak > 0 && (
         <div style={{
-          background: "var(--coral)",
+          background: "#FCA5A5",
           color: "#000",
           border: "1px solid var(--border)",
           borderRadius: "var(--radius-sm)",

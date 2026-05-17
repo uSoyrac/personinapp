@@ -21,31 +21,31 @@ export default function AffiliatePage() {
         
         {/* Hero */}
         <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-          <div className="badge badge-accent" style={{ marginBottom: "1rem", display: "inline-flex" }}>Partner Program</div>
-          <h1 style={{ fontSize: "clamp(2.5rem, 5vw, 3.5rem)", marginBottom: "1rem" }}>
-            Earn <span className="gradient-text">30% Recurring</span> Commission.
+          <div style={{ marginBottom: "1rem", display: "inline-flex", background: "#D1FAE5", color: "#065F46", border: "1px solid #000", fontWeight: 800, padding: "0.375rem 1rem", textTransform: "uppercase", letterSpacing: "0.05em", boxShadow: "2px 2px 0px #000", borderRadius: "4px", fontSize: "0.875rem" }}>Partner Program</div>
+          <h1 style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", marginBottom: "1.5rem", fontWeight: 900, lineHeight: 1.1 }}>
+            Earn <span style={{ color: "#C4B5FD" }}>30%</span> <span style={{ color: "#FDE047" }}>Recurring</span><br/>Commission.
           </h1>
-          <p style={{ fontSize: "1.25rem", color: "var(--foreground-muted)", lineHeight: 1.6 }}>
+          <p style={{ fontSize: "1.25rem", color: "#4B5563", lineHeight: 1.6, fontWeight: 500, maxWidth: "700px", margin: "0 auto" }}>
             Join the PracticeForge Partner Program. Recommend the world's most advanced AI IELTS & TOEFL lab to your students and followers, and earn revenue for every active subscription.
           </p>
         </div>
 
         {/* Info Cards */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem", marginBottom: "4rem" }}>
-          <div className="card" style={{ padding: "2rem", textAlign: "center", background: "var(--surface-2)", border: "none" }}>
-            <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>💸</div>
-            <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "var(--primary)" }}>30% Recurring</h3>
-            <p style={{ fontSize: "0.9375rem", color: "var(--foreground-muted)", margin: 0 }}>Earn 30% of the subscription fee every single month your referral stays active.</p>
+          <div style={{ padding: "3rem 2rem", textAlign: "center", background: "#F3F4F6", borderRadius: "16px" }}>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>💸</div>
+            <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "#A78BFA", fontWeight: 800 }}>30% Recurring</h3>
+            <p style={{ fontSize: "0.9375rem", color: "#4B5563", margin: 0, lineHeight: 1.6, fontWeight: 500 }}>Earn 30% of the subscription fee every single month your referral stays active.</p>
           </div>
-          <div className="card" style={{ padding: "2rem", textAlign: "center", background: "var(--surface-2)", border: "none" }}>
-            <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>🍪</div>
-            <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "var(--primary)" }}>60-Day Cookie</h3>
-            <p style={{ fontSize: "0.9375rem", color: "var(--foreground-muted)", margin: 0 }}>If they click your link and subscribe within 60 days, you get the credit.</p>
+          <div style={{ padding: "3rem 2rem", textAlign: "center", background: "#F3F4F6", borderRadius: "16px" }}>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🍪</div>
+            <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "#A78BFA", fontWeight: 800 }}>60-Day Cookie</h3>
+            <p style={{ fontSize: "0.9375rem", color: "#4B5563", margin: 0, lineHeight: 1.6, fontWeight: 500 }}>If they click your link and subscribe within 60 days, you get the credit.</p>
           </div>
-          <div className="card" style={{ padding: "2rem", textAlign: "center", background: "var(--surface-2)", border: "none" }}>
-            <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>🚀</div>
-            <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "var(--primary)" }}>High Conversion</h3>
-            <p style={{ fontSize: "0.9375rem", color: "var(--foreground-muted)", margin: 0 }}>Our free tools and targeted onboarding convert visitors into paid users effectively.</p>
+          <div style={{ padding: "3rem 2rem", textAlign: "center", background: "#F3F4F6", borderRadius: "16px" }}>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🚀</div>
+            <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "#A78BFA", fontWeight: 800 }}>High Conversion</h3>
+            <p style={{ fontSize: "0.9375rem", color: "#4B5563", margin: 0, lineHeight: 1.6, fontWeight: 500 }}>Our free tools and targeted onboarding convert visitors into paid users effectively.</p>
           </div>
         </div>
 
