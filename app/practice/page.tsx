@@ -206,17 +206,17 @@ export default function PracticePage() {
 
           {/* Upsell Banner for non-premium */}
           {(tier === "guest" || tier === "free") && !error && (
-            <div className="card-elevated animate-fadeIn" style={{ padding: "2rem", marginBottom: "1.75rem", background: "linear-gradient(135deg, var(--primary-glow) 0%, rgba(124, 58, 237, 0.05) 100%)", border: "1px solid var(--primary-light)", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1.5rem", justifyContent: "space-between", borderRadius: "var(--radius-lg)" }}>
+            <div className="card-elevated animate-fadeIn" style={{ padding: "2rem", marginBottom: "1.75rem", background: "#FDE047", border: "3px solid #000", boxShadow: "8px 8px 0px #000", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1.5rem", justifyContent: "space-between", borderRadius: "8px" }}>
               <div style={{ flex: 1, minWidth: "250px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
                   <span style={{ fontSize: "1.5rem" }}>⭐</span>
-                  <h3 style={{ margin: 0, fontSize: "1.25rem", color: "var(--primary)" }}>Accelerate Your Score</h3>
+                  <h3 style={{ margin: 0, fontSize: "1.25rem", color: "#000", fontWeight: 900 }}>Accelerate Your Score</h3>
                 </div>
-                <p style={{ margin: 0, fontSize: "0.9375rem", color: "var(--foreground-muted)", lineHeight: 1.6 }}>
-                  You are currently on the <strong style={{ textTransform: "capitalize" }}>{tier}</strong> plan. Upgrade to Pro or Gold to unlock unlimited generations, writing feedback, and AI Speaking Evaluations.
+                <p style={{ margin: 0, fontSize: "0.9375rem", color: "#000", fontWeight: 600, lineHeight: 1.6 }}>
+                  You are currently on the <strong style={{ textTransform: "capitalize", background: "#FFF", padding: "0 0.2rem", border: "2px solid #000" }}>{tier}</strong> plan. Upgrade to Pro or Gold to unlock unlimited generations, writing feedback, and AI Speaking Evaluations.
                 </p>
               </div>
-              <button className="btn-primary" onClick={() => window.dispatchEvent(new Event("open-signup"))} style={{ padding: "0.875rem 1.5rem", whiteSpace: "nowrap", boxShadow: "0 4px 14px rgba(124, 58, 237, 0.3)", borderRadius: "999px" }}>
+              <button className="btn-primary" onClick={() => window.dispatchEvent(new Event("open-signup"))} style={{ padding: "0.875rem 1.5rem", whiteSpace: "nowrap", borderRadius: "8px" }}>
                 View Premium Plans
               </button>
             </div>
@@ -258,13 +258,15 @@ export default function PracticePage() {
                     id={`exam-${opt.id}`}
                     onClick={() => setExamType(opt.id)}
                     style={{
-                      background: examType === opt.id ? "var(--primary-glow)" : "var(--surface)",
-                      border: `2px solid ${examType === opt.id ? "var(--primary)" : "var(--border)"}`,
-                      borderRadius: "var(--radius-md)",
-                      padding: "1rem",
+                      background: examType === opt.id ? "#D2FF3A" : "#FFFFFF",
+                      border: "3px solid #000",
+                      borderRadius: "8px",
+                      padding: "1.25rem",
                       cursor: "pointer",
                       textAlign: "left",
-                      transition: "all 0.2s ease",
+                      boxShadow: examType === opt.id ? "none" : "4px 4px 0px #000",
+                      transform: examType === opt.id ? "translate(4px, 4px)" : "none",
+                      transition: "all 0.15s ease",
                     }}
                   >
                     <div style={{ display: "flex", gap: "0.625rem", alignItems: "center", marginBottom: "0.25rem" }}>
@@ -340,13 +342,17 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
                       id={`level-${opt.id}`}
                       onClick={() => setLevel(opt.id)}
                       style={{
-                        background: level === opt.id ? "var(--primary-glow)" : "var(--background)",
-                        border: `1px solid ${level === opt.id ? "var(--primary)" : "var(--border)"}`,
-                        borderRadius: "var(--radius-md)",
+                        background: level === opt.id ? "#A855F7" : "#FFFFFF",
+                        color: level === opt.id ? "#FFF" : "#000",
+                        border: "3px solid #000",
+                        borderRadius: "8px",
                         padding: "0.625rem 1rem",
                         cursor: "pointer",
+                        fontWeight: level === opt.id ? 800 : 600,
                         textAlign: "left",
-                        transition: "all 0.2s ease",
+                        boxShadow: level === opt.id ? "none" : "3px 3px 0px #000",
+                        transform: level === opt.id ? "translate(3px, 3px)" : "none",
+                        transition: "all 0.15s ease",
                       }}
                     >
                       <span style={{ fontWeight: 700, color: "var(--foreground)", fontSize: "0.9375rem", display: "block" }}>{opt.id}</span>
