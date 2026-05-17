@@ -126,49 +126,49 @@ a:hover { color: var(--primary); }
    Buttons
    ============================== */
 .btn-primary {
-  background: var(--primary);
-  color: #FFFFFF;
+  background: var(--lavender);
+  color: #000000;
   border: var(--border-width) solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0.875rem 1.75rem;
-  font-family: var(--font-sans);
+  border-radius: 0px;
+  padding: 1rem 2rem;
+  font-family: var(--font-display);
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
 }
 .btn-primary:hover {
-  transform: translate(6px, 6px);
+  transform: translate(2px, 2px);
   box-shadow: 0px 0px 0px #000;
-  color: #000;
 }
 .btn-primary:active {
-  transform: translate(8px, 8px);
+  transform: translate(4px, 4px);
   box-shadow: 0px 0px 0px #000;
 }
 
 .btn-secondary {
-  background: var(--surface);
-  color: var(--foreground);
+  background: #000000;
+  color: #FFFFFF;
   border: var(--border-width) solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0.875rem 1.75rem;
-  font-family: var(--font-sans);
+  border-radius: 0px;
+  padding: 1rem 2rem;
+  font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .btn-secondary:hover {
-  transform: translate(3px, 3px);
-  box-shadow: 0px 0px 0px #000;
-  background: var(--surface-2);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-sm);
+  color: var(--gold);
 }
 
 /* ==============================

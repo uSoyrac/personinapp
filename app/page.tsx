@@ -118,10 +118,10 @@ export default function LandingPage() {
                 <button 
                   type="submit" 
                   className="btn-primary" 
-                  style={{ padding: "1rem 2.5rem", fontSize: "1.125rem", borderRadius: "9999px", minWidth: "200px" }}
+                  style={{ minWidth: "200px" }}
                   disabled={isGenerating || !inputText.trim()}
                 >
-                  {isGenerating ? "Analyzing text..." : "Generate Practice →"}
+                  {isGenerating ? "Analyzing text..." : "GENERATE PRACTICE →"}
                 </button>
               </div>
             </form>
