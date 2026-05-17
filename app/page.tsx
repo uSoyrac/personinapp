@@ -251,7 +251,7 @@ export default function LandingPage() {
                   "Unlimited Personal Dictionary"
                 ].map(feature => (
                   <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 700, color: "#111827" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" strokeWidth="3" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#A855F7" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: "-2px" }}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     {feature}
                   </li>
                 ))}
@@ -273,7 +273,7 @@ export default function LandingPage() {
                   "Guaranteed Score Acceleration Path"
                 ].map(feature => (
                   <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 700, color: "#111827" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EAB308" strokeWidth="3" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#FDE047" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: "-2px" }}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     {feature}
                   </li>
                 ))}
