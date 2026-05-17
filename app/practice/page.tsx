@@ -181,7 +181,7 @@ export default function PracticePage() {
           </div>
 
           {/* Tier toggle */}
-          <div className="card" style={{ marginBottom: "1.75rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+          <div className="card" style={{ padding: "1.25rem 1.5rem", marginBottom: "1.75rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", background: "#FFFFFF" }}>
             <div>
               <p style={{ margin: "0 0 0.25rem", fontWeight: 800, color: "var(--foreground)", fontSize: "0.9375rem", textTransform: "capitalize" }}>
                 {tier} Plan
