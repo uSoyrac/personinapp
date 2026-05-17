@@ -87,6 +87,7 @@ export default function LandingPage() {
                 <button 
                   key={t.id}
                   onClick={() => setMode(t.id as AppMode)}
+                  className="hover:scale-[1.02] active:scale-[0.98] transition-transform"
                   style={{ 
                     flex: 1, padding: "0.75rem", borderRadius: "6px", 
                     background: mode === t.id ? "var(--surface)" : "transparent", 
@@ -103,11 +104,11 @@ export default function LandingPage() {
 
             <form onSubmit={handleGenerate}>
               <textarea 
-                className="input-base" 
+                className="input-base focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all duration-200" 
                 placeholder={
-                  mode === "ielts" ? "Paste an article, essay, or transcript here to generate IELTS Reading, Vocabulary, and Writing practice..." :
-                  mode === "toefl" ? "Paste a lecture transcript or reading passage here to generate TOEFL iBT style questions..." :
-                  "Paste any English text here to open the Personal Language Lab..."
+                  mode === "ielts" ? "e.g., Paste an article, essay, or transcript here to generate IELTS Reading, Vocabulary, and Writing practice..." :
+                  mode === "toefl" ? "e.g., Paste a lecture transcript or reading passage here to generate TOEFL iBT style questions..." :
+                  "e.g., Paste any English text here to open the Personal Language Lab..."
                 }
                 rows={8}
                 value={inputText}
@@ -117,7 +118,7 @@ export default function LandingPage() {
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
                 <div style={{ fontSize: "0.875rem", color: "var(--foreground-faint)" }}>
-                  {inputText.length} characters
+                  {inputText.trim() ? inputText.trim().split(/\s+/).length : 0} words
                 </div>
                 <button 
                   type="submit" 

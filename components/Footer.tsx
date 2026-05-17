@@ -108,7 +108,7 @@ export default function Footer() {
         >
           <div>
             <div className="badge badge-accent" style={{ marginBottom: "0.5rem" }}>Partner Program</div>
-            <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.25rem", color: "var(--foreground)" }}>Partner ol affiliate ile</h3>
+            <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.25rem", color: "var(--foreground)" }}>Become an Affiliate Partner</h3>
             <p style={{ margin: 0, fontSize: "0.9375rem", color: "var(--foreground-muted)", maxWidth: "500px", lineHeight: 1.6 }}>
               Refer your audience to PracticeForge and earn generous recurring commissions. Join our exclusive affiliate network today and grow with us.
             </p>

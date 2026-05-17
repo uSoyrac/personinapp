@@ -5,6 +5,7 @@ import type { SavedQuestion } from "@/types";
 import { getQuestionBank, deleteQuestion } from "@/lib/questionBank";
 import { addXP } from "@/lib/gamification";
 import Confetti from "@/components/Confetti";
+import Link from "next/link";
 
 export default function QuestionBankPage() {
   const [questions, setQuestions] = useState<SavedQuestion[]>([]);
@@ -83,7 +84,7 @@ export default function QuestionBankPage() {
               <p style={{ margin: "0 0 2rem", color: "var(--foreground-muted)" }}>
                 Generate practice tests and click "➕ Bankama Ekle" to save questions here.
               </p>
-              <a href="/practice" className="btn-primary" style={{ display: "inline-block" }}>Go to Practice</a>
+              <Link href="/practice" className="btn-primary" style={{ display: "inline-block" }}>Go to Practice</Link>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
