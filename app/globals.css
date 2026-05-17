@@ -54,10 +54,10 @@
   /* Refined Solid Neobrutalism shadows */
   --shadow-sm: 2px 2px 0px 0px #000000;
   --shadow-md: 4px 4px 0px 0px #000000;
-  --shadow-lg: 8px 8px 0px 0px #000000;
-  --shadow-glow: 6px 6px 0px 0px #000000;
+  --shadow-lg: 6px 6px 0px 0px #000000;
+  --shadow-glow: 0 0 0 2px var(--bg), 0 0 0 4px #000;
   
-  --border-width: 3px;
+  --border-width: 2px;
 }
 
 *:focus {
@@ -120,8 +120,8 @@ a:hover { color: var(--primary); }
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 10px 10px 0px 0px #000000;
+  transform: translateY(-2px);
+  box-shadow: 8px 8px 0px 0px #000000;
 }
 
 .card-elevated {
@@ -206,27 +206,23 @@ a:hover { color: var(--primary); }
 .badge-rose    { background: rgba(236, 72, 153, 0.1); color: #9D174D; border-color: rgba(236, 72, 153, 0.2); }
 .badge-coral   { background: rgba(239, 68, 68, 0.1); color: #991B1B; border-color: rgba(239, 68, 68, 0.2); }
 
-/* ==============================
-   Inputs
-   ============================== */
 .input-base {
   background: var(--surface);
-  border: 3px solid #000;
-  border-radius: 8px;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
   color: var(--foreground);
   font-family: var(--font-sans);
   font-size: 1rem;
   padding: 0.875rem 1.125rem;
   width: 100%;
-  box-shadow: 4px 4px 0px #000;
+  box-shadow: var(--shadow-sm);
   outline: none;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .input-base::placeholder { color: var(--foreground-faint); }
 .input-base:focus {
-  border-color: #000;
-  box-shadow: none;
-  transform: translate(4px, 4px);
+  border-color: var(--primary-dark);
+  box-shadow: var(--shadow-glow);
 }
 
 .label {
@@ -307,33 +303,35 @@ a:hover { color: var(--primary); }
 .tab-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  background: transparent;
+  gap: 0.5rem;
+  background: var(--surface-2);
+  padding: 0.375rem;
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--border);
 }
 .tab-item {
   flex: 1;
   text-align: center;
   padding: 0.75rem 1rem;
-  background: #FFF;
-  border: 3px solid #000;
-  border-radius: 8px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: 600;
+  color: var(--foreground-muted);
   cursor: pointer;
-  box-shadow: 4px 4px 0px #000;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.2s ease;
 }
 .tab-item:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px #000;
+  color: var(--foreground);
+  background: rgba(0, 0, 0, 0.03);
 }
 .tab-item.active {
-  background: #CAB0FF;
-  color: #000;
-  box-shadow: none;
-  transform: translate(4px, 4px);
-  font-weight: 900;
+  background: var(--surface);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-sm);
+  border: var(--border-width) solid var(--border);
+  font-weight: 800;
 }
 
 /* ==============================
