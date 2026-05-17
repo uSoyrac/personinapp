@@ -26,14 +26,14 @@ export default function XPBar() {
     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
       {/* Level Badge */}
       <div style={{
-        background: "var(--brutal-blue, #007AFF)",
-        color: "#FFF",
-        border: "2px solid #000",
-        borderRadius: "4px",
-        padding: "0.25rem 0.5rem",
-        fontSize: "0.75rem",
+        background: "var(--sky, #00F0FF)",
+        color: "#000",
+        border: "var(--border-width) solid var(--border)",
+        borderRadius: "var(--radius-sm)",
+        padding: "0.5rem 0.75rem",
+        fontSize: "0.875rem",
         fontWeight: 900,
-        boxShadow: "2px 2px 0px #1a1a1a",
+        boxShadow: "var(--shadow-sm)",
       }}>
         Lvl {state.level}
       </div>
@@ -42,9 +42,10 @@ export default function XPBar() {
       <div style={{ display: "flex", flexDirection: "column", width: "120px" }}>
         <div style={{
           width: "100%",
-          height: "12px",
+          height: "16px",
           background: "var(--surface)",
-          border: "2px solid #000",
+          border: "var(--border-width) solid var(--border)",
+          borderRadius: "var(--radius-sm)",
           position: "relative",
           overflow: "hidden",
         }}>
@@ -54,8 +55,8 @@ export default function XPBar() {
             left: 0,
             height: "100%",
             width: `${Math.min(Math.max(progress, 0), 100)}%`,
-            background: "var(--brutal-yellow, #FFE200)",
-            borderRight: progress > 0 && progress < 100 ? "2px solid #000" : "none",
+            background: "var(--gold)",
+            borderRight: progress > 0 && progress < 100 ? "var(--border-width) solid var(--border)" : "none",
             transition: "width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
           }} />
         </div>
@@ -68,14 +69,14 @@ export default function XPBar() {
       {/* Streak Badge */}
       {state.streak > 0 && (
         <div style={{
-          background: "var(--brutal-red, #FF3B30)",
-          color: "#FFF",
-          border: "2px solid #000",
-          borderRadius: "4px",
-          padding: "0.25rem 0.5rem",
-          fontSize: "0.75rem",
+          background: "var(--coral)",
+          color: "#000",
+          border: "var(--border-width) solid var(--border)",
+          borderRadius: "var(--radius-sm)",
+          padding: "0.5rem 0.75rem",
+          fontSize: "0.875rem",
           fontWeight: 900,
-          boxShadow: "2px 2px 0px #1a1a1a",
+          boxShadow: "var(--shadow-sm)",
           display: "flex",
           alignItems: "center",
           gap: "0.25rem",

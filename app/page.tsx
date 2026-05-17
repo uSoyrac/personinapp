@@ -84,10 +84,11 @@ export default function LandingPage() {
                   onClick={() => setMode(t.id as AppMode)}
                   className="hover:scale-[1.02] active:scale-[0.98] transition-transform"
                   style={{ 
-                    flex: 1, padding: "0.75rem", borderRadius: "6px", 
-                    background: mode === t.id ? "var(--surface)" : "transparent", 
-                    color: mode === t.id ? "var(--primary)" : "var(--foreground-muted)", 
-                    fontWeight: 600, border: "none", cursor: "pointer", transition: "all 0.2s", 
+                    flex: 1, padding: "0.75rem", borderRadius: "var(--radius-sm)", 
+                    background: mode === t.id ? "#000000" : "transparent", 
+                    color: mode === t.id ? "var(--gold)" : "var(--foreground-muted)", 
+                    fontWeight: 900, border: mode === t.id ? "var(--border-width) solid var(--border)" : "var(--border-width) solid transparent", 
+                    cursor: "pointer", transition: "all 0.2s", 
                     boxShadow: mode === t.id ? "var(--shadow-sm)" : "none",
                     fontSize: "0.9375rem"
                   }}
