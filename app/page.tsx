@@ -107,17 +107,25 @@ export default function LandingPage() {
                 rows={8}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                style={{ resize: "none", fontSize: "1.125rem", padding: "1.5rem", lineHeight: 1.6, marginBottom: "1.5rem", background: "var(--bg)", border: "1px solid var(--border)", boxShadow: "inset 0 2px 4px rgba(0,0,0,0.02)" }}
-              />
-
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
-                <div style={{ fontSize: "0.875rem", color: "var(--foreground-faint)" }}>
-                  {inputText.trim() ? inputText.trim().split(/\s+/).length : 0} words
+            <form onSubmit={handleGenerate} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{ position: "relative" }}>
+                <textarea 
+                  className="input-base"
+                  value={inputText}
+                  onChange={e => setInputText(e.target.value)}
+                  placeholder="Paste your article, essay, or lecture notes here..."
+                  style={{ minHeight: "150px", resize: "vertical", fontSize: "1.125rem", padding: "1.25rem", border: "3px solid #000", boxShadow: "4px 4px 0px #000", borderRadius: "8px" }}
+                />
+                <div style={{ position: "absolute", bottom: "1rem", right: "1rem", fontSize: "0.875rem", color: "var(--foreground-muted)", fontWeight: 500 }}>
+                  {inputText.length} chars
                 </div>
+              </div>
+              
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <button 
                   type="submit" 
                   className="btn-primary" 
-                  style={{ minWidth: "200px" }}
+                  style={{ minWidth: "200px", padding: "1.25rem 2rem", fontSize: "1.125rem", borderRadius: "8px", background: "#D2FF3A" }}
                   disabled={isGenerating || !inputText.trim()}
                 >
                   {isGenerating ? "Analyzing text..." : <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>EXPLORE <ArrowUpRight size={20} strokeWidth={3} /></span>}
@@ -234,13 +242,13 @@ export default function LandingPage() {
             </div>
 
             {/* Pro Plan */}
-            <div style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "#FFFFFF", position: "relative", border: "2px solid #D8B4FE", borderRadius: "8px", boxShadow: "4px 4px 0px #000" }}>
+            <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "#FFFFFF", position: "relative" }}>
               <div style={{ position: "absolute", top: "-14px", left: "50%", transform: "translateX(-50%)" }}>
-                <span style={{ background: "#D8B4FE", color: "#FFF", padding: "0.25rem 1rem", border: "2px solid #000", borderRadius: "4px", fontWeight: 800, textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>Most Popular</span>
+                <span style={{ background: "#A855F7", color: "#FFF", padding: "0.375rem 1rem", border: "3px solid #000", borderRadius: "8px", fontWeight: 900, textTransform: "uppercase", fontSize: "0.875rem", letterSpacing: "0.05em", boxShadow: "4px 4px 0px #000" }}>Most Popular</span>
               </div>
               <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#A855F7", fontWeight: 800 }}>Pro Study</h3>
               <p style={{ fontSize: "2.5rem", fontWeight: 900, fontFamily: "var(--font-display)", color: "#000", marginBottom: "0.5rem", display: "flex", alignItems: "baseline", gap: "0.1rem" }}>$14.99<span style={{ fontSize: "1rem", color: "#000", fontWeight: 800 }}>/mo</span></p>
-              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "#4B5563", fontWeight: 500, lineHeight: 1.5 }}>For core students needing comprehensive writing support.</p>
+              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "#4B5563", fontWeight: 600, lineHeight: 1.5 }}>For core students needing comprehensive writing support.</p>
               
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
                 {[
@@ -249,20 +257,20 @@ export default function LandingPage() {
                   "Line-by-line AI Writing feedback",
                   "Unlimited Personal Dictionary"
                 ].map(feature => (
-                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 600, color: "#111827" }}>
+                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 700, color: "#111827" }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" strokeWidth="3" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
                     {feature}
                   </li>
                 ))}
               </ul>
-              <button style={{ width: "100%", justifyContent: "center", background: "#D8B4FE", color: "#000", border: "2px solid #000", padding: "1rem", fontWeight: 800, borderRadius: "4px", cursor: "pointer", textTransform: "uppercase" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>UPGRADE TO PRO</button>
+              <button className="btn-primary" style={{ width: "100%", justifyContent: "center", background: "#A855F7" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>UPGRADE TO PRO</button>
             </div>
 
             {/* Elite Plan */}
-            <div style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "#FFFFFF", position: "relative", border: "2px solid #FDE047", borderRadius: "8px", boxShadow: "4px 4px 0px #000" }}>
+            <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "#FFFFFF", position: "relative" }}>
               <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#EAB308", fontWeight: 800 }}>Elite Mastery</h3>
               <p style={{ fontSize: "2.5rem", fontWeight: 900, fontFamily: "var(--font-display)", color: "#000", marginBottom: "0.5rem", display: "flex", alignItems: "baseline", gap: "0.1rem" }}>$29.99<span style={{ fontSize: "1rem", color: "#000", fontWeight: 800 }}>/mo</span></p>
-              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "#4B5563", fontWeight: 500, lineHeight: 1.5 }}>For students urgently needing Band 7.0+ or 100+.</p>
+              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "#4B5563", fontWeight: 600, lineHeight: 1.5 }}>For students urgently needing Band 7.0+ or 100+.</p>
               
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
                 {[
@@ -272,12 +280,12 @@ export default function LandingPage() {
                   "Guaranteed Score Acceleration Path"
                 ].map(feature => (
                   <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 700, color: "#111827" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FDE047" strokeWidth="3" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EAB308" strokeWidth="3" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
                     {feature}
                   </li>
                 ))}
               </ul>
-              <button style={{ width: "100%", justifyContent: "center", background: "linear-gradient(to right, #F59E0B, #D97706)", color: "#000", border: "2px solid #000", padding: "1rem", fontWeight: 800, borderRadius: "4px", cursor: "pointer", textTransform: "uppercase" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>GET ELITE MASTERY</button>
+              <button className="btn-secondary" style={{ width: "100%", justifyContent: "center", background: "#FDE047" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>GET ELITE MASTERY</button>
             </div>
 
           </div>

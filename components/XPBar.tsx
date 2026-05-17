@@ -27,28 +27,29 @@ export default function XPBar() {
     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
       {/* Level Badge */}
       <div style={{
-        background: "#60A5FA",
+        background: "#A855F7",
         color: "#000",
-        border: "1px solid var(--border)",
-        borderRadius: "var(--radius-sm)",
-        padding: "0.15rem 0.4rem",
-        fontSize: "0.7rem",
-        fontWeight: 800,
-        boxShadow: "1px 1px 0px #000",
+        border: "3px solid #000",
+        borderRadius: "8px",
+        padding: "0.25rem 0.5rem",
+        fontSize: "0.875rem",
+        fontWeight: 900,
+        boxShadow: "3px 3px 0px #000",
       }}>
         Lvl {state.level}
       </div>
 
       {/* Progress Bar Container */}
-      <div style={{ display: "flex", flexDirection: "column", width: "80px" }}>
+      <div style={{ display: "flex", flexDirection: "column", width: "100px" }}>
         <div style={{
           width: "100%",
-          height: "8px",
-          background: "var(--surface)",
-          border: "1px solid var(--border)",
-          borderRadius: "9999px",
+          height: "12px",
+          background: "#FFF",
+          border: "3px solid #000",
+          borderRadius: "8px",
           position: "relative",
           overflow: "hidden",
+          boxShadow: "3px 3px 0px #000",
         }}>
           <div style={{
             position: "absolute",
@@ -56,33 +57,33 @@ export default function XPBar() {
             left: 0,
             height: "100%",
             width: `${Math.min(Math.max(progress, 0), 100)}%`,
-            background: "#FDE047",
-            borderRight: progress > 0 && progress < 100 ? "1px solid var(--border)" : "none",
+            background: "#D2FF3A",
+            borderRight: progress > 0 && progress < 100 ? "3px solid #000" : "none",
             transition: "width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
           }} />
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.125rem" }}>
-          <span style={{ fontSize: "0.6rem", fontWeight: 700 }}>XP</span>
-          <span style={{ fontSize: "0.6rem", fontWeight: 700 }}>{state.xp}/{state.nextLevelXP}</span>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.25rem" }}>
+          <span style={{ fontSize: "0.75rem", fontWeight: 800 }}>XP</span>
+          <span style={{ fontSize: "0.75rem", fontWeight: 800 }}>{state.xp}/{state.nextLevelXP}</span>
         </div>
       </div>
 
       {/* Streak Badge */}
       {state.streak > 0 && (
         <div style={{
-          background: "#FCA5A5",
+          background: "#FDE047",
           color: "#000",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius-sm)",
-          padding: "0.15rem 0.4rem",
-          fontSize: "0.7rem",
-          fontWeight: 800,
-          boxShadow: "1px 1px 0px #000",
+          border: "3px solid #000",
+          borderRadius: "8px",
+          padding: "0.25rem 0.5rem",
+          fontSize: "0.875rem",
+          fontWeight: 900,
+          boxShadow: "3px 3px 0px #000",
           display: "flex",
           alignItems: "center",
-          gap: "0.15rem",
+          gap: "0.25rem",
         }} title="Daily Streak">
-          <Flame size={12} strokeWidth={2.5} /> {state.streak}
+          <Flame size={16} strokeWidth={3} /> {state.streak}
         </div>
       )}
     </div>

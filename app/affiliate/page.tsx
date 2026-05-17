@@ -22,7 +22,7 @@ export default function AffiliatePage() {
         
         {/* Hero */}
         <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-          <div style={{ marginBottom: "1rem", display: "inline-flex", background: "#D1FAE5", color: "#065F46", border: "1px solid #000", fontWeight: 800, padding: "0.375rem 1rem", textTransform: "uppercase", letterSpacing: "0.05em", boxShadow: "2px 2px 0px #000", borderRadius: "4px", fontSize: "0.875rem" }}>Partner Program</div>
+          <div style={{ marginBottom: "1rem", display: "inline-flex", background: "#D2FF3A", color: "#000", border: "3px solid #000", fontWeight: 900, padding: "0.5rem 1rem", textTransform: "uppercase", letterSpacing: "0.05em", boxShadow: "4px 4px 0px #000", borderRadius: "8px", fontSize: "0.875rem" }}>Partner Program</div>
           <h1 style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", marginBottom: "1.5rem", fontWeight: 900, lineHeight: 1.1 }}>
             Earn <span style={{ color: "#C4B5FD" }}>30%</span> <span style={{ color: "#FDE047" }}>Recurring</span><br/>Commission.
           </h1>
@@ -32,21 +32,21 @@ export default function AffiliatePage() {
         </div>
 
         {/* Info Cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem", marginBottom: "4rem" }}>
-          <div style={{ padding: "3rem 2rem", textAlign: "center", background: "#F3F4F6", borderRadius: "16px" }}>
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}><Banknote size={48} color="#7C3AED" strokeWidth={1.5} /></div>
-            <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "#7C3AED", fontWeight: 800 }}>30% Recurring</h3>
-            <p style={{ fontSize: "0.9375rem", color: "#4B5563", margin: 0, lineHeight: 1.6, fontWeight: 500 }}>Earn 30% of the subscription fee every single month your referral stays active.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "2rem", marginBottom: "4rem" }}>
+          <div className="card" style={{ padding: "3rem 2rem", textAlign: "center", background: "#FFF" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}><Banknote size={56} color="#000" strokeWidth={2.5} style={{ background: "#A855F7", padding: "10px", borderRadius: "50%", boxShadow: "4px 4px 0px #000", border: "3px solid #000" }} /></div>
+            <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#000", fontWeight: 900 }}>30% Recurring</h3>
+            <p style={{ fontSize: "1rem", color: "#111827", margin: 0, lineHeight: 1.6, fontWeight: 600 }}>Earn 30% of the subscription fee every single month your referral stays active.</p>
           </div>
-          <div style={{ padding: "3rem 2rem", textAlign: "center", background: "#F3F4F6", borderRadius: "16px" }}>
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}><Cookie size={48} color="#D97706" strokeWidth={1.5} /></div>
-            <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "#7C3AED", fontWeight: 800 }}>60-Day Cookie</h3>
-            <p style={{ fontSize: "0.9375rem", color: "#4B5563", margin: 0, lineHeight: 1.6, fontWeight: 500 }}>If they click your link and subscribe within 60 days, you get the credit.</p>
+          <div className="card" style={{ padding: "3rem 2rem", textAlign: "center", background: "#FFF" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}><Cookie size={56} color="#000" strokeWidth={2.5} style={{ background: "#FDE047", padding: "10px", borderRadius: "50%", boxShadow: "4px 4px 0px #000", border: "3px solid #000" }} /></div>
+            <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#000", fontWeight: 900 }}>60-Day Cookie</h3>
+            <p style={{ fontSize: "1rem", color: "#111827", margin: 0, lineHeight: 1.6, fontWeight: 600 }}>If they click your link and subscribe within 60 days, you get the credit.</p>
           </div>
-          <div style={{ padding: "3rem 2rem", textAlign: "center", background: "#F3F4F6", borderRadius: "16px" }}>
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}><Rocket size={48} color="#DC2626" strokeWidth={1.5} /></div>
-            <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "#7C3AED", fontWeight: 800 }}>High Conversion</h3>
-            <p style={{ fontSize: "0.9375rem", color: "#4B5563", margin: 0, lineHeight: 1.6, fontWeight: 500 }}>Our free tools and targeted onboarding convert visitors into paid users effectively.</p>
+          <div className="card" style={{ padding: "3rem 2rem", textAlign: "center", background: "#FFF" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}><Rocket size={56} color="#000" strokeWidth={2.5} style={{ background: "#FCA5A5", padding: "10px", borderRadius: "50%", boxShadow: "4px 4px 0px #000", border: "3px solid #000" }} /></div>
+            <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#000", fontWeight: 900 }}>High Conversion</h3>
+            <p style={{ fontSize: "1rem", color: "#111827", margin: 0, lineHeight: 1.6, fontWeight: 600 }}>Our free tools and targeted onboarding convert visitors into paid users effectively.</p>
           </div>
         </div>
 
