@@ -42,22 +42,22 @@
   --accent-light: #FEF08A;
   --accent-glow: #FCEE0A;
 
-  /* Sharp edges */
-  --radius-sm: 0px;
-  --radius-md: 4px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
+  /* Modern Sharp edges */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 
   --font-sans: "Inter", system-ui, sans-serif;
   --font-display: "Outfit", "Inter", system-ui, sans-serif;
 
-  /* Heavy 100% Solid Neobrutalism shadows */
-  --shadow-sm: 3px 3px 0px 0px #000000;
-  --shadow-md: 6px 6px 0px 0px #000000;
-  --shadow-lg: 10px 10px 0px 0px #000000;
-  --shadow-glow: 6px 6px 0px 0px #000000;
+  /* Refined Solid Neobrutalism shadows */
+  --shadow-sm: 2px 2px 0px 0px #000000;
+  --shadow-md: 4px 4px 0px 0px #000000;
+  --shadow-lg: 6px 6px 0px 0px #000000;
+  --shadow-glow: 4px 4px 0px 0px #000000;
   
-  --border-width: 3px;
+  --border-width: 2px;
 }
 
 /* ==============================
@@ -240,6 +240,19 @@ a:hover { color: var(--primary); }
   -webkit-text-fill-color: transparent;
   background-clip: text;
   display: inline-block;
+}
+
+.highlight-box {
+  display: inline-block;
+  background: var(--accent);
+  padding: 0.1rem 0.75rem;
+  transform: rotate(-2deg);
+  border: var(--border-width) solid var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-sm);
+  margin: 0 0.5rem;
+  color: #000;
+  white-space: nowrap;
 }
 
 /* ==============================

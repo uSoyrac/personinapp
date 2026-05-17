@@ -35,42 +35,37 @@ export default function LandingPage() {
 
   return (
     <div>
-      {/* ==================== PANGRAM-STYLE HERO ==================== */}
+      {/* ==================== NEO-BRUTAL HERO ==================== */}
       <section
         style={{
-          padding: "6rem 1.5rem 6rem",
+          padding: "8rem 1.5rem 6rem",
           position: "relative",
           overflow: "hidden",
-          minHeight: "80vh",
+          minHeight: "85vh",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center"
+          justifyContent: "center",
+          background: "var(--bg)"
         }}
       >
-        {/* Soft Background Gradients */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: "-10%",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "100%",
-            maxWidth: "1000px",
-            height: "600px",
-            background: "radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 70%)",
-            pointerEvents: "none",
-            zIndex: -1,
-          }}
-        />
-
-        <div className="container-sm animate-fadeIn" style={{ position: "relative", maxWidth: "800px" }}>
-          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-            <h1 style={{ marginBottom: "1rem", color: "var(--foreground)", fontSize: "clamp(2.5rem, 5vw, 3.5rem)" }}>
-              Master <span className="gradient-text">IELTS & TOEFL</span> instantly.
+        <div className="container-sm animate-fadeIn" style={{ position: "relative", maxWidth: "960px", margin: "0 auto" }}>
+          
+          <div style={{ textAlign: "center", marginBottom: "4rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div className="badge" style={{ marginBottom: "2rem", transform: "rotate(-3deg) scale(1.1)", background: "var(--accent)", color: "#000" }}>
+              GET STARTED →
+            </div>
+            <h1 style={{ 
+              marginBottom: "1.5rem", 
+              color: "var(--foreground)", 
+              fontSize: "clamp(3.5rem, 8vw, 6rem)", 
+              lineHeight: 1.05,
+              letterSpacing: "-0.04em",
+              fontWeight: 900
+            }}>
+              Master <span className="highlight-box">IELTS & TOEFL</span> instantly.
             </h1>
-            <p style={{ fontSize: "1.25rem", maxWidth: "600px", margin: "0 auto", color: "var(--foreground-muted)" }}>
-              Paste any text or link below to generate a highly accurate, exam-style practice session tailored to your target score.
+            <p style={{ fontSize: "1.35rem", maxWidth: "600px", margin: "0 auto", color: "var(--foreground-muted)", fontWeight: 500, lineHeight: 1.5 }}>
+              We are a digital asset and language leader helping ambitious students target Band 7.0+ and 100+ scores effortlessly.
             </p>
           </div>
 
@@ -138,38 +133,31 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ==================== HOW IT WORKS ==================== */}
-      <section id="how-it-works" className="section" style={{ background: "var(--surface-2)" }}>
+      {/* ==================== HOW IT WORKS (CHORKE STYLE CARDS) ==================== */}
+      <section id="how-it-works" className="section" style={{ background: "var(--bg)", borderTop: "var(--border-width) solid var(--border)" }}>
         <div className="container">
-          <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-            <h2 style={{ color: "var(--foreground)", marginBottom: "1rem" }}>A proven method for rapid score increases</h2>
-            <p style={{ fontSize: "1.125rem", maxWidth: "600px", margin: "0 auto" }}>
-              We've stripped away the noise. Just bring your content, and let our AI create the perfect, high-yield study session.
-            </p>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "2rem",
-            }}
-          >
-            {HOW_IT_WORKS.map((step) => (
-              <div
-                key={step.step}
-                className="card"
-                style={{ position: "relative", overflow: "hidden", padding: "2rem" }}
-              >
-                <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", background: "var(--primary-glow)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem", fontWeight: "bold", marginBottom: "1.5rem" }}>
-                  {step.step}
-                </div>
-                <h3 style={{ margin: "0 0 0.75rem", color: "var(--foreground)", fontSize: "1.25rem" }}>
-                  {step.title}
-                </h3>
-                <p style={{ margin: 0, fontSize: "1rem", lineHeight: 1.6 }}>{step.desc}</p>
-              </div>
-            ))}
+          
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem" }}>
+            {/* Card 1: Yellow */}
+            <div className="card" style={{ background: "var(--gold)", border: "var(--border-width) solid var(--border)", padding: "2.5rem", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-md)" }}>
+              <div style={{ fontSize: "3rem", marginBottom: "1.5rem" }}>💡</div>
+              <h3 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "1rem", color: "#000" }}>Bring Your Content</h3>
+              <p style={{ fontSize: "1.0625rem", color: "#111", lineHeight: 1.6 }}>Paste any text—an article, transcript, or lecture notes. You choose what interests you. Institutional-grade study materials.</p>
+            </div>
+            
+            {/* Card 2: Mint */}
+            <div className="card" style={{ background: "var(--mint)", border: "var(--border-width) solid var(--border)", padding: "2.5rem", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-md)" }}>
+              <div style={{ fontSize: "3rem", marginBottom: "1.5rem" }}>🎯</div>
+              <h3 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "1rem", color: "#000" }}>Set Your Goal</h3>
+              <p style={{ fontSize: "1.0625rem", color: "#111", lineHeight: 1.6 }}>Select IELTS or TOEFL, your current level, and your dream score. Full lifecycle tracking and strategic advisory.</p>
+            </div>
+            
+            {/* Card 3: Lila */}
+            <div className="card" style={{ background: "var(--lavender)", border: "var(--border-width) solid var(--border)", padding: "2.5rem", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-md)" }}>
+              <div style={{ fontSize: "3rem", marginBottom: "1.5rem" }}>🚀</div>
+              <h3 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "1rem", color: "#000" }}>Accelerate Mastery</h3>
+              <p style={{ fontSize: "1.0625rem", color: "#111", lineHeight: 1.6 }}>Instantly receive a complete, exam-style practice session tailored to push you to the next band. Direct insights and feedback.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -187,21 +175,23 @@ export default function LandingPage() {
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem" }}>
             {[
-              { name: "Sarah L.", score: "IELTS Band 6.0 → 7.5", text: "I was stuck at 6.0 in Writing for months. The line-by-line grammar breakdown and vocabulary suggestions here finally pushed me to a 7.5. Absolutely game-changing." },
-              { name: "Ahmed K.", score: "TOEFL iBT 85 → 102", text: "The speaking agent is terrifyingly accurate. It caught my pronunciation errors that my human tutor missed. Got my target score in 3 weeks!" },
-              { name: "Elena V.", score: "IELTS Band 5.5 → 7.0", text: "I used the text analysis feature in the General English lab every day. Learning from articles I actually liked made studying effortless." },
+              { name: "Sarah L.", role: "IELTS Candidate", score: "IELTS Band 6.0 → 7.5", text: "I was stuck at 6.0 in Writing for months. The line-by-line grammar breakdown and vocabulary suggestions here finally pushed me to a 7.5. Absolutely game-changing.", bg: "var(--lavender)" },
+              { name: "Ahmed K.", role: "TOEFL Test Taker", score: "TOEFL iBT 85 → 102", text: "The speaking agent is terrifyingly accurate. It caught my pronunciation errors that my human tutor missed. Got my target score in 3 weeks!", bg: "var(--surface)" },
+              { name: "Elena V.", role: "English Learner", score: "General English", text: "I used the text analysis feature in the General English lab every day. Learning from articles I actually liked made studying effortless.", bg: "var(--surface)" },
             ].map((review, i) => (
-              <div key={i} className="card" style={{ padding: "2rem", background: "var(--surface)", position: "relative" }}>
-                <div style={{ position: "absolute", top: "2rem", right: "2rem", color: "var(--gold)", opacity: 0.2 }}>
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+              <div key={i} className="card" style={{ padding: "0", background: review.bg, position: "relative", display: "flex", flexDirection: "column" }}>
+                <div style={{ padding: "1.5rem", borderBottom: "var(--border-width) solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--surface)" }}>
+                  <div>
+                    <p style={{ margin: 0, fontWeight: 800, color: "var(--foreground)", fontSize: "1.125rem" }}>{review.name}</p>
+                    <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--foreground-muted)" }}>{review.role}</p>
+                  </div>
+                  <div style={{ display: "flex", gap: "0.25rem", color: "var(--gold)" }}>
+                    {"★★★★★".split("").map((star, idx) => <span key={idx}>{star}</span>)}
+                  </div>
                 </div>
-                <div style={{ display: "flex", gap: "0.25rem", color: "var(--gold)", marginBottom: "1rem" }}>
-                  {"★★★★★".split("").map((star, idx) => <span key={idx}>{star}</span>)}
-                </div>
-                <p style={{ fontSize: "1.0625rem", lineHeight: 1.6, color: "var(--foreground)", marginBottom: "1.5rem", fontStyle: "italic", position: "relative", zIndex: 1, paddingRight: "2rem" }}>"{review.text}"</p>
-                <div>
-                  <p style={{ margin: 0, fontWeight: 700, color: "var(--foreground)" }}>{review.name}</p>
-                  <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--mint-dark)", fontWeight: 600 }}>{review.score}</p>
+                <div style={{ padding: "2rem" }}>
+                  <p style={{ fontSize: "1rem", lineHeight: 1.6, color: "var(--foreground)", marginBottom: "1.5rem" }}>{review.text}</p>
+                  <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--foreground)", fontWeight: 800, background: "var(--surface-2)", padding: "0.5rem 1rem", borderRadius: "var(--radius-sm)", display: "inline-block", border: "1px solid var(--border)" }}>{review.score}</p>
                 </div>
               </div>
             ))}
