@@ -236,11 +236,11 @@ export default function LandingPage() {
             </div>
 
             {/* Pro Plan */}
-            <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", border: "2px solid var(--primary-light)", position: "relative" }}>
-              <div style={{ position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)" }}>
-                <span className="badge" style={{ background: "var(--primary)", color: "#fff", padding: "0.25rem 1rem", border: "none", fontWeight: 700 }}>Most Popular</span>
+            <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "var(--surface)", position: "relative" }}>
+              <div style={{ position: "absolute", top: "-16px", left: "50%", transform: "translateX(-50%) rotate(-2deg)" }}>
+                <span className="badge" style={{ background: "var(--lavender)", color: "#000", padding: "0.375rem 1rem", border: "var(--border-width) solid var(--border)", boxShadow: "var(--shadow-sm)", fontWeight: 900, textTransform: "uppercase" }}>Most Popular</span>
               </div>
-              <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "var(--primary)" }}>Pro Study</h3>
+              <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#000", fontWeight: 900 }}>Pro Study</h3>
               <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$15<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
               <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "var(--foreground-muted)" }}>For core students needing comprehensive writing support.</p>
               
@@ -251,20 +251,20 @@ export default function LandingPage() {
                   "Line-by-line AI Writing feedback",
                   "Unlimited Personal Dictionary"
                 ].map(feature => (
-                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 500 }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
+                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 600, color: "#000" }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="3" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
                     {feature}
                   </li>
                 ))}
               </ul>
-              <button className="btn-primary" style={{ width: "100%", justifyContent: "center" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>Upgrade to Pro</button>
+              <button className="btn-primary" style={{ width: "100%", justifyContent: "center" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>UPGRADE TO PRO</button>
             </div>
 
             {/* Elite Plan */}
-            <div className="card-elevated" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)", borderColor: "var(--gold)" }}>
-              <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "var(--gold)" }}>Elite Mastery</h3>
-              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$29<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
-              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "var(--foreground-muted)" }}>For students urgently needing Band 7.0+ or 100+.</p>
+            <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "var(--gold)" }}>
+              <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#000", fontWeight: 900 }}>Elite Mastery</h3>
+              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "#000", marginBottom: "0.5rem" }}>$29<span style={{ fontSize: "1rem", color: "#333", fontWeight: 500 }}>/mo</span></p>
+              <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "#222" }}>For students urgently needing Band 7.0+ or 100+.</p>
               
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
                 {[
@@ -273,13 +273,13 @@ export default function LandingPage() {
                   "Unlimited Mock Tests",
                   "Guaranteed Score Acceleration Path"
                 ].map(feature => (
-                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 600 }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
+                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", fontSize: "0.9375rem", fontWeight: 700, color: "#000" }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="3" style={{ flexShrink: 0, marginTop: "2px" }}><polyline points="20 6 9 17 4 12"/></svg>
                     {feature}
                   </li>
                 ))}
               </ul>
-              <button className="btn-primary" style={{ width: "100%", justifyContent: "center", background: "linear-gradient(135deg, #F59E0B, #D97706)", boxShadow: "0 4px 14px 0 rgba(245, 158, 11, 0.39)" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>Get Elite Mastery</button>
+              <button className="btn-secondary" style={{ width: "100%", justifyContent: "center" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>GET ELITE MASTERY</button>
             </div>
 
           </div>
