@@ -96,24 +96,17 @@ export default function LandingPage() {
               ))}
             </div>
 
-            <form onSubmit={handleGenerate}>
-              <textarea 
-                className="input-base focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all duration-200" 
-                placeholder={
-                  mode === "ielts" ? "e.g., Paste an article, essay, or transcript here to generate IELTS Reading, Vocabulary, and Writing practice..." :
-                  mode === "toefl" ? "e.g., Paste a lecture transcript or reading passage here to generate TOEFL iBT style questions..." :
-                  "e.g., Paste any English text here to open the Personal Language Lab..."
-                }
-                rows={8}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
             <form onSubmit={handleGenerate} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div style={{ position: "relative" }}>
                 <textarea 
                   className="input-base"
                   value={inputText}
                   onChange={e => setInputText(e.target.value)}
-                  placeholder="Paste your article, essay, or lecture notes here..."
+                  placeholder={
+                    mode === "ielts" ? "e.g., Paste an article, essay, or transcript here to generate IELTS Reading, Vocabulary, and Writing practice..." :
+                    mode === "toefl" ? "e.g., Paste a lecture transcript or reading passage here to generate TOEFL iBT style questions..." :
+                    "e.g., Paste any English text here to open the Personal Language Lab..."
+                  }
                   style={{ minHeight: "150px", resize: "vertical", fontSize: "1.125rem", padding: "1.25rem", border: "3px solid #000", boxShadow: "4px 4px 0px #000", borderRadius: "8px" }}
                 />
                 <div style={{ position: "absolute", bottom: "1rem", right: "1rem", fontSize: "0.875rem", color: "var(--foreground-muted)", fontWeight: 500 }}>
