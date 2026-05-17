@@ -50,10 +50,7 @@ export default function LandingPage() {
       >
         <div className="container-sm animate-fadeIn" style={{ position: "relative", maxWidth: "960px", margin: "0 auto" }}>
           
-          <div style={{ textAlign: "center", marginBottom: "4rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <div className="badge" style={{ marginBottom: "2rem", transform: "rotate(-3deg) scale(1.1)", background: "var(--accent)", color: "#000" }}>
-              GET STARTED →
-            </div>
+          <div style={{ textAlign: "left", marginBottom: "4rem", display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
             <h1 style={{ 
               marginBottom: "1.5rem", 
               color: "var(--foreground)", 
@@ -64,7 +61,7 @@ export default function LandingPage() {
             }}>
               Master <span className="highlight-box">IELTS & TOEFL</span> instantly.
             </h1>
-            <p style={{ fontSize: "1.35rem", maxWidth: "600px", margin: "0 auto", color: "var(--foreground-muted)", fontWeight: 500, lineHeight: 1.5 }}>
+            <p style={{ fontSize: "1.35rem", maxWidth: "600px", color: "var(--foreground)", fontWeight: 500, lineHeight: 1.5 }}>
               We are a digital asset and language leader helping ambitious students target Band 7.0+ and 100+ scores effortlessly.
             </p>
           </div>
@@ -122,7 +119,7 @@ export default function LandingPage() {
                   style={{ minWidth: "200px" }}
                   disabled={isGenerating || !inputText.trim()}
                 >
-                  {isGenerating ? "Analyzing text..." : "GENERATE PRACTICE →"}
+                  {isGenerating ? "Analyzing text..." : <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>EXPLORE <ArrowUpRight size={20} strokeWidth={3} /></span>}
                 </button>
               </div>
             </form>
@@ -290,7 +287,7 @@ export default function LandingPage() {
       <section className="section" style={{ padding: "6rem 0" }}>
         <div className="container-sm">
           <div className="card-elevated" style={{ padding: "4rem 2rem", background: "linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)", textAlign: "center", border: "1px solid var(--border)" }}>
-            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🎁</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}><Gift size={48} color="var(--primary)" strokeWidth={1.5} /></div>
             <h2 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Free IELTS/TOEFL Vocabulary Guide</h2>
             <p style={{ fontSize: "1.125rem", color: "var(--foreground-muted)", marginBottom: "2.5rem", maxWidth: "500px", margin: "0 auto 2.5rem", lineHeight: 1.6 }}>
               Join 15,000+ students. Enter your email to instantly download our PDF with the 500 most frequent Academic words.

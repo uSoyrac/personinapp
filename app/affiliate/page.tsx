@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Banknote, Cookie, Rocket, PartyPopper } from "lucide-react";
 
 export default function AffiliatePage() {
   const [formData, setFormData] = useState({ name: "", email: "", url: "", audienceSize: "" });
@@ -33,17 +34,17 @@ export default function AffiliatePage() {
         {/* Info Cards */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem", marginBottom: "4rem" }}>
           <div style={{ padding: "3rem 2rem", textAlign: "center", background: "#F3F4F6", borderRadius: "16px" }}>
-            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>💸</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}><Banknote size={48} color="#A78BFA" strokeWidth={1.5} /></div>
             <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "#A78BFA", fontWeight: 800 }}>30% Recurring</h3>
             <p style={{ fontSize: "0.9375rem", color: "#4B5563", margin: 0, lineHeight: 1.6, fontWeight: 500 }}>Earn 30% of the subscription fee every single month your referral stays active.</p>
           </div>
           <div style={{ padding: "3rem 2rem", textAlign: "center", background: "#F3F4F6", borderRadius: "16px" }}>
-            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🍪</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}><Cookie size={48} color="#FDE047" strokeWidth={1.5} /></div>
             <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "#A78BFA", fontWeight: 800 }}>60-Day Cookie</h3>
             <p style={{ fontSize: "0.9375rem", color: "#4B5563", margin: 0, lineHeight: 1.6, fontWeight: 500 }}>If they click your link and subscribe within 60 days, you get the credit.</p>
           </div>
           <div style={{ padding: "3rem 2rem", textAlign: "center", background: "#F3F4F6", borderRadius: "16px" }}>
-            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🚀</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}><Rocket size={48} color="#FCA5A5" strokeWidth={1.5} /></div>
             <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem", color: "#A78BFA", fontWeight: 800 }}>High Conversion</h3>
             <p style={{ fontSize: "0.9375rem", color: "#4B5563", margin: 0, lineHeight: 1.6, fontWeight: 500 }}>Our free tools and targeted onboarding convert visitors into paid users effectively.</p>
           </div>
@@ -58,7 +59,7 @@ export default function AffiliatePage() {
 
           {submitted ? (
             <div className="animate-scaleIn" style={{ padding: "3rem 2rem", textAlign: "center", background: "rgba(16, 185, 129, 0.05)", borderRadius: "var(--radius-md)", border: "1px solid rgba(16, 185, 129, 0.2)" }}>
-              <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>🎉</div>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}><PartyPopper size={48} color="var(--mint-dark)" strokeWidth={1.5} /></div>
               <h3 style={{ fontSize: "1.5rem", color: "var(--mint-dark)", marginBottom: "1rem" }}>Application Received!</h3>
               <p style={{ fontSize: "1.0625rem", color: "var(--foreground)", maxWidth: "400px", margin: "0 auto" }}>
                 Thanks for your interest, {formData.name}. Our team will review your channel and email you your unique affiliate link within 24 hours.

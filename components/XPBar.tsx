@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Flame } from "lucide-react";
 import { getGameState } from "@/lib/gamification";
 
 export default function XPBar() {
@@ -81,7 +82,7 @@ export default function XPBar() {
           alignItems: "center",
           gap: "0.15rem",
         }} title="Daily Streak">
-          🔥 {state.streak}
+          <Flame size={12} strokeWidth={2.5} /> {state.streak}
         </div>
       )}
     </div>

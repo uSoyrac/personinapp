@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { BookOpen, Users, Settings, LogOut, Zap } from "lucide-react";
 import XPBar from "@/components/XPBar";
 import { showToast } from "@/components/Toast";
 import type { UserTier } from "@/types";
@@ -136,35 +137,35 @@ export default function Nav() {
                   {tier !== "gold" && (
                     <button 
                       onClick={() => { localStorage.setItem("practiceforge_tier", "gold"); window.location.reload(); }}
-                      style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "var(--primary-glow)", color: "var(--primary)", border: "none", fontSize: "0.875rem", fontWeight: 600, cursor: "pointer", marginBottom: "0.5rem" }}
+                      style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "var(--primary-glow)", color: "var(--primary)", border: "none", fontSize: "0.875rem", fontWeight: 600, cursor: "pointer", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.375rem" }}
                     >
-                      🚀 Upgrade to Gold
+                      <Zap size={16} /> Upgrade to Gold
                     </button>
                   )}
 
-                  <Link href="/question-bank" style={{ width: "100%", display: "block", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--foreground)", fontSize: "0.875rem", cursor: "pointer", marginBottom: "0.5rem" }}>
-                    📚 Question Bank
+                  <Link href="/question-bank" style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.375rem", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--foreground)", fontSize: "0.875rem", cursor: "pointer", marginBottom: "0.5rem" }}>
+                    <BookOpen size={16} /> Question Bank
                   </Link>
-                  <Link href="/community" style={{ width: "100%", display: "block", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--foreground)", fontSize: "0.875rem", cursor: "pointer", marginBottom: "0.5rem" }}>
-                    👥 Community
+                  <Link href="/community" style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.375rem", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--foreground)", fontSize: "0.875rem", cursor: "pointer", marginBottom: "0.5rem" }}>
+                    <Users size={16} /> Community
                   </Link>
                   
                   <button 
                     onClick={() => showToast("Subscription management coming soon. Contact support@practiceforge.com", "info")}
-                    style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--foreground)", border: "none", fontSize: "0.875rem", cursor: "pointer", marginBottom: "0.5rem" }}
+                    style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--foreground)", border: "none", fontSize: "0.875rem", cursor: "pointer", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.375rem" }}
                     onMouseEnter={e => (e.target as HTMLElement).style.background = "var(--surface-2)"}
                     onMouseLeave={e => (e.target as HTMLElement).style.background = "transparent"}
                   >
-                    ⚙️ Manage Subscription
+                    <Settings size={16} /> Manage Subscription
                   </button>
                   
                   <button 
                     onClick={() => { localStorage.setItem("practiceforge_tier", "guest"); window.location.reload(); }}
-                    style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--rose)", border: "none", fontSize: "0.875rem", cursor: "pointer" }}
+                    style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--rose)", border: "none", fontSize: "0.875rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.375rem" }}
                     onMouseEnter={e => (e.target as HTMLElement).style.background = "var(--surface-2)"}
                     onMouseLeave={e => (e.target as HTMLElement).style.background = "transparent"}
                   >
-                    🚪 Log Out
+                    <LogOut size={16} /> Log Out
                   </button>
                 </div>
               )}
