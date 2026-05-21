@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/set-state-in-effect, react/no-unescaped-entities */
 
 import { useState, useEffect, useRef } from "react";
 import { saveWords } from "@/lib/wordList";
@@ -153,7 +154,7 @@ export default function GeneralEnglishPage() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr lg:1.5fr", gap: "2rem", alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: "2rem", alignItems: "start" }}>
           
           {/* Controls / Input Panel */}
           <div className="card" style={{ padding: "2rem" }}>

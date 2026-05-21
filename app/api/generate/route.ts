@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!input.examType || !["IELTS_ACADEMIC", "TOEFL_IBT"].includes(input.examType)) {
+    if (!input.examType || !["IELTS_ACADEMIC", "TOEFL_IBT", "GENERAL_ENGLISH"].includes(input.examType)) {
       return NextResponse.json({ error: "Invalid exam type." }, { status: 400 });
     }
 

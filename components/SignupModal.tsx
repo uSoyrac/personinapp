@@ -51,6 +51,7 @@ export default function SignupModal() {
         }}
       >
         <button 
+          id="close-signup-modal"
           onClick={() => setIsOpen(false)}
           style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", cursor: "pointer", color: "var(--foreground-muted)", fontSize: "1.5rem" }}
         >

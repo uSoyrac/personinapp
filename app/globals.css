@@ -31,6 +31,17 @@
   --sky: var(--premium-blue);
   --rose: var(--premium-rose);
   --gold: var(--premium-yellow);
+
+  /* Brutalist palette aliases */
+  --brutal-yellow: #FDE047;
+  --brutal-green: #D2FF3A;
+  --brutal-red: #FF6B6B;
+  --brutal-purple: #A855F7;
+  --brutal-blue: #60A5FA;
+
+  /* Dark shade aliases */
+  --mint-dark: #065F46;
+  --rose-dark: #9D174D;
   
   /* System mappings */
   --background: var(--bg);
@@ -212,6 +223,7 @@ a:hover { color: var(--primary); }
 .badge-amber   { background: rgba(245, 158, 11, 0.1); color: #92400E; border-color: rgba(245, 158, 11, 0.2); }
 .badge-rose    { background: rgba(236, 72, 153, 0.1); color: #9D174D; border-color: rgba(236, 72, 153, 0.2); }
 .badge-coral   { background: rgba(239, 68, 68, 0.1); color: #991B1B; border-color: rgba(239, 68, 68, 0.2); }
+.badge-gray    { background: rgba(107, 114, 128, 0.1); color: #374151; border-color: rgba(107, 114, 128, 0.2); }
 
 .input-base {
   background: var(--surface);
@@ -277,11 +289,14 @@ a:hover { color: var(--primary); }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @keyframes correctPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
 @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+@keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 .animate-fadeIn { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-fadeInFast { animation: fadeInFast 0.2s ease both; }
 .animate-float { animation: float 4s ease-in-out infinite; }
 .animate-scaleIn { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-spin-slow { animation: spinSlow 2s linear infinite; }
 .animate-correctPulse { animation: correctPulse 0.3s ease; }
 
 /* ==============================
@@ -471,6 +486,27 @@ img { max-width: 100%; height: auto; }
 
 @media (min-width: 769px) {
   .hide-desktop { display: none !important; }
+}
+
+/* ==============================
+   Skeleton Loading
+   ============================== */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 25%, rgba(0,0,0,0.04) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* ==============================
+   Disabled State
+   ============================== */
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
 /* ==============================
