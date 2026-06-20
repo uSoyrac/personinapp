@@ -96,53 +96,124 @@ export default function QuestionBankPage() {
                 const isCorrect = selected === q.correctIndex;
 
                 return (
-                  <div key={q.id} className={`question-card ${isAnswered ? (isCorrect ? "animate-correctPulse" : "animate-wrongShake") : ""}`} style={{ position: "relative" }}>
-                    <button 
-                      onClick={() => handleDelete(q.id)}
-                      style={{ position: "absolute", top: "-0.5rem", right: "-0.5rem", background: "var(--rose)", border: "2px solid #000", padding: "0.25rem 0.5rem", fontSize: "0.75rem", fontWeight: 800, cursor: "pointer", zIndex: 10, borderRadius: "50%", width: "30px", height: "30px" }}
-                      title="Delete Question"
-                    >
-                      X
-                    </button>
-                    
-                    <div style={{ padding: "1.5rem", borderBottom: "1px solid var(--border)", display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
-                      <p style={{ margin: 0, color: "var(--foreground)", fontSize: "1.0625rem", lineHeight: 1.5, fontWeight: 700 }}>
-                        <span style={{ color: "var(--primary)", marginRight: "0.5rem" }}>{i + 1}.</span>
+                  <div
+                    key={q.id}
+                    className={`card ${isAnswered && isCorrect ? "animate-scaleIn" : ""}`}
+                    style={{ position: "relative", padding: 0, overflow: "hidden" }}
+                  >
+                    {/* Header bar: status + delete */}
+                    <div style={{ padding: "1rem 1.25rem", background: "var(--surface-2)", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.75rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", minWidth: 0 }}>
+                        <span style={{
+                          width: "2rem", height: "2rem", flexShrink: 0,
+                          background: isAnswered ? (isCorrect ? "var(--mint)" : "var(--rose)") : "var(--surface)",
+                          color: isAnswered ? "#fff" : "var(--primary)",
+                          border: isAnswered ? "none" : "1px solid var(--primary-light)",
+                          borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: "0.875rem", fontWeight: 700, transition: "all 0.3s ease",
+                        }}>
+                          {isAnswered ? (isCorrect ? "✓" : "✗") : i + 1}
+                        </span>
+                        <span style={{ fontSize: "0.8125rem", color: "var(--foreground-muted)", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>
+                          Question {i + 1}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleDelete(q.id)}
+                        className="btn-secondary"
+                        title="Delete Question"
+                        style={{ padding: "0.375rem 0.875rem", fontSize: "0.75rem", borderRadius: "9999px", color: "var(--rose)", borderColor: "rgba(244, 63, 94, 0.35)", flexShrink: 0 }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+
+                    {/* Question text */}
+                    <div style={{ padding: "1.5rem 1.5rem 0.5rem" }}>
+                      <p style={{ margin: 0, color: "var(--foreground)", fontSize: "1.0625rem", lineHeight: 1.6, fontWeight: 600 }}>
                         {q.question}
                       </p>
                     </div>
 
-                    <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    {/* Options */}
+                    <div style={{ padding: "1rem 1.5rem 1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                       {q.options.map((option, idx) => {
-                        let cls = "option-btn";
+                        let bg = "var(--surface)";
+                        let borderColor = "var(--border)";
+                        let badgeBg = "var(--surface-2)";
+                        let badgeColor = "var(--foreground-muted)";
+
                         if (isAnswered) {
-                          if (idx === q.correctIndex) cls += " correct";
-                          else if (idx === selected && !isCorrect) cls += " incorrect";
+                          if (idx === q.correctIndex) {
+                            bg = "rgba(16, 185, 129, 0.1)";
+                            borderColor = "var(--mint)";
+                            badgeBg = "var(--mint)";
+                            badgeColor = "#fff";
+                          } else if (idx === selected) {
+                            bg = "rgba(244, 63, 94, 0.1)";
+                            borderColor = "var(--rose)";
+                            badgeBg = "var(--rose)";
+                            badgeColor = "#fff";
+                          }
                         }
+
+                        const dimmed = isAnswered && idx !== q.correctIndex && idx !== selected;
 
                         return (
                           <button
                             key={idx}
-                            className={cls}
                             onClick={() => selectAnswer(q.id, idx, q.correctIndex)}
                             disabled={isAnswered}
+                            style={{
+                              display: "flex", alignItems: "center", gap: "0.875rem",
+                              width: "100%", textAlign: "left",
+                              padding: "0.875rem 1.125rem",
+                              background: bg, border: `2px solid ${borderColor}`,
+                              borderRadius: "var(--radius-md)", color: "var(--foreground)",
+                              fontSize: "1rem", fontWeight: 500,
+                              cursor: isAnswered ? "default" : "pointer",
+                              transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+                              opacity: dimmed ? 0.55 : 1,
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isAnswered) {
+                                e.currentTarget.style.borderColor = "var(--primary)";
+                                e.currentTarget.style.transform = "translate(-2px, -2px)";
+                                e.currentTarget.style.boxShadow = "var(--shadow-md)";
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isAnswered) {
+                                e.currentTarget.style.borderColor = borderColor;
+                                e.currentTarget.style.transform = "translate(0, 0)";
+                                e.currentTarget.style.boxShadow = "none";
+                              }
+                            }}
                           >
-                            {option}
+                            <span style={{
+                              minWidth: "2rem", height: "2rem", flexShrink: 0,
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              borderRadius: "50%", background: badgeBg, color: badgeColor,
+                              fontSize: "0.8125rem", fontWeight: 700, transition: "all 0.2s ease",
+                            }}>
+                              {isAnswered && idx === q.correctIndex ? "✓" : (isAnswered && idx === selected ? "✗" : String.fromCharCode(65 + idx))}
+                            </span>
+                            <span style={{ flex: 1, minWidth: 0 }}>{option}</span>
                           </button>
                         );
                       })}
 
+                      {/* Explanation */}
                       {isAnswered && (
                         <div className="animate-fadeInFast" style={{
-                          background: isCorrect ? "var(--mint)" : "var(--rose)",
-                          border: `3px solid #000`,
-                          boxShadow: "4px 4px 0px #000",
-                          borderRadius: "0", padding: "1rem", marginTop: "1rem",
+                          background: isCorrect ? "rgba(16, 185, 129, 0.08)" : "rgba(244, 63, 94, 0.08)",
+                          border: `2px solid ${isCorrect ? "var(--mint)" : "var(--rose)"}`,
+                          borderRadius: "var(--radius-md)", padding: "1rem 1.125rem", marginTop: "0.25rem",
                         }}>
-                          <p style={{ margin: "0 0 0.25rem", fontSize: "0.875rem", fontWeight: 800, color: "#000", textTransform: "uppercase" }}>
-                            {isCorrect ? " Correct! +10 XP" : " Incorrect +2 XP"}
+                          <p style={{ margin: "0 0 0.375rem", fontSize: "0.8125rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", color: isCorrect ? "var(--mint-dark)" : "var(--rose)" }}>
+                            {isCorrect ? "✓ Correct · +10 XP" : "✗ Incorrect · +2 XP"}
                           </p>
-                          <p style={{ margin: 0, fontSize: "0.9375rem", lineHeight: 1.6, color: "#000", fontWeight: 600 }}>
+                          <p style={{ margin: 0, fontSize: "0.9375rem", lineHeight: 1.6, color: "var(--foreground)" }}>
                             {q.explanation}
                           </p>
                         </div>
