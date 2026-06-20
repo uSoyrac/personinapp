@@ -5,9 +5,10 @@ import Footer from "@/components/Footer";
 import SignupModal from "@/components/SignupModal";
 import ToastContainer from "@/components/Toast";
 import { AppProvider } from "@/lib/AppContext";
+import { SITE_URL } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://practiceforge.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "PracticeForge — AI-Powered IELTS & TOEFL Practice",
     template: "%s | PracticeForge"
@@ -50,24 +51,17 @@ export const metadata: Metadata = {
   openGraph: {
     title: "PracticeForge — AI-Powered IELTS & TOEFL Practice",
     description: "Personalised exam practice in seconds. Unlock dynamic Reading, Vocabulary, and AI Speaking tests.",
-    url: "https://practiceforge.com",
+    url: SITE_URL,
     siteName: "PracticeForge",
-    images: [
-      {
-        url: "https://practiceforge.com/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "PracticeForge Dashboard",
-      },
-    ],
     locale: "en_US",
     type: "website",
+    // og:image is provided automatically by app/opengraph-image.tsx
   },
   twitter: {
     card: "summary_large_image",
     title: "PracticeForge — AI-Powered IELTS & TOEFL Practice",
     description: "Personalised exam practice in seconds. Unlock dynamic Reading, Vocabulary, and AI Speaking tests.",
-    images: ["https://practiceforge.com/og-image.jpg"],
+    // twitter:image falls back to the generated og:image
   },
 };
 
