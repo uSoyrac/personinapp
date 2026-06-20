@@ -2,12 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { showToast } from "@/components/Toast";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { createClient } from "@/lib/supabase/client";
+import { bridgeTierAfterLogin } from "@/lib/authClient";
+
+type Mode = "signup" | "login";
 
 export default function SignupModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mode, setMode] = useState<Mode>("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [inviteCode, setInviteCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleOpen = () => setIsOpen(true);
@@ -17,24 +25,77 @@ export default function SignupModal() {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const configured = isSupabaseConfigured();
+  const isSignup = mode === "signup";
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
-    
-    // Simulate API registration, store code if provided
-    if (inviteCode) {
-      localStorage.setItem("practiceforge_invite_code", inviteCode);
+    setError(null);
+
+    // Demo fallback: no backend configured yet — keep the original mock flow.
+    if (!configured) {
+      if (inviteCode) localStorage.setItem("practiceforge_invite_code", inviteCode);
+      localStorage.setItem("practiceforge_tier", "free");
+      window.location.reload();
+      return;
     }
-    localStorage.setItem("practiceforge_tier", "free");
-    window.location.reload();
+
+    setLoading(true);
+    const supabase = createClient();
+    try {
+      if (isSignup) {
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            data: inviteCode ? { invite_code: inviteCode } : undefined,
+          },
+        });
+        if (signUpError) throw signUpError;
+
+        if (data.session) {
+          // Email confirmation disabled → user is signed in immediately.
+          bridgeTierAfterLogin();
+          showToast("Welcome to PracticeForge!", "success");
+          window.location.reload();
+        } else {
+          // Email confirmation required.
+          showToast("Check your email to confirm your account.", "info");
+          setIsOpen(false);
+        }
+      } else {
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInError) throw signInError;
+        bridgeTierAfterLogin();
+        showToast("Welcome back!", "success");
+        window.location.reload();
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Authentication failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    showToast(`Log in with ${provider} is coming soon. Please use email.`, "info");
+  const handleSocialLogin = async (provider: "Google" | "Apple" | "Facebook") => {
+    // Only Google is wired for now; the rest stay "coming soon".
+    if (!configured || provider !== "Google") {
+      showToast(`Log in with ${provider} is coming soon. Please use email.`, "info");
+      return;
+    }
+    setError(null);
+    const supabase = createClient();
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+    if (oauthError) setError(oauthError.message);
   };
 
   return (
-    <div 
+    <div
       className="animate-fadeInFast"
       style={{
         position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
@@ -43,14 +104,14 @@ export default function SignupModal() {
         zIndex: 999, padding: "1rem"
       }}
     >
-      <div 
+      <div
         className="card-elevated"
         style={{
           background: "var(--surface)", width: "100%", maxWidth: "400px", padding: "2.5rem",
           position: "relative"
         }}
       >
-        <button 
+        <button
           id="close-signup-modal"
           onClick={() => setIsOpen(false)}
           style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", cursor: "pointer", color: "var(--foreground-muted)", fontSize: "1.5rem" }}
@@ -59,8 +120,12 @@ export default function SignupModal() {
         </button>
 
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <h2 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>Create Free Account</h2>
-          <p style={{ color: "var(--foreground-muted)", fontSize: "0.9375rem" }}>Unlock daily practice and your personal dictionary.</p>
+          <h2 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>
+            {isSignup ? "Create Free Account" : "Welcome back"}
+          </h2>
+          <p style={{ color: "var(--foreground-muted)", fontSize: "0.9375rem" }}>
+            {isSignup ? "Unlock daily practice and your personal dictionary." : "Log in to continue your progress."}
+          </p>
         </div>
 
         {/* Social Logins */}
@@ -85,55 +150,75 @@ export default function SignupModal() {
           <div style={{ flex: 1, height: "1px", background: "var(--border)" }} />
         </div>
 
+        {error && (
+          <div style={{ marginBottom: "1rem", padding: "0.75rem 1rem", borderRadius: "var(--radius-sm)", background: "rgba(244,63,94,0.08)", border: "1px solid var(--rose)", color: "var(--rose)", fontSize: "0.875rem", fontWeight: 600 }}>
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div>
             <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.875rem", fontWeight: 600 }}>Email Address</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com" 
-              style={{ width: "100%", padding: "0.75rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", background: "var(--surface-2)", color: "var(--foreground)" }} 
+              placeholder="you@example.com"
+              style={{ width: "100%", padding: "0.75rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", background: "var(--surface-2)", color: "var(--foreground)" }}
             />
           </div>
           <div>
             <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.875rem", fontWeight: 600 }}>Password</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               required
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••" 
-              style={{ width: "100%", padding: "0.75rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", background: "var(--surface-2)", color: "var(--foreground)" }} 
-            />
-          </div>
-          <div style={{ marginTop: "0.5rem", padding: "1.25rem", borderRadius: "var(--radius-md)", background: "var(--surface-2)", border: "1px solid var(--border)", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: 0, left: 0, width: "4px", height: "100%", background: "var(--primary)" }} />
-            <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem", fontSize: "0.875rem", fontWeight: 700, color: "var(--foreground)" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                Referral / Affiliate Code
-              </span>
-              {inviteCode.length >= 3 && (
-                <span className="animate-fadeIn" style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: "var(--mint)", fontSize: "0.75rem", fontWeight: 800 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Valid
-                </span>
-              )}
-            </label>
-            <input 
-              type="text" 
-              value={inviteCode}
-              onChange={e => setInviteCode(e.target.value)}
-              placeholder="e.g. PARTNER20" 
-              style={{ width: "100%", padding: "0.875rem", borderRadius: "var(--radius-sm)", border: `2px dashed ${inviteCode.length >= 3 ? "var(--mint)" : "var(--primary-light)"}`, background: "var(--surface)", color: inviteCode.length >= 3 ? "var(--mint-dark)" : "var(--primary)", fontWeight: 700, textAlign: "center", letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "1rem", transition: "all 0.3s" }} 
+              placeholder="••••••••"
+              style={{ width: "100%", padding: "0.75rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", background: "var(--surface-2)", color: "var(--foreground)" }}
             />
           </div>
 
-          <button type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: "1rem", padding: "0.875rem" }}>
-            Sign up
+          {isSignup && (
+            <div style={{ marginTop: "0.5rem", padding: "1.25rem", borderRadius: "var(--radius-md)", background: "var(--surface-2)", border: "1px solid var(--border)", position: "relative", overflow: "hidden" }}>
+              <div style={{ position: "absolute", top: 0, left: 0, width: "4px", height: "100%", background: "var(--primary)" }} />
+              <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem", fontSize: "0.875rem", fontWeight: 700, color: "var(--foreground)" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                  Referral / Affiliate Code
+                </span>
+                {inviteCode.length >= 3 && (
+                  <span className="animate-fadeIn" style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: "var(--mint)", fontSize: "0.75rem", fontWeight: 800 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Valid
+                  </span>
+                )}
+              </label>
+              <input
+                type="text"
+                value={inviteCode}
+                onChange={e => setInviteCode(e.target.value)}
+                placeholder="e.g. PARTNER20"
+                style={{ width: "100%", padding: "0.875rem", borderRadius: "var(--radius-sm)", border: `2px dashed ${inviteCode.length >= 3 ? "var(--mint)" : "var(--primary-light)"}`, background: "var(--surface)", color: inviteCode.length >= 3 ? "var(--mint-dark)" : "var(--primary)", fontWeight: 700, textAlign: "center", letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "1rem", transition: "all 0.3s" }}
+              />
+            </div>
+          )}
+
+          <button type="submit" disabled={loading} className="btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: "1rem", padding: "0.875rem", opacity: loading ? 0.7 : 1, cursor: loading ? "not-allowed" : "pointer" }}>
+            {loading ? "Please wait…" : isSignup ? "Sign up" : "Log in"}
           </button>
         </form>
+
+        <p style={{ textAlign: "center", marginTop: "1.25rem", fontSize: "0.875rem", color: "var(--foreground-muted)" }}>
+          {isSignup ? "Already have an account?" : "New to PracticeForge?"}{" "}
+          <button
+            type="button"
+            onClick={() => { setMode(isSignup ? "login" : "signup"); setError(null); }}
+            style={{ background: "none", border: "none", color: "var(--primary)", fontWeight: 700, cursor: "pointer", padding: 0 }}
+          >
+            {isSignup ? "Log in" : "Sign up free"}
+          </button>
+        </p>
       </div>
     </div>
   );

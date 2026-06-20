@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { BookOpen, Users, Settings, LogOut, Zap } from "lucide-react";
 import XPBar from "@/components/XPBar";
 import { showToast } from "@/components/Toast";
+import { signOutAndReset } from "@/lib/authClient";
 import type { UserTier } from "@/types";
 
 const NAV_LINKS = [
@@ -162,7 +163,7 @@ export default function Nav() {
                   </button>
                   
                   <button 
-                    onClick={() => { localStorage.setItem("practiceforge_tier", "guest"); window.location.reload(); }}
+                    onClick={() => signOutAndReset()}
                     style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-sm)", background: "transparent", color: "var(--rose)", border: "none", fontSize: "0.875rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.375rem" }}
                     onMouseEnter={e => (e.target as HTMLElement).style.background = "var(--surface-2)"}
                     onMouseLeave={e => (e.target as HTMLElement).style.background = "transparent"}
@@ -255,7 +256,7 @@ export default function Nav() {
                 ⚙️ Manage Subscription
               </button>
               <button 
-                onClick={() => { localStorage.setItem("practiceforge_tier", "guest"); window.location.reload(); }}
+                onClick={() => signOutAndReset()}
                 className="btn-secondary"
                 style={{ justifyContent: "center", padding: "0.75rem", borderRadius: "var(--radius-sm)", color: "var(--rose)", borderColor: "var(--rose)" }}
               >
