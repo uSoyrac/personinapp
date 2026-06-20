@@ -78,7 +78,9 @@ export default function Footer() {
                 { href: "/academy", label: "PracticeForge Academy" },
                 { href: "/pricing", label: "Pricing & Plans" },
                 { href: "/affiliate", label: "Partner Program" },
-                { href: "#", label: "Privacy Policy" },
+                { href: "/privacy", label: "Privacy Policy" },
+                { href: "/terms", label: "Terms of Service" },
+                { href: "/contact", label: "Contact" },
               ].map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} style={{ fontSize: "0.875rem", color: "var(--foreground-muted)" }}>
