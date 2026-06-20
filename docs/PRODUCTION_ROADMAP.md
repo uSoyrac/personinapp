@@ -22,28 +22,31 @@ All keys go into environment variables (never committed). See `.env.example`.
 
 ## Phases (each phase is a working vertical slice)
 
+> **Status (code):** Phases 0, 1 and 3 are **built and merge-ready** behind config
+> guards — the app still runs as the demo until you add Supabase/Stripe keys.
+> Phase 2 (data migration) and the account-dependent steps remain.
+
 ### Phase 0 — Foundation & deploy
-- [ ] Env config + `.env.example`
-- [ ] Supabase browser/server clients + `proxy.ts` session refresh
-- [ ] Deploy current site to Vercel on the real domain
+- [x] Env config + `.env.example`
+- [x] Supabase browser/server clients + `proxy.ts` session refresh
+- [ ] Deploy current site to Vercel on the real domain — **needs your Vercel + domain**
 - [ ] SEO: env-based domain, generate `og-image`, per-page metadata
 
-### Phase 1 — Real authentication
-- [ ] Supabase email/password + Google OAuth
-- [ ] Replace the mock `SignupModal` with real sign up / sign in / sign out
-- [ ] Auth callback route + session-aware `Nav`
-- [ ] Protect gated routes via `proxy.ts`
+### Phase 1 — Real authentication  *(built; activate with Supabase keys)*
+- [x] Supabase email/password + Google OAuth (in `SignupModal`)
+- [x] Real sign up / sign in / sign out (`lib/authClient.ts`, `Nav`)
+- [x] Auth callback route (`app/auth/callback`)
+- [ ] Protect gated routes server-side via `proxy.ts` (after Phase 2)
 
-### Phase 2 — Database (replace localStorage)
-- [ ] Schema: `profiles`, `subscriptions`, `folders`, `saved_words`, `saved_questions`, `xp_events`
-- [ ] Row Level Security policies (per-user)
+### Phase 2 — Database (replace localStorage)  *(pending — best built against live Supabase)*
+- [x] Schema + RLS + new-user trigger (`supabase/migrations/0001_init.sql`)
 - [ ] Migrate vocabulary / question-bank / library / gamification to the DB
 
-### Phase 3 — Stripe subscriptions
-- [ ] Checkout Session route (subscription mode)
-- [ ] Webhook handler → write subscription status to DB
-- [ ] Customer Portal route (manage/cancel)
-- [ ] **Server-side** premium gating (replace the spoofable `localStorage` tier)
+### Phase 3 — Stripe subscriptions  *(built; activate with Stripe keys)*
+- [x] Checkout Session route (`app/api/stripe/checkout`)
+- [x] Webhook handler → writes subscription status to DB (`app/api/stripe/webhook`)
+- [x] Customer Portal route (`app/api/stripe/portal`)
+- [x] Server-side gating helper (`lib/subscription.ts`) — wired into pages in Phase 2
 
 ### Phase 4 — Hardening for launch
 - [ ] Legal pages: Terms & Privacy (required by Stripe)
