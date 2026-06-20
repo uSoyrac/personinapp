@@ -26,9 +26,40 @@ const FAQ = [
 ];
 
 export default function PricingPage() {
-  const handleUpgrade = (tier: "guest" | "free" | "pro" | "elite") => {
-    localStorage.setItem("practiceforge_tier", tier);
-    window.location.href = "/practice";
+  const handleUpgrade = async (tier: "guest" | "free" | "pro" | "elite") => {
+    // Free tier needs no payment.
+    if (tier === "free" || tier === "guest") {
+      localStorage.setItem("practiceforge_tier", tier);
+      window.location.href = "/practice";
+      return;
+    }
+
+    // Paid tiers: try real Stripe Checkout, fall back to the demo flow.
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: tier }),
+      });
+
+      if (res.ok) {
+        const { url } = await res.json();
+        if (url) {
+          window.location.href = url;
+          return;
+        }
+      } else if (res.status === 401) {
+        // Not signed in → open the auth modal instead of charging.
+        window.dispatchEvent(new Event("open-signup"));
+        return;
+      }
+      // 503 (payments not configured) or any other case → demo fallback.
+      localStorage.setItem("practiceforge_tier", tier);
+      window.location.href = "/practice";
+    } catch {
+      localStorage.setItem("practiceforge_tier", tier);
+      window.location.href = "/practice";
+    }
   };
 
   return (
