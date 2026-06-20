@@ -70,6 +70,7 @@ export default function PracticePage() {
   // Load tier and usage from localStorage
   useEffect(() => {
     const savedTier = localStorage.getItem("practiceforge_tier") as UserTier;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- restoring tier persisted in localStorage on mount; must run client-side to stay hydration-safe
     if (savedTier) setTier(savedTier);
 
     const today = new Date().toISOString().split("T")[0];
@@ -225,8 +226,8 @@ export default function PracticePage() {
           {/* Upsell Walls */}
           {error === "GUEST_WALL" && (
             <div className="card-elevated animate-fadeIn" style={{ padding: "2rem", marginBottom: "1.75rem", background: "linear-gradient(to right, var(--surface), var(--surface-2))", borderLeft: "4px solid var(--primary)" }}>
-              <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>You've unlocked your potential!</h3>
-              <p style={{ color: "var(--foreground-muted)", marginBottom: "1.5rem" }}>You've used your 1 free guest trial. Create a free account to unlock daily practice, a personalized dictionary, and progress tracking.</p>
+              <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>You&apos;ve unlocked your potential!</h3>
+              <p style={{ color: "var(--foreground-muted)", marginBottom: "1.5rem" }}>You&apos;ve used your 1 free guest trial. Create a free account to unlock daily practice, a personalized dictionary, and progress tracking.</p>
               <button className="btn-primary" onClick={() => window.dispatchEvent(new Event("open-signup"))}>Create Free Account</button>
             </div>
           )}
@@ -234,7 +235,7 @@ export default function PracticePage() {
           {error === "FREE_WALL" && (
             <div className="card-elevated animate-fadeIn" style={{ padding: "2rem", marginBottom: "1.75rem", background: "linear-gradient(to right, var(--surface), var(--surface-2))", borderLeft: "4px solid var(--primary)" }}>
               <h3 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>Daily Limit Reached</h3>
-              <p style={{ color: "var(--foreground-muted)", marginBottom: "1.5rem" }}>You've reached your free daily limit. Upgrade to Pro Study to unlock unlimited practice and AI writing feedback.</p>
+              <p style={{ color: "var(--foreground-muted)", marginBottom: "1.5rem" }}>You&apos;ve reached your free daily limit. Upgrade to Pro Study to unlock unlimited practice and AI writing feedback.</p>
               <button className="btn-primary" onClick={() => { localStorage.setItem("practiceforge_tier", "pro"); window.location.reload(); }}>Upgrade to Pro Study</button>
             </div>
           )}

@@ -1,39 +1,78 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useSyncExternalStore } from "react";
 import type { PracticeGenerationResult } from "@/types";
 
+// Minimal typings for the Web Speech API (not part of the standard DOM lib).
+interface SpeechRecognitionAlternative {
+  transcript: string;
+}
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  0: SpeechRecognitionAlternative;
+}
+interface SpeechRecognitionResultList {
+  length: number;
+  [index: number]: SpeechRecognitionResult;
+}
+interface SpeechRecognitionEvent {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+interface SpeechRecognitionInstance {
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+interface SpeechWindow extends Window {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+}
+
+const emptySubscribe = () => () => {};
+function getSpeechSupported(): boolean {
+  if (typeof window === "undefined") return false;
+  return "SpeechRecognition" in window || "webkitSpeechRecognition" in window;
+}
+
 export default function SpeakingCard({ result }: { result: PracticeGenerationResult }) {
-  const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  
+
   // Exam Mode State
   const [examStarted, setExamStarted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
   const [examComplete, setExamComplete] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+
+  // Hydration-safe browser feature detection (false on the server / first render).
+  const isSupported = useSyncExternalStore(emptySubscribe, getSpeechSupported, () => false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = true;
-      
-      recognitionRef.current.onresult = (event: any) => {
-        let finalTranscript = '';
+    const speechWindow = window as SpeechWindow;
+    const SpeechRecognitionCtor = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+    if (SpeechRecognitionCtor) {
+      const recognition = new SpeechRecognitionCtor();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let finalTranscript = "";
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
             finalTranscript += event.results[i][0].transcript;
           }
         }
         if (finalTranscript) {
-          setTranscript(prev => prev + " " + finalTranscript);
+          setTranscript((prev) => prev + " " + finalTranscript);
         }
       };
+      recognitionRef.current = recognition;
     }
     return () => clearInterval(timerRef.current!);
   }, []);
@@ -45,7 +84,6 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
     setExamComplete(false);
     setTimeLeft(120);
     recognitionRef.current?.start();
-    setIsRecording(true);
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -62,21 +100,20 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
   const finishExam = () => {
     clearInterval(timerRef.current!);
     recognitionRef.current?.stop();
-    setIsRecording(false);
     setExamComplete(true);
   };
 
   const analyzeSpeech = async () => {
     if (!transcript.trim()) return;
     setIsAnalyzing(true);
-    
+
     // Simulate AI Exam Analysis
     setTimeout(() => {
       const words = transcript.split(" ").length;
       let band = "5.0";
       if (words > 100) band = "6.5";
       if (words > 200) band = "7.5";
-      
+
       setFeedback(`**Estimated Band Score: ${band}**\n\nGreat effort! You spoke clearly and addressed the prompts.\n\n**Strengths:** Good fluency and confidence.\n\n**Improvements:** Try to use more advanced vocabulary. For example, instead of saying 'very good', you could use 'excellent' or 'outstanding'. Maintain better cohesion between ideas.`);
       setIsAnalyzing(false);
     }, 2000);
@@ -87,11 +124,11 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
       <div className="badge badge-primary" style={{ marginBottom: "1rem", display: "inline-flex" }}>
         Premium Examiner Agent 🎙️
       </div>
-      
+
       <h3 style={{ margin: "0 0 1rem", fontSize: "1.25rem", color: "var(--foreground)", fontFamily: "var(--font-display)" }}>
         Part 2: Long Turn
       </h3>
-      
+
       <div style={{ background: "var(--surface-2)", padding: "1.5rem", borderLeft: "4px solid var(--primary)", marginBottom: "2rem", borderRadius: "var(--radius-sm)" }}>
         <p style={{ margin: 0, fontSize: "1.0625rem", fontWeight: 500, color: "var(--foreground)", lineHeight: 1.6 }}>{result.speakingPrompt}</p>
         {result.speakingFollowUps.length > 0 && (
@@ -102,15 +139,15 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", alignItems: "center" }}>
-        {!recognitionRef.current && (
+        {!isSupported && (
           <div style={{ color: "var(--rose)", fontWeight: 700, textAlign: "center" }}>
             ⚠️ Speech Recognition is not supported in this browser. Please use Chrome.
           </div>
         )}
 
         {/* The AI Examiner Avatar UI */}
-        <div style={{ 
-          width: "120px", height: "120px", borderRadius: "50%", 
+        <div style={{
+          width: "120px", height: "120px", borderRadius: "50%",
           background: "linear-gradient(135deg, var(--surface-2), var(--surface))",
           border: "2px solid var(--border)",
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -144,19 +181,19 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
 
         {/* Action Buttons */}
         {!examStarted && !examComplete && (
-          <button 
-            onClick={startExam} 
+          <button
+            onClick={startExam}
             className="btn-primary"
             style={{ width: "100%", justifyContent: "center", padding: "1.25rem", fontSize: "1.125rem", borderRadius: "var(--radius-md)" }}
-            disabled={!recognitionRef.current}
+            disabled={!isSupported}
           >
             Start Exam
           </button>
         )}
 
         {examStarted && !examComplete && (
-          <button 
-            onClick={finishExam} 
+          <button
+            onClick={finishExam}
             className="btn-secondary"
             style={{ width: "100%", justifyContent: "center", borderColor: "var(--rose)", color: "var(--rose)" }}
           >
@@ -165,8 +202,8 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
         )}
 
         {examComplete && !feedback && (
-          <button 
-            onClick={analyzeSpeech} 
+          <button
+            onClick={analyzeSpeech}
             className="btn-primary"
             style={{ width: "100%", background: "linear-gradient(135deg, var(--gold), #D97706)", color: "#fff", padding: "1.25rem", border: "none", fontSize: "1.125rem", borderRadius: "var(--radius-md)", justifyContent: "center" }}
             disabled={isAnalyzing}
@@ -186,7 +223,7 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
                 Band 6.5
               </div>
             </div>
-            
+
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
               <div style={{ background: "rgba(16, 185, 129, 0.1)", padding: "1rem", borderRadius: "var(--radius-sm)", borderLeft: "4px solid #10b981" }}>
                 <strong style={{ color: "#10b981", display: "block", marginBottom: "0.5rem" }}>Strengths</strong>
@@ -194,14 +231,14 @@ export default function SpeakingCard({ result }: { result: PracticeGenerationRes
               </div>
               <div style={{ background: "rgba(244, 63, 94, 0.1)", padding: "1rem", borderRadius: "var(--radius-sm)", borderLeft: "4px solid var(--rose)" }}>
                 <strong style={{ color: "var(--rose)", display: "block", marginBottom: "0.5rem" }}>Improvements</strong>
-                <span style={{ fontSize: "0.875rem", color: "var(--foreground)" }}>Enhance Lexical Resource. Avoid repeating 'good'; use 'excellent' or 'outstanding'.</span>
+                <span style={{ fontSize: "0.875rem", color: "var(--foreground)" }}>{"Enhance Lexical Resource. Avoid repeating 'good'; use 'excellent' or 'outstanding'."}</span>
               </div>
             </div>
 
             {transcript && (
               <div style={{ padding: "1rem", border: "1px dashed var(--border)", background: "var(--surface-2)", borderRadius: "var(--radius-sm)" }}>
                 <p style={{ margin: 0, fontWeight: 700, fontSize: "0.75rem", color: "var(--foreground-muted)", textTransform: "uppercase", marginBottom: "0.5rem" }}>Transcript Analysis</p>
-                <p style={{ margin: 0, color: "var(--foreground-faint)", fontSize: "0.875rem", fontStyle: "italic" }}>"{transcript}"</p>
+                <p style={{ margin: 0, color: "var(--foreground-faint)", fontSize: "0.875rem", fontStyle: "italic" }}>{`"${transcript}"`}</p>
               </div>
             )}
           </div>

@@ -31,8 +31,8 @@ export default function ReadingCard({ questions, examType }: ReadingCardProps) {
     const xp = isCorrect ? 10 : 2;
     addXP(xp);
 
-    // XP popup
-    const popupId = `${qId}-${Date.now()}`;
+    // XP popup — qId is unique per popup since a question can only be answered once
+    const popupId = qId;
     setXpPopups(prev => [...prev, { id: popupId, amount: xp, x: Math.random() * 60 + 20 }]);
     setTimeout(() => setXpPopups(prev => prev.filter(p => p.id !== popupId)), 1200);
 

@@ -49,7 +49,6 @@ function saveState(state: GameState) {
 export function getGameState(): GameState {
   const state = getState();
   // Update streak
-  const today = new Date().toISOString().split("T")[0];
   if (state.lastActive) {
     const last = new Date(state.lastActive);
     const diff = Math.floor((Date.now() - last.getTime()) / 86400000);

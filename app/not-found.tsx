@@ -19,7 +19,7 @@ export default function NotFound() {
         </h1>
         
         <p style={{ fontSize: "1.25rem", color: "var(--foreground-muted)", marginBottom: "3rem", lineHeight: 1.6 }}>
-          We couldn't find the page you're looking for. It might have been moved, deleted, or you simply took a wrong turn. Let's get you back to practicing!
+          We couldn&apos;t find the page you&apos;re looking for. It might have been moved, deleted, or you simply took a wrong turn. Let&apos;s get you back to practicing!
         </p>
 
         <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>

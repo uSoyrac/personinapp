@@ -1,20 +1,17 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { getLeaderboard, Timeframe, Region, LeaderboardUser } from "@/lib/leaderboard";
 import { LANGUAGE_FLAGS } from "@/lib/translations";
 import { useAppContext } from "@/lib/AppContext";
+import { useHydrated } from "@/lib/useHydrated";
 
 export default function LeaderboardPage() {
   const [timeframe, setTimeframe] = useState<Timeframe>("weekly");
   const [region, setRegion] = useState<Region>("worldwide");
   const { userProfile, updateUserProfile } = useAppContext();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHydrated();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const board = useMemo(() => {
     if (!mounted) return [];

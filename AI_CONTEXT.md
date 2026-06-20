@@ -1,5 +1,5 @@
 # AI Context: PracticeForge Project State
-**Last Updated:** 2026-05-11
+**Last Updated:** 2026-06-20
 
 This file serves as a comprehensive hand-off document for any AI assistant working on this project. It summarizes the core features, architecture, and recent developments.
 
@@ -10,15 +10,10 @@ This file serves as a comprehensive hand-off document for any AI assistant worki
 
 ## Recent Major Developments
 
-### 1. Academy & SEO Optimization
+### 1. Academy (Insights)
 - **Folder:** `app/academy`
-- **Dynamic Routing:** `app/academy/[slug]/page.tsx`
-- **Features:**
-  - Semantic HTML5 used for all article structures.
-  - JSON-LD Schema (Article & Breadcrumbs) injected for Google Rich Results.
-  - Dynamic metadata generated via `generateMetadata`.
-  - **AI Readability:** Added `<link rel="alternate" type="text/markdown">` in the head pointing to a clean Markdown API.
-  - **API Endpoint:** `app/api/academy/[slug]/llm/route.ts` returns the pure Markdown content of the article for AI crawlers, matching the rich content (tables, links) of the page.
+- **Page:** `app/academy/page.tsx` — a single client-rendered "Insights" page that lists and displays articles. There is currently **no** `app/academy/[slug]/page.tsx` route; the `[slug]` segment is only used by the LLM API below.
+- **LLM Markdown API:** `app/api/academy/[slug]/llm/route.ts` returns pure Markdown derived from a slug, intended for AI crawlers.
 
 ### 2. Gamification & Profiles
 - **Folder:** `app/leaderboard`
@@ -50,10 +45,20 @@ This file serves as a comprehensive hand-off document for any AI assistant worki
 - In `/library` and `/community`, there is a **"Simulate Premium (Dev)"** button to toggle the premium state for testing.
 - To clear all state, you can visit the site with `?reset=true` in the URL (handled in `Nav.tsx`).
 
+## Quality & Production Readiness
+- **Install first:** a clean checkout needs `npm install` before building — `next build` type-checks `playwright.config.ts` / `tests/`, so a missing `@playwright/test` breaks the build.
+- **Quality gates (all green):**
+  - `npm run lint` — ESLint (0 errors, 0 warnings).
+  - `npm run typecheck` — `tsc --noEmit`.
+  - `npm run build` — production build.
+  - `npm test` — Playwright e2e (`tests/e2e.spec.ts` + `tests/extended.spec.ts`). The Playwright config auto-starts a dev server on port 3050.
+- **Hydration pattern:** client-only/`localStorage`-derived values must not be read during render. Use `useHydrated()` (`lib/useHydrated.ts`, built on `useSyncExternalStore`) as the gate instead of the `useState(false)` + `useEffect(setMounted(true))` pattern, which the React Compiler lint rules (`react-hooks/set-state-in-effect`) flag.
+- **Security:** pinned to `next@16.2.9` (patches the high-severity advisories present in 16.2.4). Remaining `npm audit` items are Next's build-time bundled `postcss` — do **not** run `npm audit fix --force`, which would downgrade Next.
+
 ## File Map for Key Features
 - **Global State:** `lib/AppContext.tsx`
 - **Global CSS:** `app/globals.css` (Contains `.hover-card`, `.article-table`, `.alert-hook` etc.)
-- **Academy Template:** `app/academy/[slug]/page.tsx`
+- **Academy Page:** `app/academy/page.tsx`
 - **LLM API:** `app/api/academy/[slug]/llm/route.ts`
 - **Vocabulary Quiz:** `app/vocabulary/page.tsx`
 - **Leaderboard:** `app/leaderboard/page.tsx`

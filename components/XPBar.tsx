@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { Flame } from "lucide-react";
 import { getGameState } from "@/lib/gamification";
+import { useHydrated } from "@/lib/useHydrated";
 
 export default function XPBar() {
   const [state, setState] = useState({ xp: 0, level: 1, streak: 0, nextLevelXP: 100 });
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHydrated();
 
   useEffect(() => {
-    setMounted(true);
     const update = () => {
       const s = getGameState();
       setState({ ...s, nextLevelXP: Math.max(100, Math.floor(100 * Math.pow(1.5, s.level - 1))) });

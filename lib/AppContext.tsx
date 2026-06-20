@@ -1,12 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 
 export type Folder = {
   id: string;
   name: string;
   words: { term: string; definition: string }[];
-  questions: any[];
+  questions: unknown[];
 };
 
 export type AppState = {
@@ -53,28 +53,34 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [folders, setFolders] = useState<Folder[]>([
     { id: 'default-1', name: 'My Difficult Words', words: [], questions: [] }
   ]);
-  const [isClient, setIsClient] = useState(false);
+  // Tracks whether the initial localStorage load has completed, so we never
+  // persist the default state over real saved data before reading it.
+  const hasLoadedRef = useRef(false);
 
   // Load from local storage on mount
   useEffect(() => {
-    setIsClient(true);
     const savedProfile = localStorage.getItem('practiceForgeProfile');
     const savedPremium = localStorage.getItem('practiceForgePremium');
     const savedFolders = localStorage.getItem('practiceForgeFolders');
-    
+
+    // These setState calls hydrate context from persisted localStorage on mount.
+    // They must run client-side (not during render) to avoid SSR hydration mismatches.
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (savedProfile) setUserProfile(JSON.parse(savedProfile));
     if (savedPremium) setIsPremium(savedPremium === 'true');
     if (savedFolders) setFolders(JSON.parse(savedFolders));
+    /* eslint-enable react-hooks/set-state-in-effect */
+
+    hasLoadedRef.current = true;
   }, []);
 
-  // Save to local storage on change
+  // Save to local storage on change (but only after the initial load)
   useEffect(() => {
-    if (isClient) {
-      localStorage.setItem('practiceForgeProfile', JSON.stringify(userProfile));
-      localStorage.setItem('practiceForgePremium', String(isPremium));
-      localStorage.setItem('practiceForgeFolders', JSON.stringify(folders));
-    }
-  }, [userProfile, isPremium, folders, isClient]);
+    if (!hasLoadedRef.current) return;
+    localStorage.setItem('practiceForgeProfile', JSON.stringify(userProfile));
+    localStorage.setItem('practiceForgePremium', String(isPremium));
+    localStorage.setItem('practiceForgeFolders', JSON.stringify(folders));
+  }, [userProfile, isPremium, folders]);
 
   const updateUserProfile = (profile: Partial<AppState['userProfile']>) => {
     setUserProfile(prev => ({ ...prev, ...profile }));

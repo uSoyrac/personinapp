@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 // Metadata removed as this is now a client component
 
 const FAQ = [

@@ -28,11 +28,12 @@ export default function Nav() {
     if (window.location.search.includes("reset=true")) {
       localStorage.clear();
       window.history.replaceState({}, document.title, window.location.pathname);
-      setTier("guest");
+      // tier already defaults to "guest", so no state update is needed here
       return;
     }
 
     const savedTier = localStorage.getItem("practiceforge_tier") as UserTier;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- restoring tier persisted in localStorage on mount; must run client-side to stay hydration-safe
     if (savedTier) setTier(savedTier);
   }, []);
 

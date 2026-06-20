@@ -75,7 +75,7 @@ export default function AcademyPage() {
               </div>
               <p>
                 One of the most common pitfalls students face is lack of structured feedback. 
-                When preparing for high-stakes tests, simply doing mock exams isn't enough; you must understand <em>why</em> you made mistakes.
+                When preparing for high-stakes tests, simply doing mock exams isn&apos;t enough; you must understand <em>why</em> you made mistakes.
               </p>
               <p>
                 We highly recommend using our Practice Lab to generate personalized questions and get immediate insights on your weak areas.

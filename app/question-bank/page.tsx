@@ -14,6 +14,7 @@ export default function QuestionBankPage() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loads persisted questions from localStorage on mount; must run client-side to stay hydration-safe
     setQuestions(getQuestionBank());
   }, []);
 
@@ -25,7 +26,8 @@ export default function QuestionBankPage() {
     const xp = isCorrect ? 10 : 2;
     addXP(xp);
 
-    const popupId = `${qId}-${Date.now()}`;
+    // qId is unique per popup since a question can only be answered once
+    const popupId = qId;
     setXpPopups(prev => [...prev, { id: popupId, amount: xp, x: Math.random() * 60 + 20 }]);
     setTimeout(() => setXpPopups(prev => prev.filter(p => p.id !== popupId)), 1200);
 
@@ -82,7 +84,7 @@ export default function QuestionBankPage() {
             <div className="card" style={{ padding: "4rem 2rem", textAlign: "center" }}>
               <h3 style={{ margin: "0 0 1rem", fontSize: "1.5rem" }}>Bankanız boş.</h3>
               <p style={{ margin: "0 0 2rem", color: "var(--foreground-muted)" }}>
-                Generate practice tests and click "➕ Bankama Ekle" to save questions here.
+                Generate practice tests and click &quot;➕ Bankama Ekle&quot; to save questions here.
               </p>
               <Link href="/practice" className="btn-primary" style={{ display: "inline-block" }}>Go to Practice</Link>
             </div>

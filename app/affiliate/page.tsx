@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Banknote, Cookie, Rocket, PartyPopper } from "lucide-react";
 
 export default function AffiliatePage() {
@@ -27,7 +26,7 @@ export default function AffiliatePage() {
             Earn <span style={{ color: "#C4B5FD" }}>30%</span> <span style={{ color: "#FDE047" }}>Recurring</span><br/>Commission.
           </h1>
           <p style={{ fontSize: "1.25rem", color: "#4B5563", lineHeight: 1.6, fontWeight: 500, maxWidth: "700px", margin: "0 auto" }}>
-            Join the PracticeForge Partner Program. Recommend the world's most advanced AI IELTS & TOEFL lab to your students and followers, and earn revenue for every active subscription.
+            Join the PracticeForge Partner Program. Recommend the world&apos;s most advanced AI IELTS &amp; TOEFL lab to your students and followers, and earn revenue for every active subscription.
           </p>
         </div>
 
@@ -107,7 +106,7 @@ export default function AffiliatePage() {
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             <div style={{ padding: "1.5rem", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)" }}>
               <h4 style={{ margin: "0 0 0.5rem", fontSize: "1.125rem" }}>How do I get paid?</h4>
-              <p style={{ margin: 0, color: "var(--foreground-muted)", lineHeight: 1.6 }}>We process payouts via PayPal or direct bank transfer on the 15th of every month for the previous month's earnings. Minimum payout is $50.</p>
+              <p style={{ margin: 0, color: "var(--foreground-muted)", lineHeight: 1.6 }}>We process payouts via PayPal or direct bank transfer on the 15th of every month for the previous month&apos;s earnings. Minimum payout is $50.</p>
             </div>
             <div style={{ padding: "1.5rem", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)" }}>
               <h4 style={{ margin: "0 0 0.5rem", fontSize: "1.125rem" }}>What is a recurring commission?</h4>
@@ -115,7 +114,7 @@ export default function AffiliatePage() {
             </div>
             <div style={{ padding: "1.5rem", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)" }}>
               <h4 style={{ margin: "0 0 0.5rem", fontSize: "1.125rem" }}>Do you provide promotional materials?</h4>
-              <p style={{ margin: 0, color: "var(--foreground-muted)", lineHeight: 1.6 }}>Yes! Once approved, you'll get access to a dashboard with brand assets, logo files, and suggested email/social media copy to make promoting easy.</p>
+              <p style={{ margin: 0, color: "var(--foreground-muted)", lineHeight: 1.6 }}>Yes! Once approved, you&apos;ll get access to a dashboard with brand assets, logo files, and suggested email/social media copy to make promoting easy.</p>
             </div>
           </div>
         </div>

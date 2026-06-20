@@ -2,12 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { SavedWord } from "@/lib/wordList";
-import { 
-  getWordList, 
-  saveWords, 
-  removeWord, 
-  clearWordList, 
-  getWordStats, 
+import {
+  getWordList,
+  saveWords,
+  removeWord,
+  getWordStats,
   updateWordProgress,
   deleteSet,
   renameSet,
@@ -15,7 +14,7 @@ import {
 } from "@/lib/wordList";
 import { addXP, awardBadge } from "@/lib/gamification";
 import { useAppContext } from "@/lib/AppContext";
-import ProgressBar from "@/components/ProgressBar";
+import { useHydrated } from "@/lib/useHydrated";
 import Confetti from "@/components/Confetti";
 import { showToast } from "@/components/Toast";
 
@@ -77,7 +76,7 @@ export default function VocabularyPage() {
   const [quizMode, setQuizMode] = useState<QuizDirection>("word-def");
   const [quiz, setQuiz] = useState<{ qs: QuizQ[]; ci: number; ans: (number | null)[] } | null>(null);
   const [confetti, setConfetti] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHydrated();
   
   const [manualWord, setManualWord] = useState("");
   const [manualDef, setManualDef] = useState("");
@@ -112,7 +111,8 @@ export default function VocabularyPage() {
     });
   }, []);
 
-  useEffect(() => { setMounted(true); refresh(); }, [refresh]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- refresh() hydrates word lists from localStorage on mount; must run client-side to stay hydration-safe
+  useEffect(() => { refresh(); }, [refresh]);
 
   const setsMap: Record<string, SavedWord[]> = {};
   words.forEach(w => {
@@ -128,7 +128,6 @@ export default function VocabularyPage() {
   const currentSet = activeSet === "hard" ? words.filter(w => w.difficulty === "hard") : (setsMap[activeSet] ?? []);
   const hardWords = words.filter(w => w.difficulty === "hard");
 
-  const [isStartingQuiz, setIsStartingQuiz] = useState(false);
 
   function startQuiz(setName: string) {
     if (!isPremium && words.length > 20) {
@@ -145,13 +144,11 @@ export default function VocabularyPage() {
       return;
     }
 
-    setIsStartingQuiz(true);
     const limit = isPremium ? s.length : Math.min(20, s.length);
     const qs = buildQuiz(shuffleArray(s).slice(0, limit), quizMode);
     setQuiz({ qs, ci: 0, ans: new Array(qs.length).fill(null) });
     setActiveSet(setName);
     setView("quiz");
-    setIsStartingQuiz(false);
   }
 
   function handleAnswer(idx: number) {

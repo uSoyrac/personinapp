@@ -1,15 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, Gift } from "lucide-react";
-
-const HOW_IT_WORKS = [
-  { step: "1", icon: "📄", title: "Bring Your Content", desc: "Paste any text—an article, transcript, or lecture notes. You choose what interests you." },
-  { step: "2", icon: "🎯", title: "Set Your Goal", desc: "Select IELTS or TOEFL, your current level, and your dream score. We handle the rest." },
-  { step: "3", icon: "🚀", title: "Accelerate", desc: "Instantly receive a complete, exam-style practice session tailored to push you to the next band." },
-];
 
 type AppMode = "ielts" | "toefl" | "general";
 
