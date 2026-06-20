@@ -30,7 +30,7 @@ All keys go into environment variables (never committed). See `.env.example`.
 - [x] Env config + `.env.example`
 - [x] Supabase browser/server clients + `proxy.ts` session refresh
 - [ ] Deploy current site to Vercel on the real domain — **needs your Vercel + domain**
-- [ ] SEO: env-based domain, generate `og-image`, per-page metadata
+- [x] SEO: env-based domain (`lib/siteUrl.ts`), dynamic `og-image` (`app/opengraph-image.tsx`), per-page metadata layouts
 
 ### Phase 1 — Real authentication  *(built; activate with Supabase keys)*
 - [x] Supabase email/password + Google OAuth (in `SignupModal`)
@@ -49,7 +49,7 @@ All keys go into environment variables (never committed). See `.env.example`.
 - [x] Server-side gating helper (`lib/subscription.ts`) — wired into pages in Phase 2
 
 ### Phase 4 — Hardening for launch
-- [ ] Legal pages: Terms & Privacy (required by Stripe)
+- [x] Legal pages: Terms, Privacy & Contact (`app/terms`, `app/privacy`, `app/contact`) — templates, review with a lawyer
 - [ ] Transactional email (welcome / receipts) via Supabase or Resend
 - [ ] Rate limiting on API routes, error monitoring, analytics
 - [ ] Final audit + load check
