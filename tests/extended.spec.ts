@@ -113,3 +113,23 @@ test.describe('Writing Feedback Page', () => {
     await expect(page.getByRole('heading', { name: 'Your Feedback' })).toBeVisible({ timeout: 15000 });
   });
 });
+
+// ==============================================
+// Academy (SEO content pipeline)
+// ==============================================
+test.describe('Academy', () => {
+  test('lists articles and renders a static article page with structured data', async ({ page }) => {
+    await page.goto('/academy');
+    await expect(page.locator('h1')).toContainText('Academy');
+
+    // Article card links into the static article route.
+    const card = page.getByRole('link', { name: /Score Band 8/ });
+    await expect(card).toBeVisible();
+    await card.click();
+
+    await expect(page).toHaveURL(/\/academy\/how-to-score-band-8/);
+    await expect(page.locator('h1')).toContainText('Band 8');
+    // JSON-LD Article schema is present for SEO.
+    await expect(page.locator('script[type="application/ld+json"]')).toBeAttached();
+  });
+});

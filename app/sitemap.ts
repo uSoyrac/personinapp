@@ -1,8 +1,16 @@
 import { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/siteUrl";
+import { getAllArticles } from "@/lib/academy";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = SITE_URL;
+
+  const articleEntries: MetadataRoute.Sitemap = getAllArticles().map((a) => ({
+    url: `${baseUrl}/academy/${a.slug}`,
+    lastModified: a.date ? new Date(a.date) : new Date(),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
 
   return [
     {
@@ -71,5 +79,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.2,
     },
+    ...articleEntries,
   ];
 }
