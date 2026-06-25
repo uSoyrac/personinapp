@@ -106,12 +106,12 @@ export default function Nav() {
 
           {tier === "guest" ? (
             <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-              <button className="btn-secondary" style={{ padding: "0.5rem 1rem", fontSize: "0.875rem", borderRadius: "var(--radius-sm)", whiteSpace: "nowrap", height: "fit-content" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>
+              <Link href="/login" className="btn-secondary" style={{ padding: "0.5rem 1rem", fontSize: "0.875rem", borderRadius: "var(--radius-sm)", whiteSpace: "nowrap", height: "fit-content" }}>
                 Log in
-              </button>
-              <button className="btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.875rem", borderRadius: "var(--radius-sm)", whiteSpace: "nowrap", height: "fit-content" }} onClick={() => window.dispatchEvent(new Event("open-signup"))}>
+              </Link>
+              <Link href="/signup" className="btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.875rem", borderRadius: "var(--radius-sm)", whiteSpace: "nowrap", height: "fit-content" }}>
                 Sign up for Free
-              </button>
+              </Link>
             </div>
           ) : (
             <div style={{ position: "relative" }}>
@@ -226,12 +226,12 @@ export default function Nav() {
           </div>
           {tier === "guest" ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <button className="btn-secondary" style={{ padding: "0.75rem", borderRadius: "var(--radius-sm)", justifyContent: "center" }} onClick={() => { setMobileOpen(false); window.dispatchEvent(new Event("open-signup")); }}>
+              <Link href="/login" className="btn-secondary" style={{ padding: "0.75rem", borderRadius: "var(--radius-sm)", justifyContent: "center" }} onClick={() => setMobileOpen(false)}>
                 Log in
-              </button>
-              <button className="btn-primary" style={{ padding: "0.75rem", borderRadius: "var(--radius-sm)", justifyContent: "center" }} onClick={() => { setMobileOpen(false); window.dispatchEvent(new Event("open-signup")); }}>
+              </Link>
+              <Link href="/signup" className="btn-primary" style={{ padding: "0.75rem", borderRadius: "var(--radius-sm)", justifyContent: "center" }} onClick={() => setMobileOpen(false)}>
                 Sign up for Free
-              </button>
+              </Link>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>

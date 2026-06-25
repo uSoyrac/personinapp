@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import SignupModal from "@/components/SignupModal";
+import AuthRedirect from "@/components/AuthRedirect";
 import ToastContainer from "@/components/Toast";
 import CookieConsent from "@/components/CookieConsent";
 import { AppProvider } from "@/lib/AppContext";
@@ -82,7 +82,7 @@ export default function RootLayout({
           <Nav />
           <main style={{ flex: 1 }}>{children}</main>
           <Footer />
-          <SignupModal />
+          <AuthRedirect />
           <ToastContainer />
           <CookieConsent />
         </AppProvider>

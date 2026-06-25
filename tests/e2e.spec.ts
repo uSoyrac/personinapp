@@ -46,15 +46,14 @@ test.describe('Homepage', () => {
     await expect(exploreBtn).toBeEnabled();
   });
 
-  test('signup modal opens', async ({ page }) => {
+  test('signup CTA routes to the signup page', async ({ page }) => {
     await page.goto('/');
-    
-    // Open modal via JavaScript event (reliable regardless of nav rendering)
+
+    // Legacy open-signup triggers now route to the dedicated /signup page.
     await page.evaluate(() => window.dispatchEvent(new Event('open-signup')));
-    
-    // Modal should appear
-    const modalHeading = page.getByRole('heading', { name: 'Create Free Account' });
-    await expect(modalHeading).toBeVisible({ timeout: 3000 });
+
+    await expect(page).toHaveURL(/\/signup/);
+    await expect(page.getByRole('heading', { name: /Create your free account/ })).toBeVisible({ timeout: 3000 });
   });
 
   test('testimonials section displays', async ({ page }) => {
@@ -253,61 +252,36 @@ test.describe('Affiliate Page', () => {
 });
 
 // ==============================================
-// Signup Modal Tests  
+// Auth Pages (dedicated /login and /signup)
 // ==============================================
-test.describe('Signup Modal', () => {
-  test('social login and email form visible', async ({ page }) => {
-    await page.goto('/');
-    
-    // Open modal
-    await page.evaluate(() => window.dispatchEvent(new Event('open-signup')));
-    await page.waitForTimeout(500);
-    
-    // Modal heading
-    await expect(page.getByRole('heading', { name: 'Create Free Account' })).toBeVisible();
-    
-    // Social buttons
+test.describe('Auth Pages', () => {
+  test('signup page shows form, Google, and mandatory consent gate', async ({ page }) => {
+    await page.goto('/signup');
+
+    await expect(page.getByRole('heading', { name: /Create your free account/ })).toBeVisible();
     await expect(page.getByText('Continue with Google')).toBeVisible();
-    await expect(page.getByText('Continue with Apple')).toBeVisible();
-    await expect(page.getByText('Continue with Facebook')).toBeVisible();
-    
-    // Email form
-    await expect(page.locator('input[type="email"]').first()).toBeVisible();
-    await expect(page.locator('input[type="password"]').first()).toBeVisible();
+    await expect(page.locator('#auth-email')).toBeVisible();
+    await expect(page.locator('#auth-password')).toBeVisible();
+
+    // Submit is blocked until the Privacy/Terms consent box is checked.
+    await expect(page.locator('#auth-submit')).toBeDisabled();
+    await page.locator('#auth-consent').check();
+    await expect(page.locator('#auth-submit')).toBeEnabled();
   });
 
-  test('invite code shows valid indicator', async ({ page }) => {
-    await page.goto('/');
-    
-    await page.evaluate(() => window.dispatchEvent(new Event('open-signup')));
-    await page.waitForTimeout(500);
-    
-    // Type invite code (>=3 chars shows "Valid")
-    const codeInput = page.locator('input[placeholder="e.g. PARTNER20"]');
-    await codeInput.fill('TESTCODE');
-    
-    await expect(page.getByText('Valid')).toBeVisible({ timeout: 3000 });
+  test('login page shows form and links to signup', async ({ page }) => {
+    await page.goto('/login');
+
+    await expect(page.getByRole('heading', { name: /Welcome back/ })).toBeVisible();
+    await expect(page.locator('#auth-email')).toBeVisible();
+    await expect(page.locator('#auth-password')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Sign up free' })).toBeVisible();
   });
 
-  test('modal closes on X', async ({ page }) => {
+  test('nav Sign up button routes to /signup', async ({ page }) => {
     await page.goto('/');
-    
-    await page.evaluate(() => window.dispatchEvent(new Event('open-signup')));
-    await page.waitForTimeout(500);
-    
-    const modalHeading = page.getByRole('heading', { name: 'Create Free Account' });
-    await expect(modalHeading).toBeVisible();
-    
-    // Close - find the close button
-    const closeBtn = page.locator('#close-signup-modal');
-    await closeBtn.click({ force: true }).catch(async () => {
-      // Fallback: direct browser click
-      await page.evaluate(() => {
-        document.getElementById('close-signup-modal')?.click();
-      });
-    });
-    
-    await expect(modalHeading).not.toBeVisible({ timeout: 3000 });
+    await page.getByRole('link', { name: 'Sign up for Free' }).first().click();
+    await expect(page).toHaveURL(/\/signup/);
   });
 });
 
