@@ -3,8 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { showToast } from "@/components/Toast";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { createClient } from "@/lib/supabase/client";
 import { bridgeTierAfterLogin } from "@/lib/authClient";
 
 export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
@@ -16,8 +14,6 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const configured = isSupabaseConfigured();
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -26,61 +22,43 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
       return;
     }
     if (!email || !password) return;
-
-    // Demo fallback when the backend isn't configured yet.
-    if (!configured) {
-      if (inviteCode) localStorage.setItem("practiceforge_invite_code", inviteCode);
-      localStorage.setItem("practiceforge_tier", "free");
-      window.location.href = "/practice";
+    if (isSignup && password.length < 8) {
+      setError("Password must be at least 8 characters.");
       return;
     }
 
     setLoading(true);
-    const supabase = createClient();
     try {
-      if (isSignup) {
-        const { data, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-            data: inviteCode ? { invite_code: inviteCode } : undefined,
-          },
-        });
-        if (signUpError) throw signUpError;
-        if (data.session) {
-          bridgeTierAfterLogin();
-          showToast("Welcome to PracticeForge!", "success");
-          window.location.href = "/practice";
-        } else {
-          showToast("Check your email to confirm your account.", "info");
-        }
-      } else {
-        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-        if (signInError) throw signInError;
+      const res = await fetch(isSignup ? "/api/auth/register" : "/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, displayName: email.split("@")[0] }),
+      });
+
+      if (res.ok) {
+        if (inviteCode) localStorage.setItem("practiceforge_invite_code", inviteCode);
         bridgeTierAfterLogin();
-        showToast("Welcome back!", "success");
+        showToast(isSignup ? "Welcome to PracticeForge!" : "Welcome back!", "success");
         window.location.href = "/practice";
+        return;
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Authentication failed. Please try again.");
+      if (res.status === 503) {
+        // Backend not configured yet → keep the demo flow working.
+        localStorage.setItem("practiceforge_tier", "free");
+        window.location.href = "/practice";
+        return;
+      }
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      setError(data.error || "Authentication failed. Please try again.");
+    } catch {
+      setError("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleGoogle() {
-    if (!configured) {
-      showToast("Google sign-in activates once the backend is connected.", "info");
-      return;
-    }
-    setError(null);
-    const supabase = createClient();
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
-    if (oauthError) setError(oauthError.message);
+  function handleGoogle() {
+    showToast("Google sign-in is coming soon — please use email for now.", "info");
   }
 
   const inputStyle: React.CSSProperties = {

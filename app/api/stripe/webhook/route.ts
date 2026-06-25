@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripe, isStripeConfigured, planForPrice } from "@/lib/stripe/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { query } from "@/lib/db";
 
 // Stripe sends raw JSON we must verify with the signing secret, so we read the
 // body as text and never let a framework parse it first.
@@ -24,31 +24,35 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 
-  const admin = createAdminClient();
-
   async function syncSubscription(sub: Stripe.Subscription) {
     const userId = sub.metadata?.user_id;
     if (!userId) return;
 
     const priceId = sub.items.data[0]?.price.id;
     const live = sub.status === "active" || sub.status === "trialing";
-    // `current_period_end` shape varies across Stripe API versions; read defensively.
     const periodEnd = (sub as unknown as { current_period_end?: number }).current_period_end;
+    const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
 
-    await admin
-      .from("subscriptions")
-      .upsert(
-        {
-          user_id: userId,
-          stripe_customer_id: typeof sub.customer === "string" ? sub.customer : sub.customer.id,
-          stripe_subscription_id: sub.id,
-          plan: live ? planForPrice(priceId) : "free",
-          status: sub.status,
-          current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      );
+    await query(
+      `insert into subscriptions
+         (user_id, stripe_customer_id, stripe_subscription_id, plan, status, current_period_end, updated_at)
+       values ($1, $2, $3, $4, $5, $6, now())
+       on conflict (user_id) do update set
+         stripe_customer_id     = excluded.stripe_customer_id,
+         stripe_subscription_id = excluded.stripe_subscription_id,
+         plan                   = excluded.plan,
+         status                 = excluded.status,
+         current_period_end     = excluded.current_period_end,
+         updated_at             = now()`,
+      [
+        userId,
+        customerId,
+        sub.id,
+        live ? planForPrice(priceId) : "free",
+        sub.status,
+        periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      ]
+    );
   }
 
   switch (event.type) {

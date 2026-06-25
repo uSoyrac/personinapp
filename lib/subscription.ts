@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth/user";
+import { query } from "@/lib/db";
 
 export type Subscription = {
   plan: string;
@@ -7,24 +8,18 @@ export type Subscription = {
 };
 
 /**
- * Reads the signed-in user's subscription row (server-side, RLS-protected).
- * Returns null when there is no user or no row. This is the single source of
- * truth for premium access — never trust the client.
+ * Reads the signed-in user's subscription row (server-side). The single source
+ * of truth for premium access — never trust the client.
  */
 export async function getCurrentSubscription(): Promise<Subscription | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) return null;
 
-  const { data } = await supabase
-    .from("subscriptions")
-    .select("plan, status, current_period_end")
-    .eq("user_id", user.id)
-    .single();
-
-  return data ?? null;
+  const rows = await query<Subscription>(
+    "select plan, status, current_period_end from subscriptions where user_id = $1",
+    [user.id]
+  );
+  return rows[0] ?? null;
 }
 
 /** True only for an active/trialing paid plan. */

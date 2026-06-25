@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth/user";
 import { getStripe, isStripeConfigured, priceForPlanCycle, type PaidPlan, type BillingCycle } from "@/lib/stripe/server";
 
 // Creates a Stripe Checkout Session (subscription mode) for the signed-in user.
@@ -16,10 +16,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "That plan/billing cycle is not available yet." }, { status: 400 });
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ error: "Please sign in first." }, { status: 401 });
   }
