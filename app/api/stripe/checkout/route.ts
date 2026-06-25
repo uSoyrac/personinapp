@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getStripe, isStripeConfigured, priceForPlan, type PaidPlan } from "@/lib/stripe/server";
+import { getStripe, isStripeConfigured, priceForPlanCycle, type PaidPlan, type BillingCycle } from "@/lib/stripe/server";
 
 // Creates a Stripe Checkout Session (subscription mode) for the signed-in user.
 export async function POST(request: Request) {
@@ -8,10 +8,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Payments are not configured yet." }, { status: 503 });
   }
 
-  const { plan } = (await request.json().catch(() => ({}))) as { plan?: PaidPlan };
-  const priceId = priceForPlan(plan === "elite" ? "elite" : "pro");
+  const { plan, cycle } = (await request.json().catch(() => ({}))) as { plan?: PaidPlan; cycle?: BillingCycle };
+  const resolvedPlan: PaidPlan = plan === "elite" ? "elite" : "pro";
+  const resolvedCycle: BillingCycle = cycle === "quarterly" || cycle === "annual" ? cycle : "monthly";
+  const priceId = priceForPlanCycle(resolvedPlan, resolvedCycle);
   if (!priceId) {
-    return NextResponse.json({ error: "That plan is not available yet." }, { status: 400 });
+    return NextResponse.json({ error: "That plan/billing cycle is not available yet." }, { status: 400 });
   }
 
   const supabase = await createClient();
@@ -32,7 +34,7 @@ export async function POST(request: Request) {
     client_reference_id: user.id,
     success_url: `${siteUrl}/pricing?success=1`,
     cancel_url: `${siteUrl}/pricing?canceled=1`,
-    metadata: { user_id: user.id, plan: plan ?? "pro" },
+    metadata: { user_id: user.id, plan: resolvedPlan, cycle: resolvedCycle },
     subscription_data: { metadata: { user_id: user.id } },
   });
 

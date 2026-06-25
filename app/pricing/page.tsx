@@ -1,6 +1,32 @@
 "use client";
 
+import { useState } from "react";
+
 // Metadata removed as this is now a client component
+
+type Cycle = "monthly" | "quarterly" | "annual";
+
+const CYCLES: { id: Cycle; label: string; badge?: string }[] = [
+  { id: "monthly", label: "Monthly" },
+  { id: "quarterly", label: "3 Months", badge: "Save 10%" },
+  { id: "annual", label: "Annual", badge: "1 month free" },
+];
+
+// Base monthly list price per plan.
+const BASE_MONTHLY: Record<"pro" | "elite", number> = { pro: 14.99, elite: 29.99 };
+
+function priceFor(plan: "pro" | "elite", cycle: Cycle): { perMonth: string; note: string } {
+  const m = BASE_MONTHLY[plan];
+  if (cycle === "quarterly") {
+    const total = m * 3 * 0.9; // 10% off
+    return { perMonth: (total / 3).toFixed(2), note: `$${total.toFixed(2)} billed every 3 months · save 10%` };
+  }
+  if (cycle === "annual") {
+    const total = m * 11; // pay 11, get 12 → 1 month free
+    return { perMonth: (total / 12).toFixed(2), note: `$${total.toFixed(2)} billed yearly · 1 month free` };
+  }
+  return { perMonth: m.toFixed(2), note: "billed monthly" };
+}
 
 const FAQ = [
   {
@@ -26,6 +52,8 @@ const FAQ = [
 ];
 
 export default function PricingPage() {
+  const [cycle, setCycle] = useState<Cycle>("annual");
+
   const handleUpgrade = async (tier: "guest" | "free" | "pro" | "elite") => {
     // Free tier needs no payment.
     if (tier === "free" || tier === "guest") {
@@ -39,7 +67,7 @@ export default function PricingPage() {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: tier }),
+        body: JSON.stringify({ plan: tier, cycle }),
       });
 
       if (res.ok) {
@@ -79,6 +107,37 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Billing cycle toggle */}
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: "2.5rem", padding: "0 1.5rem" }}>
+        <div role="tablist" aria-label="Billing cycle" style={{ display: "inline-flex", gap: "0.25rem", padding: "0.375rem", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "9999px", flexWrap: "wrap", justifyContent: "center" }}>
+          {CYCLES.map((c) => {
+            const active = cycle === c.id;
+            return (
+              <button
+                key={c.id}
+                role="tab"
+                aria-selected={active}
+                onClick={() => setCycle(c.id)}
+                style={{
+                  border: "none", cursor: "pointer", borderRadius: "9999px",
+                  padding: "0.5rem 1.25rem", fontSize: "0.875rem", fontWeight: 700,
+                  background: active ? "var(--primary)" : "transparent",
+                  color: active ? "#fff" : "var(--foreground-muted)",
+                  display: "flex", alignItems: "center", gap: "0.5rem", transition: "all 0.15s ease",
+                }}
+              >
+                {c.label}
+                {c.badge && (
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 800, padding: "0.1rem 0.45rem", borderRadius: "9999px", background: active ? "rgba(255,255,255,0.25)" : "var(--mint)", color: "#fff" }}>
+                    {c.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* 3-TIER PRICING CARDS */}
       <section style={{ padding: "0 1.5rem 6rem" }}>
         <div className="container">
@@ -112,7 +171,8 @@ export default function PricingPage() {
                 <span className="badge" style={{ background: "var(--primary)", color: "#fff", padding: "0.375rem 1rem", border: "none", fontWeight: 700, boxShadow: "var(--shadow-sm)" }}>Most Popular</span>
               </div>
               <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "var(--primary)" }}>Pro Study</h3>
-              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$14.99<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
+              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.25rem" }}>${priceFor("pro", cycle).perMonth}<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
+              <p style={{ fontSize: "0.8125rem", marginBottom: "1.25rem", color: "var(--foreground-faint)", minHeight: "1.1rem" }}>{priceFor("pro", cycle).note}</p>
               <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "var(--foreground-muted)" }}>For core students needing comprehensive writing support.</p>
               
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -134,7 +194,8 @@ export default function PricingPage() {
             {/* Elite Plan */}
             <div className="card-elevated" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%", background: "linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)", borderColor: "var(--gold)", position: "relative" }}>
               <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "var(--gold)" }}>Elite Mastery</h3>
-              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.5rem" }}>$29.99<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
+              <p style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--foreground)", marginBottom: "0.25rem" }}>${priceFor("elite", cycle).perMonth}<span style={{ fontSize: "1rem", color: "var(--foreground-muted)", fontWeight: 500 }}>/mo</span></p>
+              <p style={{ fontSize: "0.8125rem", marginBottom: "1.25rem", color: "var(--foreground-faint)", minHeight: "1.1rem" }}>{priceFor("elite", cycle).note}</p>
               <p style={{ fontSize: "0.9375rem", marginBottom: "2rem", color: "var(--foreground-muted)" }}>For students urgently needing Band 7.0+ or 100+.</p>
               
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>

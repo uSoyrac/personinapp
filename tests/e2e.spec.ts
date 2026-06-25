@@ -201,18 +201,23 @@ test.describe('Vocabulary Page', () => {
 // Pricing Page Tests
 // ==============================================
 test.describe('Pricing Page', () => {
-  test('all plans and FAQ visible', async ({ page }) => {
+  test('all plans, billing toggle and FAQ visible', async ({ page }) => {
     await page.goto('/pricing');
-    
+
     // Plan headings - use exact match to avoid FAQ conflicts
     await expect(page.getByRole('heading', { name: 'Starter', exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Pro Study', exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Elite Mastery', exact: true })).toBeVisible();
-    
-    // Prices
+
+    // Billing cycle toggle (defaults to Annual = 1 month free)
+    await expect(page.getByRole('tab', { name: /Annual/ })).toBeVisible();
+    await expect(page.getByText('1 month free').first()).toBeVisible();
+
+    // Switch to Monthly → base list prices show
+    await page.getByRole('tab', { name: 'Monthly' }).click();
     await expect(page.getByText('$14.99').first()).toBeVisible();
     await expect(page.getByText('$29.99').first()).toBeVisible();
-    
+
     // FAQ
     await expect(page.getByText('Frequently asked questions')).toBeVisible();
   });
