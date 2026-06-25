@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CookieSettingsLink from "@/components/CookieSettingsLink";
 
 export default function Footer() {
   return (
@@ -75,11 +76,13 @@ export default function Footer() {
             </p>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               {[
+                { href: "/about", label: "About Us" },
                 { href: "/academy", label: "PracticeForge Academy" },
                 { href: "/pricing", label: "Pricing & Plans" },
                 { href: "/affiliate", label: "Partner Program" },
                 { href: "/privacy", label: "Privacy Policy" },
                 { href: "/terms", label: "Terms of Service" },
+                { href: "/cookies", label: "Cookie Policy" },
                 { href: "/contact", label: "Contact" },
               ].map((l) => (
                 <li key={l.href}>
@@ -88,6 +91,7 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+              <li><CookieSettingsLink /></li>
             </ul>
           </div>
         </div>

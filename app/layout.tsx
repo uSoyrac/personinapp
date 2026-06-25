@@ -4,6 +4,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import SignupModal from "@/components/SignupModal";
 import ToastContainer from "@/components/Toast";
+import CookieConsent from "@/components/CookieConsent";
 import { AppProvider } from "@/lib/AppContext";
 import { SITE_URL } from "@/lib/siteUrl";
 
@@ -83,6 +84,7 @@ export default function RootLayout({
           <Footer />
           <SignupModal />
           <ToastContainer />
+          <CookieConsent />
         </AppProvider>
       </body>
     </html>
