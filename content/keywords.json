@@ -1,10 +1,13 @@
 [
-  { "keyword": "ielts writing band 8 task 2", "status": "published", "slug": "how-to-score-band-8-ielts-writing" },
-  { "keyword": "toefl speaking templates", "status": "published", "slug": "toefl-speaking-templates" },
-  { "keyword": "ielts reading time management", "status": "published", "slug": "ielts-reading-time-management" },
+  { "keyword": "ielts writing band 8 task 2", "status": "published", "slug": "how-to-score-band-8-ielts-writing", "volume": 3600, "kd": 37, "market": "in" },
+  { "keyword": "toefl speaking templates", "status": "published", "slug": "toefl-speaking-templates", "volume": 40, "kd": 13, "market": "us" },
+  { "keyword": "ielts reading time management", "status": "published", "slug": "ielts-reading-time-management", "volume": 10, "kd": 0, "market": "us" },
 
-  { "keyword": "how to improve ielts listening score", "status": "pending" },
-  { "keyword": "academic vocabulary for ielts", "status": "pending" },
-  { "keyword": "toefl independent writing structure", "status": "pending" },
-  { "keyword": "common ielts speaking mistakes", "status": "pending" }
+  { "keyword": "ielts vs toefl which is easier", "status": "pending", "volume": 1780, "kd": 20, "market": "in", "note": "comparison; combines 'which is easier toefl or ielts' + 'which is better ielts or toefl' — best low-KD first target" },
+  { "keyword": "ielts reading multiple choice strategy", "status": "pending", "volume": 1900, "kd": 23, "market": "in" },
+  { "keyword": "ielts writing task 2 questions and topics", "status": "pending", "volume": 2400, "kd": 30, "market": "in" },
+  { "keyword": "ielts essay topics with model answers", "status": "pending", "volume": 1000, "kd": 32, "market": "in" },
+  { "keyword": "ielts vocabulary guide", "status": "pending", "volume": 880, "kd": 29, "market": "in" },
+  { "keyword": "does handwriting affect ielts score", "status": "pending", "volume": 880, "kd": 23, "market": "in" },
+  { "keyword": "ielts listening tips to boost score", "status": "pending", "volume": 90, "kd": 19, "market": "us" }
 ]
