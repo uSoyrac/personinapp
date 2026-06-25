@@ -78,6 +78,29 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  name: "PracticeForge",
+                  url: SITE_URL,
+                  logo: `${SITE_URL}/opengraph-image`,
+                  description:
+                    "AI-powered IELTS and TOEFL practice that turns any text into personalised exam-style reading, vocabulary and speaking tests.",
+                },
+                {
+                  "@type": "WebSite",
+                  name: "PracticeForge",
+                  url: SITE_URL,
+                },
+              ],
+            }),
+          }}
+        />
         <AppProvider>
           <Nav />
           <main style={{ flex: 1 }}>{children}</main>
