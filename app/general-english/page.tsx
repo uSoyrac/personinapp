@@ -154,7 +154,7 @@ export default function GeneralEnglishPage() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: "2rem", alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 360px), 1fr))", gap: "2rem", alignItems: "start" }}>
           
           {/* Controls / Input Panel */}
           <div className="card" style={{ padding: "2rem" }}>
@@ -251,7 +251,7 @@ export default function GeneralEnglishPage() {
                       <div>
                         <h4 style={{ margin: "0 0 0.75rem", display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--foreground)" }}><span style={{ color: "var(--gold)" }}>🎯</span> Key Vocabulary</h4>
                         <p style={{ fontSize: "0.875rem", color: "var(--foreground-faint)", margin: "0 0 1rem" }}>Click the + button to save words directly to your dictionary.</p>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.75rem" }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 200px), 1fr))", gap: "0.75rem" }}>
                           {MOCK_WORDS.map(w => {
                             const isSaved = savedWords.has(w.word);
                             return (

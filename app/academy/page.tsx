@@ -25,7 +25,7 @@ export default function AcademyPage() {
         {articles.length === 0 ? (
           <p style={{ color: "var(--foreground-muted)" }}>New articles are on the way — check back soon.</p>
         ) : (
-          <div style={{ display: "grid", gap: "2rem", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
+          <div style={{ display: "grid", gap: "2rem", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))" }}>
             {articles.map((a) => (
               <Link
                 key={a.slug}

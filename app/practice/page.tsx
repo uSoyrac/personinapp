@@ -252,7 +252,7 @@ export default function PracticePage() {
             {/* Exam Type */}
             <div>
               <p className="label">1. Select Exam Type</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "0.75rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: "0.75rem" }}>
                 {EXAM_OPTIONS.map((opt) => (
                   <button
                     key={opt.id}
@@ -363,7 +363,7 @@ Example: 'Urbanisation has profoundly transformed ecosystems across the globe. A
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: "1rem" }}>
                 <div>
                   <p className="label">Target Score</p>
                   <input

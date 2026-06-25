@@ -130,7 +130,7 @@ export default function LandingPage() {
       <section id="how-it-works" className="section" style={{ background: "var(--bg)", borderTop: "var(--border-width) solid var(--border)" }}>
         <div className="container">
           
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: "1.5rem" }}>
             {/* Card 1: Yellow */}
             <div className="card" style={{ background: "var(--gold)", border: "var(--border-width) solid var(--border)", padding: "2.5rem", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-md)" }}>
               <div style={{ fontSize: "3rem", marginBottom: "1.5rem" }}>💡</div>
@@ -166,7 +166,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: "2rem" }}>
             {[
               { name: "Sarah L.", role: "IELTS Candidate", score: "IELTS Band 6.0 → 7.5", text: "I was stuck at 6.0 in Writing for months. The line-by-line grammar breakdown and vocabulary suggestions here finally pushed me to a 7.5. Absolutely game-changing.", bg: "var(--lavender)" },
               { name: "Ahmed K.", role: "TOEFL Test Taker", score: "TOEFL iBT 85 → 102", text: "The speaking agent is terrifyingly accurate. It caught my pronunciation errors that my human tutor missed. Got my target score in 3 weeks!", bg: "var(--surface)" },
@@ -203,7 +203,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem", alignItems: "start" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: "2rem", alignItems: "start" }}>
             
             {/* Starter Plan */}
             <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%" }}>

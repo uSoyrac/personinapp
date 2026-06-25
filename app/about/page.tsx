@@ -38,7 +38,7 @@ export default function AboutPage() {
         </p>
 
         <h2 style={{ fontSize: "1.5rem", marginBottom: "1.5rem" }}>What we stand for</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.5rem", marginBottom: "3rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: "1.5rem", marginBottom: "3rem" }}>
           {VALUES.map((v) => (
             <div key={v.title} className="card" style={{ padding: "1.5rem" }}>
               <div style={{ fontSize: "1.75rem", marginBottom: "0.75rem" }}>{v.icon}</div>

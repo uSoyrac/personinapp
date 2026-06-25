@@ -267,7 +267,7 @@ export default function VocabularyPage() {
           </div>
 
           {/* Stats Section */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1.25rem", marginBottom: "2.5rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 180px), 1fr))", gap: "1.25rem", marginBottom: "2.5rem" }}>
             {[
               { l: "Total Vocabulary", v: stats.total, c: "var(--primary)", icon: "📚" },
               { l: "Mastered Words", v: stats.learned, c: "var(--mint)", icon: "🏆" },
@@ -305,7 +305,7 @@ export default function VocabularyPage() {
             <div className="animate-fadeIn">
               
               {/* Quick Add & Set Management Row */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem", marginBottom: "2.5rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: "1.5rem", marginBottom: "2.5rem" }}>
                 
                 {/* Add Word Card */}
                 <div className="card" style={{ padding: "1.75rem" }}>

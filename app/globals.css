@@ -480,15 +480,25 @@ a:hover { color: var(--primary); }
 @media (max-width: 768px) {
   .section { padding: 4rem 1.25rem; }
   .section-sm { padding: 3rem 1.25rem; }
-  .hide-mobile { display: none !important; }
   .stack-mobile { flex-direction: column !important; }
   h1 { font-size: 2.5rem; }
 }
 
 img { max-width: 100%; height: auto; }
 
-@media (min-width: 769px) {
+/* Nav switches to the hamburger menu below 1120px. The desktop bar (6 links +
+   XP bar + auth/profile) only fits once the 1100px container hits full width,
+   so anything narrower (tablets / small laptops) uses the clean hamburger. */
+@media (max-width: 1119px) {
+  .hide-mobile { display: none !important; }
+}
+@media (min-width: 1120px) {
   .hide-desktop { display: none !important; }
+}
+/* The XP bar in the nav only appears on wide desktops; on 1120–1280 it would
+   push the profile button off-screen, so it's hidden there. */
+@media (max-width: 1279px) {
+  .xp-desktop-only { display: none !important; }
 }
 
 /* ==============================

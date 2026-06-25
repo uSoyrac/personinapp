@@ -188,7 +188,7 @@ export default function WritingCard({ result }: WritingCardProps) {
         </div>
 
         {/* 4 Dimensions */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "0.75rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: "0.75rem" }}>
           {analysis.dimensions.map((d) => (
             <div key={d.label} className="dimension-card">
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>

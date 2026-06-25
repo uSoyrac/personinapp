@@ -84,7 +84,7 @@ export default function Nav() {
                 key={link.href}
                 href={link.href}
                 style={{
-                  padding: "0.5rem 1rem", borderRadius: "6px",
+                  padding: "0.5rem 0.7rem", borderRadius: "6px",
                   fontSize: "0.875rem", fontWeight: isActive ? 900 : 700,
                   color: isActive ? "#000" : "var(--foreground-faint)",
                   background: isActive ? "#D2FF3A" : "transparent",
@@ -100,7 +100,7 @@ export default function Nav() {
 
           <div style={{ width: "1px", height: "1.5rem", background: "var(--border)", margin: "0 0.5rem" }} />
 
-          <div style={{ marginRight: "1rem" }}>
+          <div className="xp-desktop-only" style={{ marginRight: "1rem" }}>
             {tier !== "guest" && <XPBar />}
           </div>
 

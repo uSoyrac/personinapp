@@ -31,7 +31,7 @@ export default function AffiliatePage() {
         </div>
 
         {/* Info Cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "2rem", marginBottom: "4rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: "2rem", marginBottom: "4rem" }}>
           <div className="card" style={{ padding: "3rem 2rem", textAlign: "center", background: "#FFF" }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}><Banknote size={56} color="#000" strokeWidth={2.5} style={{ background: "#A855F7", padding: "10px", borderRadius: "50%", boxShadow: "4px 4px 0px #000", border: "3px solid #000" }} /></div>
             <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#000", fontWeight: 900 }}>30% Recurring</h3>

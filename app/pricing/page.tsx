@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { showToast } from "@/components/Toast";
 
 // Metadata removed as this is now a client component
 
@@ -55,14 +56,13 @@ export default function PricingPage() {
   const [cycle, setCycle] = useState<Cycle>("annual");
 
   const handleUpgrade = async (tier: "guest" | "free" | "pro" | "elite") => {
-    // Free tier needs no payment.
+    // Free tier: create an account (no payment).
     if (tier === "free" || tier === "guest") {
-      localStorage.setItem("practiceforge_tier", tier);
-      window.location.href = "/practice";
+      window.location.href = "/signup";
       return;
     }
 
-    // Paid tiers: try real Stripe Checkout, fall back to the demo flow.
+    // Paid tiers: real Stripe Checkout only — never grant a plan without payment.
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
@@ -73,20 +73,26 @@ export default function PricingPage() {
       if (res.ok) {
         const { url } = await res.json();
         if (url) {
-          window.location.href = url;
+          window.location.href = url; // → Stripe checkout
           return;
         }
-      } else if (res.status === 401) {
-        // Not signed in → open the auth modal instead of charging.
-        window.dispatchEvent(new Event("open-signup"));
+        showToast("Could not start checkout. Please try again.", "error");
         return;
       }
-      // 503 (payments not configured) or any other case → demo fallback.
-      localStorage.setItem("practiceforge_tier", tier);
-      window.location.href = "/practice";
+      if (res.status === 401) {
+        // Not signed in → send to login, then back to pricing to subscribe.
+        window.location.href = "/login?next=/pricing";
+        return;
+      }
+      if (res.status === 503) {
+        // Stripe key not added yet — do NOT fake-grant the plan.
+        showToast("Payments are being set up — checkout will be available very soon.", "info");
+        return;
+      }
+      const data = await res.json().catch(() => ({}));
+      showToast(data.error || "Something went wrong. Please try again.", "error");
     } catch {
-      localStorage.setItem("practiceforge_tier", tier);
-      window.location.href = "/practice";
+      showToast("Network error. Please try again.", "error");
     }
   };
 
@@ -155,7 +161,7 @@ export default function PricingPage() {
       {/* 3-TIER PRICING CARDS */}
       <section style={{ padding: "0 1.5rem 6rem" }}>
         <div className="container">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2rem", alignItems: "start" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: "2rem", alignItems: "start" }}>
             
             {/* Starter Plan */}
             <div className="card" style={{ padding: "2.5rem 2rem", display: "flex", flexDirection: "column", height: "100%" }}>
