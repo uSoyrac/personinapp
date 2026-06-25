@@ -1,0 +1,45 @@
+name: Deploy to server
+
+# Auto-deploys main to your server over SSH. Credentials live in GitHub repo
+# Secrets (Settings → Secrets and variables → Actions) — this workflow never
+# contains them. Add an SSH *deploy key* (not your root password):
+#   SSH_HOST  = 45.143.11.97
+#   SSH_USER  = a deploy user (e.g. "deploy"; root works but is discouraged)
+#   SSH_KEY   = the PRIVATE key whose public key is in the server's authorized_keys
+#   SSH_PORT  = 22 (optional)
+# Generate one locally:  ssh-keygen -t ed25519 -f pf_deploy -N ""
+#   → put pf_deploy.pub in the server's ~/.ssh/authorized_keys
+#   → paste pf_deploy (private) into the SSH_KEY secret
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            APP_DIR=/opt/practiceforge
+            if [ ! -d "$APP_DIR/.git" ]; then
+              sudo mkdir -p "$APP_DIR" && sudo chown "$USER" "$APP_DIR"
+              git clone https://github.com/uSoyrac/personinapp.git "$APP_DIR"
+            fi
+            cd "$APP_DIR"
+            git fetch --all --prune
+            git reset --hard origin/main
+            # Build + (re)start ONLY this app's isolated container.
+            docker compose up -d --build
+            docker image prune -f
+            # Health check — fail the deploy if the app isn't serving.
+            sleep 5
+            curl -fsS -o /dev/null http://127.0.0.1:3100/ && echo "PracticeForge is up."

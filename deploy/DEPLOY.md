@@ -9,6 +9,27 @@ reverse-proxies your domain to it.
 
 ---
 
+## Option A — Auto-deploy via GitHub Actions (recommended, hands-off)
+
+`.github/workflows/deploy.yml` deploys `main` to your server automatically on
+every push. You never share your password with anyone — add an **SSH deploy key**
+to GitHub repo Secrets instead:
+
+1. Generate a key locally: `ssh-keygen -t ed25519 -f pf_deploy -N ""`
+2. On the server: append `pf_deploy.pub` to `~/.ssh/authorized_keys`
+   (ideally for a `deploy` user, not root).
+3. GitHub → repo → Settings → Secrets and variables → Actions → add:
+   `SSH_HOST=45.143.11.97`, `SSH_USER=deploy`, `SSH_PORT=22`,
+   `SSH_KEY=`(contents of the private `pf_deploy` file).
+4. Push to `main` (or run the workflow manually) → it pulls, builds the container,
+   health-checks, and goes live. Re-run after adding secrets if the first run failed.
+
+Requires Docker + the nginx step (Section 5) once. After that it's fully automatic.
+
+---
+
+## Option B — Manual deploy (run it yourself)
+
 ## 0. Pre-flight checks (don't skip — protects your other services)
 
 ```bash
