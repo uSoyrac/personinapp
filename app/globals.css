@@ -192,7 +192,10 @@ a:hover { color: var(--primary); }
 .btn-secondary:hover {
   transform: translate(-1px, -1px);
   box-shadow: 4px 4px 0px #000;
-  background: var(--gold);
+  /* No colour swap on hover: several secondary buttons set a coloured text
+     colour inline (rose/purple) with no inline background, so a gold hover
+     background dropped their contrast to near-invisible. Keep the resting
+     background and use only the brutalist press effect, like .btn-primary. */
 }
 .btn-secondary:active {
   transform: translate(2px, 2px);
