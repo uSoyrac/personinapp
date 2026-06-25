@@ -1,0 +1,14 @@
+# Isolated container for PracticeForge. Binds ONLY to localhost:3100 so it does
+# not clash with other services on the box; nginx reverse-proxies your domain to it.
+services:
+  web:
+    build: .
+    image: practiceforge:latest
+    container_name: practiceforge
+    restart: unless-stopped
+    # Fill in real values for live auth/payments/email; the app runs as the
+    # public demo if these are empty.
+    env_file:
+      - .env.production
+    ports:
+      - "127.0.0.1:3100:3000"
